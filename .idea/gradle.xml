@@ -7,7 +7,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/modules/test-module" />
+            <option value="$PROJECT_DIR$/modules/local-file-configuration" />
+            <option value="$PROJECT_DIR$/modules/utilities" />
             <option value="$PROJECT_DIR$/plugin" />
           </set>
         </option>

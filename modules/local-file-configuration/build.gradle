@@ -16,17 +16,12 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    api(project(':utilities'))
-    api(project(':local-file-configuration'))
-}
-
 gradlePlugin {
     // Define the plugin
     plugins {
-        tableau {
-            id = 'com.ldtteam.tableau'
-            implementationClass = 'com.ldtteam.tableau.TableauPlugin'
+        "local-file-configuration" {
+            id = 'com.ldtteam.tableau.local-file-configuration'
+            implementationClass = 'com.ldtteam.tableau.local.file.configuration.LocalFileConfigurationPlugin'
         }
     }
 }

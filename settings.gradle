@@ -9,3 +9,7 @@
 rootProject.name = 'Tableau'
 include('plugin')
 
+include('utilities')
+project(':utilities').projectDir = file('modules/utilities')
+include('local-file-configuration')
+project(':local-file-configuration').projectDir = file('modules/local-file-configuration')
