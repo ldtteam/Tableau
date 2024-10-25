@@ -6,6 +6,17 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        maven {
+            url("https://ldtteam.jfrog.io/artifactory/tableau/")
+            name("Tableau")
+        }
+        mavenLocal()
+    }
+}
+
 rootProject.name = 'Tableau'
 include('plugin')
 
@@ -13,3 +24,25 @@ include('utilities')
 project(':utilities').projectDir = file('modules/utilities')
 include('local-file-configuration')
 project(':local-file-configuration').projectDir = file('modules/local-file-configuration')
+include('crowdin')
+project(':crowdin').projectDir = file('modules/crowdin')
+include('crowdin-translation-management')
+project(':crowdin-translation-management').projectDir = file('modules/crowdin-translation-management')
+include('sonarqube')
+project(':sonarqube').projectDir = file('modules/sonarqube')
+include('common')
+project(':common').projectDir = file('modules/common')
+include('shadowing')
+project(':shadowing').projectDir = file('modules/shadowing')
+include('jarjar')
+project(':jarjar').projectDir = file('modules/jarjar')
+include('curseforge')
+project(':curseforge').projectDir = file('modules/curseforge')
+include('neogradle')
+project(':neogradle').projectDir = file('modules/neogradle')
+include('parchment')
+project(':parchment').projectDir = file('modules/parchment')
+include('git')
+project(':git').projectDir = file('modules/git')
+include('sourceset-management')
+project(':sourceset-management').projectDir = file('modules/sourceset-management')

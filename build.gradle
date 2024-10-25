@@ -11,14 +11,20 @@ plugins {
     id 'java-gradle-plugin'
 }
 
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
-}
-
 dependencies {
+    api(project(':sourceset-management'))
+    api(project(':git'))
+    api(project(':parchment'))
+    api(project(':neogradle'))
+    api(project(':curseforge'))
+    api(project(':jarjar'))
+    api(project(':shadowing'))
+    api(project(':common'))
+    api(project(':sonarqube'))
     api(project(':utilities'))
     api(project(':local-file-configuration'))
+    api(project(':crowdin'))
+    api(project(':crowdin-translation-management'))
 }
 
 gradlePlugin {

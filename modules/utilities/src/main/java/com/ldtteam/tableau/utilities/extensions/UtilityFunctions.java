@@ -1,9 +1,10 @@
 package com.ldtteam.tableau.utilities.extensions;
 
 import org.gradle.api.Project;
+import org.gradle.api.initialization.Settings;
 import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.provider.ProviderFactory;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -13,7 +14,7 @@ import java.util.*;
  */
 public abstract class UtilityFunctions implements ExtensionAware {
 
-    private final Project project;
+    private final ProviderFactory providerFactory;
 
     /**
      * The name of the extension.
@@ -21,18 +22,24 @@ public abstract class UtilityFunctions implements ExtensionAware {
     public static final String EXTENSION_NAME = "opc";
 
     /**
-     * Gets the utility functions extension for a given project.
+     * Gets the utility functions extension for a given extensible object.
      *
-     * @param project The project.
+     * @param extensionAware The extension aware object.
      * @return The utility functions extension.
      */
-    public static UtilityFunctions get(Project project) {
-        return (UtilityFunctions) ((ExtensionAware) project).getExtensions().getByName(EXTENSION_NAME);
+    public static UtilityFunctions get(ExtensionAware extensionAware) {
+        return (UtilityFunctions) extensionAware.getExtensions().getByName(EXTENSION_NAME);
     }
 
     @Inject
-    public UtilityFunctions(Project project) {
-        this.project = project;
+    public UtilityFunctions(Object object) {
+        switch (object) {
+            case ProviderFactory factory -> this.providerFactory = factory;
+            case Project project -> this.providerFactory = project.getProviders();
+            case Settings settings -> this.providerFactory = settings.getProviders();
+            case null, default ->
+                    throw new IllegalArgumentException("The object must be a ProviderFactory, a Project or a Settings.");
+        }
     }
 
     /**
@@ -112,8 +119,18 @@ public abstract class UtilityFunctions implements ExtensionAware {
      * @return The property value.
      */
     public Provider<String> getProperty(final String propertyName) {
-        return project.getProviders().gradleProperty(propertyName)
-                .orElse(project.getProviders().environmentVariable(getEnvironmentPropertyName(propertyName)));
+        return providerFactory.gradleProperty(propertyName)
+                .orElse(providerFactory.environmentVariable(getEnvironmentPropertyName(propertyName)));
+    }
+
+    /**
+     * Gets a boolean property from the project properties or environment variables.
+     *
+     * @param propertyName The name of the property.
+     * @return The property value.
+     */
+    public Provider<Boolean> getBooleanProperty(final String propertyName) {
+        return getProperty(propertyName).map(Boolean::parseBoolean);
     }
 
     /**
@@ -122,9 +139,10 @@ public abstract class UtilityFunctions implements ExtensionAware {
      * @param propertyName The prefix of the properties.
      * @return The properties and their values.
      */
+    @SuppressWarnings("UnstableApiUsage")
     public Provider<Map<String, String>> getPropertiesPrefixedBy(final String propertyName) {
-        return project.getProviders().gradlePropertiesPrefixedBy(propertyName)
-                .zip(project.getProviders().environmentVariablesPrefixedBy(getEnvironmentPropertyName(propertyName)), (gradle, env) -> {
+        return providerFactory.gradlePropertiesPrefixedBy(propertyName)
+                .zip(providerFactory.environmentVariablesPrefixedBy(getEnvironmentPropertyName(propertyName)), (gradle, env) -> {
                     final Map<String, String> result = new HashMap<>(gradle);
                     result.putAll(env);
 
@@ -213,4 +231,16 @@ public abstract class UtilityFunctions implements ExtensionAware {
         final String nextMajorVersion = determineNextMajorVersion(version);
         return "[%s, %s)".formatted(version, nextMajorVersion);
     }
+
+    /**
+     * Gets a provider which indicates whether a feature with the given name is active.
+     *
+     * @param name The name of the feature.
+     * @return The provider which indicates whether the feature is active.
+     */
+    public Provider<Boolean> getUsesProperty(final String name) {
+        final String capitalized = name.substring(0, 1).toUpperCase() + name.substring(1);
+        return getBooleanProperty("uses%s".formatted(capitalized));
+    }
+
 }

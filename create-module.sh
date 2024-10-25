@@ -89,4 +89,10 @@ find "$NEW_MODULE_DIR" -type f -exec sed -i "s/module-template/$NEW_MODULE_NAME/
 echo "include('$NEW_MODULE_NAME')" >> settings.gradle
 echo "project(':$NEW_MODULE_NAME').projectDir = file('$NEW_MODULE_DIR')" >> settings.gradle
 
+# Inject the new project as an api dependency in the root project's build.gradle
+sed -i "/dependencies {/a \    api(project(':$NEW_MODULE_NAME'))" build.gradle
+
+# Add the new module directory to Git
+git add "$NEW_MODULE_DIR"
+
 echo "New module '$NEW_MODULE_NAME' created successfully."

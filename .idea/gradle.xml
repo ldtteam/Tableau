@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -7,7 +8,18 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/modules/common" />
+            <option value="$PROJECT_DIR$/modules/crowdin" />
+            <option value="$PROJECT_DIR$/modules/crowdin-translation-management" />
+            <option value="$PROJECT_DIR$/modules/curseforge" />
+            <option value="$PROJECT_DIR$/modules/git" />
+            <option value="$PROJECT_DIR$/modules/jarjar" />
             <option value="$PROJECT_DIR$/modules/local-file-configuration" />
+            <option value="$PROJECT_DIR$/modules/neogradle" />
+            <option value="$PROJECT_DIR$/modules/parchment" />
+            <option value="$PROJECT_DIR$/modules/shadowing" />
+            <option value="$PROJECT_DIR$/modules/sonarqube" />
+            <option value="$PROJECT_DIR$/modules/sourceset-management" />
             <option value="$PROJECT_DIR$/modules/utilities" />
             <option value="$PROJECT_DIR$/plugin" />
           </set>

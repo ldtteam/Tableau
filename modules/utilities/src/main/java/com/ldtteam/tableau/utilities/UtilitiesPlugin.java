@@ -5,6 +5,7 @@ package com.ldtteam.tableau.utilities;
 
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.initialization.Settings;
 import org.jetbrains.annotations.NotNull;
 
 public class UtilitiesPlugin implements Plugin<Object> {
@@ -13,6 +14,10 @@ public class UtilitiesPlugin implements Plugin<Object> {
     public void apply(@NotNull Object target) {
         if (target instanceof Project project) {
             project.getPlugins().apply(UtilitiesProjectPlugin.class);
+        } else if (target instanceof Settings settings) {
+            settings.getPlugins().apply(UtilitiesSettingsPlugin.class);
+        } else {
+            throw new IllegalArgumentException("The object must be a Project or a Settings.");
         }
     }
 }
