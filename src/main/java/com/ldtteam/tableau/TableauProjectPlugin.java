@@ -7,7 +7,7 @@ import com.ldtteam.tableau.curseforge.CurseForgePlugin;
 import com.ldtteam.tableau.extensions.ModuleFeatures;
 import com.ldtteam.tableau.features.FeaturePluginManager;
 import com.ldtteam.tableau.git.GitPlugin;
-import com.ldtteam.tableau.jarjar.JarjarPlugin;
+import com.ldtteam.tableau.jarjar.JarJarPlugin;
 import com.ldtteam.tableau.local.file.configuration.LocalFileConfigurationPlugin;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.parchment.ParchmentPlugin;
@@ -26,15 +26,15 @@ public class TableauProjectPlugin implements Plugin<Project> {
         target.getPlugins().apply(UtilitiesPlugin.class);
         target.getPlugins().apply(LocalFileConfigurationPlugin.class);
 
-        FeaturePluginManager.applyFeaturePlugin(target, CrowdinPlugin.class, ModuleFeatures::usesCrowdin);
-        FeaturePluginManager.applyFeaturePlugin(target, CrowdinTranslationManagementPlugin.class, ModuleFeatures::usesCrowdInTranslationManagement);
-        FeaturePluginManager.applyFeaturePlugin(target, SonarQubePlugin.class, ModuleFeatures::usesSonarQube);
+        FeaturePluginManager.applyFeaturePlugin(target, CrowdinPlugin.class, ModuleFeatures::getUsesCrowdin);
+        FeaturePluginManager.applyFeaturePlugin(target, CrowdinTranslationManagementPlugin.class, ModuleFeatures::getUsesCrowdInTranslationManagement);
+        FeaturePluginManager.applyFeaturePlugin(target, SonarQubePlugin.class, ModuleFeatures::getUsesSonarQube);
 
         target.getPlugins().apply(CommonPlugin.class);
 
-        FeaturePluginManager.applyFeaturePlugin(target, ShadowingPlugin.class, ModuleFeatures::usesShadowing);
-        FeaturePluginManager.applyFeaturePlugin(target, JarjarPlugin.class, ModuleFeatures::usesJarJar);
-        FeaturePluginManager.applyFeaturePlugin(target, CurseForgePlugin.class, ModuleFeatures::usesCurse);
+        FeaturePluginManager.applyFeaturePlugin(target, ShadowingPlugin.class, ModuleFeatures::getUsesShadowing);
+        FeaturePluginManager.applyFeaturePlugin(target, JarJarPlugin.class, ModuleFeatures::getUsesJarJar);
+        FeaturePluginManager.applyFeaturePlugin(target, CurseForgePlugin.class, ModuleFeatures::getUsesCurse);
 
         target.getPlugins().apply(NeoGradlePlugin.class);
 

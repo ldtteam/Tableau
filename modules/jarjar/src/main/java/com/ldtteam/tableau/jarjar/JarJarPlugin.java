@@ -7,10 +7,12 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class JarjarProjectPlugin implements Plugin<Project> {
+public class JarJarPlugin implements Plugin<Object> {
 
     @Override
-    public void apply(@NotNull Project target) {
-        //TODO: Implement this method
+    public void apply(@NotNull Object target) {
+        if (target instanceof Project project) {
+            project.getPlugins().apply(JarJarProjectPlugin.class);
+        }
     }
 }

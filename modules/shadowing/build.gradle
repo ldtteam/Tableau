@@ -11,6 +11,10 @@ plugins {
     id 'java-gradle-plugin'
 }
 
+dependencies {
+    api libs.bundles.shadow
+}
+
 gradlePlugin {
     // Define the plugin
     plugins {

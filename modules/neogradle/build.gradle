@@ -11,6 +11,10 @@ plugins {
     id 'java-gradle-plugin'
 }
 
+dependencies {
+    api libs.bundles.neogradle
+}
+
 gradlePlugin {
     // Define the plugin
     plugins {

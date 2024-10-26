@@ -195,7 +195,7 @@ public abstract class UtilityFunctions implements ExtensionAware {
                             values.removeIf(String::isBlank);
                             return values;
                         })
-                );
+                ).orElse(List.of());
     }
 
     /**
@@ -243,4 +243,13 @@ public abstract class UtilityFunctions implements ExtensionAware {
         return getBooleanProperty("uses%s".formatted(capitalized));
     }
 
+    /**
+     * Determines whether a property with the given name is present.
+     *
+     * @param property The name of the property.
+     * @return Whether the property is present.
+     */
+    public boolean hasProperty(String property) {
+        return providerFactory.gradleProperty(property).isPresent();
+    }
 }

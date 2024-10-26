@@ -3,14 +3,31 @@
  */
 package com.ldtteam.tableau.shadowing;
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class ShadowingProjectPlugin implements Plugin<Project> {
 
+    /**
+     * Name of the configuration used by the shadow plugin that contains the dependencies to be shadowed.
+     */
+    public static final String CONTAINED_CONFIGURATION_NAME = "contained";
+
     @Override
     public void apply(@NotNull Project target) {
-        //TODO: Implement this method
+        target.getPlugins().apply(ShadowPlugin.class);
+
+        configureContainedConfiguration(target);
+    }
+
+    /**
+     * Creates and configures the contained configuration.
+     *
+     * @param project the project to configure
+     */
+    private void configureContainedConfiguration(Project project) {
+        project.getConfigurations().maybeCreate(CONTAINED_CONFIGURATION_NAME).setTransitive(false);
     }
 }
