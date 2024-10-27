@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.git.extensions;
 
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.provider.*;
@@ -24,7 +25,7 @@ public abstract class GitExtension {
      * @return The git extension.
      */
     public static GitExtension get(final Project project) {
-        return project.getGradle().getExtensions().getByType(GitExtension.class);
+        return TableauScriptingExtension.get(project, GitExtension.class);
     }
 
     /**

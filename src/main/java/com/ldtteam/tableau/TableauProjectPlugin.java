@@ -11,6 +11,7 @@ import com.ldtteam.tableau.jarjar.JarJarPlugin;
 import com.ldtteam.tableau.local.file.configuration.LocalFileConfigurationPlugin;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.parchment.ParchmentPlugin;
+import com.ldtteam.tableau.scripting.ScriptingPlugin;
 import com.ldtteam.tableau.shadowing.ShadowingPlugin;
 import com.ldtteam.tableau.sourceset.management.SourcesetManagementPlugin;
 import com.ldtteam.tableau.utilities.UtilitiesPlugin;
@@ -23,6 +24,7 @@ public class TableauProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
+        target.getPlugins().apply(ScriptingPlugin.class);
         target.getPlugins().apply(UtilitiesPlugin.class);
         target.getPlugins().apply(LocalFileConfigurationPlugin.class);
 
@@ -36,11 +38,12 @@ public class TableauProjectPlugin implements Plugin<Project> {
         FeaturePluginManager.applyFeaturePlugin(target, JarJarPlugin.class, ModuleFeatures::getUsesJarJar);
         FeaturePluginManager.applyFeaturePlugin(target, CurseForgePlugin.class, ModuleFeatures::getUsesCurse);
 
+        target.getPlugins().apply(SourcesetManagementPlugin.class);
         target.getPlugins().apply(NeoGradlePlugin.class);
 
         FeaturePluginManager.applyFeaturePlugin(target, ParchmentPlugin.class, ModuleFeatures::usesParchment);
         FeaturePluginManager.applyFeaturePlugin(target, GitPlugin.class, ModuleFeatures::usesGit);
 
-        target.getPlugins().apply(SourcesetManagementPlugin.class);
+
     }
 }

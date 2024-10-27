@@ -11,16 +11,12 @@ plugins {
     id 'java-gradle-plugin'
 }
 
-dependencies {
-    api project(':scripting')
-}
-
 gradlePlugin {
     // Define the plugin
     plugins {
-        "module-template" {
-            id = 'com.ldtteam.tableau.module-template-lowercase'
-            implementationClass = 'com.ldtteam.tableau.module-template-packagetree.ModuleTemplatePlugin'
+        "scripting" {
+            id = 'com.ldtteam.tableau.scripting'
+            implementationClass = 'com.ldtteam.tableau.scripting.ScriptingPlugin'
         }
     }
 }

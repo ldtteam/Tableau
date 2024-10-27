@@ -12,6 +12,9 @@ plugins {
 }
 
 dependencies {
+    api project(':scripting')
+    api project(':sourceset-management')
+
     api libs.bundles.neogradle
 }
 

@@ -12,6 +12,8 @@ plugins {
 }
 
 dependencies {
+    api project(':scripting')
+
     api libs.bundles.sonarqube
 }
 

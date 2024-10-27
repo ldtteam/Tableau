@@ -4,6 +4,7 @@
 package com.ldtteam.tableau.git;
 
 import com.ldtteam.tableau.git.extensions.GitExtension;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,6 @@ public class GitProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        target.getExtensions().create(GitExtension.EXTENSION_NAME, GitExtension.class, target);
+        TableauScriptingExtension.register(target, GitExtension.EXTENSION_NAME, GitExtension.class, target);
     }
 }

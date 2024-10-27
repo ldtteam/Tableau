@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.utilities.extensions;
 
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.plugins.ExtensionAware;
@@ -19,7 +20,7 @@ public abstract class UtilityFunctions implements ExtensionAware {
     /**
      * The name of the extension.
      */
-    public static final String EXTENSION_NAME = "opc";
+    public static final String EXTENSION_NAME = "utilities";
 
     /**
      * Gets the utility functions extension for a given extensible object.
@@ -28,6 +29,9 @@ public abstract class UtilityFunctions implements ExtensionAware {
      * @return The utility functions extension.
      */
     public static UtilityFunctions get(ExtensionAware extensionAware) {
+        if (extensionAware instanceof Project project) {
+            return TableauScriptingExtension.get(project, UtilityFunctions.class);
+        }
         return (UtilityFunctions) extensionAware.getExtensions().getByName(EXTENSION_NAME);
     }
 

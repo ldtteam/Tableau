@@ -12,6 +12,8 @@ plugins {
 }
 
 dependencies {
+    api(project(':scripting'))
+    api(project(':java'))
     api(project(':sourceset-management'))
     api(project(':git'))
     api(project(':parchment'))

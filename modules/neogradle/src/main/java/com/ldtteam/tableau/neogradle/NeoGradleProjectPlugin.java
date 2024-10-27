@@ -3,11 +3,27 @@
  */
 package com.ldtteam.tableau.neogradle;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
+import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
+import net.neoforged.gradle.dsl.common.runs.run.RunManager;
 import net.neoforged.gradle.userdev.UserDevPlugin;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Rule;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Stream;
 
 public class NeoGradleProjectPlugin implements Plugin<Project> {
 
@@ -15,6 +31,213 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
     public void apply(@NotNull Project target) {
         target.getPlugins().apply(UserDevPlugin.class);
 
-        target.getExtensions().create(NeoGradleExtension.EXTENSION_NAME, NeoGradleExtension.class, target);
+        TableauScriptingExtension.register(target, NeoGradleExtension.EXTENSION_NAME, NeoGradleExtension.class, target);
+
+        configureLibraryConfigurations(target);
+        configureSourceSets(target);
+        configureRuns(target);
+    }
+
+    /**
+     * Configures the source sets for the given project.
+     */
+    private void configureSourceSets(@NotNull Project target) {
+        final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
+        sourceSetExtension.getSourceSets().configureEach(sourceSet -> {
+            final NeoGradleSourceSetConfigurationExtension extension = target.getObjects()
+                    .newInstance(NeoGradleSourceSetConfigurationExtension.class, target, sourceSet);
+
+            sourceSet.getExtensions().add(NeoGradleSourceSetConfigurationExtension.EXTENSION_NAME, extension);
+        });
+    }
+
+    private void configureLibraryConfigurations(@NotNull final Project target) {
+        target.getConfigurations().addRule(new Rule() {
+            @Override
+            public @NotNull String getDescription() {
+                return "Creates a library configuration when a source set is marked to be included in the libraries, and it is requested.";
+            }
+
+            @Override
+            public void apply(@NotNull String domainObjectName) {
+                //The configuration in question is shaped as follows: "sourceSetNameLibrary".
+                //Important is the point that for the main source set, the configuration is named "library".
+                if (!domainObjectName.endsWith("Library") && !domainObjectName.equals("library")) {
+                    return;
+                }
+
+                final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
+
+                //Check if the source set is marked to be included in the libraries.
+                if (domainObjectName.equals("library")) {
+                    final SourceSetExtension.SourceSetConfiguration mainSourceSetConfig = sourceSetExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+                    final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(mainSourceSetConfig);
+                    final SourceSet mainSourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+
+                    if (!extension.getIncludeInLibraries().get()) {
+                        //Not included in libraries. Ignore.
+                        return;
+                    }
+
+                    //Create the configuration and extend the implementation configuration with it.
+                    final Configuration libraries = target.getConfigurations().create(domainObjectName);
+                    final Configuration implementation = target.getConfigurations().getByName(mainSourceSet.getImplementationConfigurationName());
+
+                    implementation.extendsFrom(libraries);
+                    return;
+                }
+
+                final String sourceSetName = domainObjectName.substring(0, domainObjectName.length() - "Library".length());
+
+                if (sourceSetExtension.getSourceSets().findByName(sourceSetName) == null) {
+                    //The source set configuration does not exist. Ignore.
+                    return;
+                }
+
+                //We know that a source set configuration exists for the given source set name.
+                //So we also know a neogradle extension exists for the source set configuration.
+                //And we know that the source set itself will exist.
+                final SourceSetExtension.SourceSetConfiguration sourceSetConfig = sourceSetExtension.getSourceSets().getByName(sourceSetName);
+                final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(sourceSetConfig);
+                final SourceSet sourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(sourceSetName);
+
+                if (!extension.getIncludeInLibraries().get()) {
+                    //Not included in libraries. Ignore.
+                    return;
+                }
+
+                //Create the configuration and extend the implementation configuration with it.
+                final Configuration libraries = target.getConfigurations().create(domainObjectName);
+                final Configuration implementation = target.getConfigurations().getByName(sourceSet.getImplementationConfigurationName());
+
+                implementation.extendsFrom(libraries);
+            }
+        });
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private void configureRuns(@NotNull Project target) {
+        final RunManager runManager = target.getExtensions().getByType(RunManager.class);
+        final NeoGradleExtension extension = NeoGradleExtension.get(target);
+        final ModExtension modExtension = ModExtension.get(target);
+        final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
+        final SourceSetContainer sourceSetContainer = target.getExtensions().getByType(SourceSetContainer.class);
+
+        //Ensure a client run is created.
+        runManager.maybeCreate("client");
+
+        //Configure the client run to use random player names if the extension is set to do so.
+        runManager.named("client", run -> {
+            run.getArguments().addAll(
+                    extension.getUseRandomPlayerNames().map(useRandomPlayerNames -> {
+                        if (useRandomPlayerNames) {
+                            final String randomAppendix = String.valueOf((Math.abs(new Random().nextInt() % 600) + 1));
+                            return List.of("--username", "Dev%s".formatted(randomAppendix));
+                        } else {
+                            //When not using random player names, we don't need to add any arguments.
+                            return null;
+                        }
+                    })
+            );
+        });
+
+        //Ensure a server run is created.
+        runManager.maybeCreate("server");
+
+        //Ensure a data gen run is created.
+        runManager.maybeCreate("data");
+
+        //Configure the data run to have the correct arguments.
+        runManager.named("data", run -> {
+            //Add the arguments for the data gen run.
+            //By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
+            run.getArguments().addAll(
+                    modExtension.getModId().map(modId -> List.of(
+                            "--mod", modId,
+                            "--all",
+                            "--output", target.file("src/datagen/generated/%s".formatted(modId)).getAbsolutePath(),
+                            "--existing", target.file("src/main/resources/").getAbsolutePath()
+                    ))
+            );
+
+            //Add the arguments for the additional data gen mods.
+            run.getArguments().addAll(
+                    extension.getAdditionalDataGenMods().map(mods -> {
+                        if (mods.isEmpty()) {
+                            //When no additional data gen mods are set, we don't need to add any arguments.
+                            return null;
+                        }
+
+                        //When additional data gen mods are set, we need to add the arguments for each mod.
+                        //Per mod, we need to add the "--existing-mod" argument followed by the mod id.
+                        return mods.stream()
+                                .flatMap(modId -> Stream.of("--existing-mod", modId))
+                                .toList();
+                    })
+            );
+        });
+
+        //Ensure a game test server run is created.
+        runManager.maybeCreate("gameTestServer");
+
+        //Configure the game test server run to have the correct arguments.
+        runManager.named("gameTestServer", run -> {
+            //Ensure that our mods have their tests run.
+            run.getSystemProperties().putAll(
+                    modExtension.getModId().map(modId -> Map.of("forge.enabledGameTestNamespaces", modId))
+            );
+        });
+
+        //Configure all runs to be compatible with our configuration.
+        runManager.configureEach(run -> {
+            //Configure logging.
+            run.systemProperty("forge.logging.markers", "");
+            run.systemProperty("forge.logging.console.level", "info");
+
+            //Add the mod sources to the run.
+            run.getModSources().addAllLater(
+                    modExtension.getModId().map(modId -> {
+                        final List<SourceSet> sourceSets = sourceSetExtension.getSourceSets()
+                                .stream()
+                                .filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())
+                                .map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
+                                .toList();
+
+                        final Multimap<String, SourceSet> modSources = HashMultimap.create();
+                        modSources.putAll(modId, sourceSets);
+
+                        return modSources;
+                    })
+            );
+
+            //After evaluation, add the library configurations to the run.
+            target.afterEvaluate(ignored -> {
+                sourceSetExtension.getSourceSets()
+                        .stream()
+                        .filter(config -> NeoGradleSourceSetConfigurationExtension.get(config).getIncludeInLibraries().get())
+                        .map(config -> sourceSetContainer.getByName(config.getName()))
+                        .map(sourceSet -> getLibraryConfiguration(target, sourceSet))
+                        .forEach(config -> run.getDependencies().getRuntime().add(config));
+            });
+        });
+    }
+
+    /**
+     * Gets the library configuration for the given source set.
+     * <p>
+     *     If the source set is the main source set, the configuration is named "library".
+     *     If the source set is not the main source set, the configuration is named "%sLibrary".formatted(sourceSet.getName()).
+     *     If the source set is missing, then an exception is thrown.
+     * </p>
+     * @param target The project to get the configuration from.
+     * @param sourceSet The source set to get the configuration for.
+     * @return The library configuration.
+     */
+    private Configuration getLibraryConfiguration(@NotNull final Project target, @NotNull final SourceSet sourceSet) {
+        if (SourceSet.isMain(sourceSet)) {
+            return target.getConfigurations().getByName("library");
+        }
+
+        return target.getConfigurations().getByName("%sLibrary".formatted(sourceSet.getName()));
     }
 }

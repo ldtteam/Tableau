@@ -14,9 +14,11 @@
             <option value="$PROJECT_DIR$/modules/curseforge" />
             <option value="$PROJECT_DIR$/modules/git" />
             <option value="$PROJECT_DIR$/modules/jarjar" />
+            <option value="$PROJECT_DIR$/modules/java" />
             <option value="$PROJECT_DIR$/modules/local-file-configuration" />
             <option value="$PROJECT_DIR$/modules/neogradle" />
             <option value="$PROJECT_DIR$/modules/parchment" />
+            <option value="$PROJECT_DIR$/modules/scripting" />
             <option value="$PROJECT_DIR$/modules/shadowing" />
             <option value="$PROJECT_DIR$/modules/sonarqube" />
             <option value="$PROJECT_DIR$/modules/sourceset-management" />

@@ -5,6 +5,7 @@ package com.ldtteam.tableau.common;
 
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
@@ -24,13 +25,12 @@ public class CommonProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        target.getPlugins().apply("java-library");
         target.getPlugins().apply("jacoco");
         target.getPlugins().apply("maven-publish");
         target.getPlugins().apply("idea");
         target.getPlugins().apply("eclipse");
 
-        target.getExtensions().create(ModExtension.EXTENSION_NAME, ModExtension.class);
+        TableauScriptingExtension.register(target, ModExtension.EXTENSION_NAME, ModExtension.class, target);
 
         configureVersioning(target);
         configureRepositories(target);
@@ -67,7 +67,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
      * @param target The target project.
      */
     private void configureVersioning(@NotNull Project target) {
-        final VersioningExtension versioning = target.getExtensions().create(VersioningExtension.EXTENSION_NAME, VersioningExtension.class);
+        final VersioningExtension versioning = TableauScriptingExtension.register(target, VersioningExtension.EXTENSION_NAME, VersioningExtension.class, target);
 
         //Default mod version string build from the configured version and suffix.
         final Provider<String> versionString = versioning.getMod().getVersion().zip(versioning.getMod().getSuffix(), (version, suffix) -> {

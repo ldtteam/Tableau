@@ -11,6 +11,10 @@ plugins {
     id 'java-gradle-plugin'
 }
 
+dependencies {
+    api project(':scripting')
+}
+
 gradlePlugin {
     // Define the plugin
     plugins {

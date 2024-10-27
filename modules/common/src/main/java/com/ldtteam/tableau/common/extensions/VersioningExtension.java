@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.common.extensions;
 
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
@@ -19,7 +20,7 @@ public abstract class VersioningExtension {
      * @return The versioning extension.
      */
     public static VersioningExtension get(final Project project) {
-        return project.getExtensions().getByType(VersioningExtension.class);
+        return TableauScriptingExtension.get(project, VersioningExtension.class);
     }
 
     /**
