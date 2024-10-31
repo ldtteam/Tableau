@@ -45,8 +45,8 @@ public class MavenPublishingExtension {
         GITHUB,
         LOCAL;
 
-        public boolean canPublish() {
-            return this != UNKNOWN && this != LOCAL;
+        public boolean includedInMaven() {
+            return this == UNKNOWN || this == LOCAL;
         }
     }
 
@@ -105,7 +105,7 @@ public class MavenPublishingExtension {
      * </p>
      */
     public void publishToGithub() {
-        if (!publishingMode.canPublish()) {
+        if (publishingMode.includedInMaven()) {
             publishingMode = PublishingMode.GITHUB;
             pom(POM::distributeOnGithubPackages);
         }
@@ -136,7 +136,7 @@ public class MavenPublishingExtension {
      * </p>
      */
     public void publishLocally() {
-        if (!publishingMode.canPublish()) {
+        if (publishingMode.includedInMaven()) {
             publishingMode = PublishingMode.LOCAL;
         }
 
