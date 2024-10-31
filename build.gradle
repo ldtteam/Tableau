@@ -12,6 +12,7 @@ plugins {
 }
 
 dependencies {
+    api(project(':maven-publishing'))
     api(project(':resource-processing'))
     api(project(':jetbrains-annotations'))
     api(project(':scripting'))

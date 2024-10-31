@@ -11,6 +11,7 @@ import com.ldtteam.tableau.jarjar.JarJarPlugin;
 import com.ldtteam.tableau.java.JavaPlugin;
 import com.ldtteam.tableau.jetbrains.annotations.JetbrainsAnnotationsPlugin;
 import com.ldtteam.tableau.local.file.configuration.LocalFileConfigurationPlugin;
+import com.ldtteam.tableau.maven.publishing.MavenPublishingPlugin;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.parchment.ParchmentPlugin;
 import com.ldtteam.tableau.resource.processing.ResourceProcessingPlugin;
@@ -36,6 +37,7 @@ public class TableauProjectPlugin implements Plugin<Project> {
         target.getPlugins().apply(ResourceProcessingPlugin.class);
         target.getPlugins().apply(NeoGradlePlugin.class);
         target.getPlugins().apply(JetbrainsAnnotationsPlugin.class);
+        target.getPlugins().apply(MavenPublishingPlugin.class);
 
         FeaturePluginManager.applyFeaturePlugin(target, GitPlugin.class, ModuleFeatures::usesGit);
         FeaturePluginManager.applyFeaturePlugin(target, ParchmentPlugin.class, ModuleFeatures::usesParchment);

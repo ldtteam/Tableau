@@ -69,6 +69,11 @@ public abstract class ModExtension {
     public abstract Property<String> getPublisher();
 
     /**
+     * @return The mod url, is the location where documentation and support can be found.
+     */
+    public abstract Property<String> getUrl();
+
+    /**
      * Mod versioning configuration.
      */
     public abstract static class Versioning {

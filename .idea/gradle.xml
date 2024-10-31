@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/modules/java" />
             <option value="$PROJECT_DIR$/modules/jetbrains-annotations" />
             <option value="$PROJECT_DIR$/modules/local-file-configuration" />
+            <option value="$PROJECT_DIR$/modules/maven-publishing" />
             <option value="$PROJECT_DIR$/modules/neogradle" />
             <option value="$PROJECT_DIR$/modules/parchment" />
             <option value="$PROJECT_DIR$/modules/resource-processing" />
