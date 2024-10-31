@@ -22,16 +22,20 @@ public class MavenPublishingProjectPlugin implements Plugin<Project> {
         target.getPlugins().apply(GitPlugin.class);
 
         TableauScriptingExtension.register(target, MavenPublishingExtension.EXTENSION_NAME, MavenPublishingExtension.class, target);
+
+        configurePublication(target);
     }
 
     public void configurePublication(Project project) {
         final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
         final MavenPublishingExtension mavenPublishing = MavenPublishingExtension.get(project);
 
-        publishing.getPublications().create("default", MavenPublication.class, publication -> {
-            publication.from(project.getComponents().getByName("java"));
-            publication.pom(mavenPublishing::configure);
-            publication.suppressAllPomMetadataWarnings();
+        project.afterEvaluate(ignored -> {
+            publishing.getPublications().create("default", MavenPublication.class, publication -> {
+                publication.from(project.getComponents().getByName("java"));
+                publication.pom(mavenPublishing::configure);
+                publication.suppressAllPomMetadataWarnings();
+            });
         });
     }
 }
