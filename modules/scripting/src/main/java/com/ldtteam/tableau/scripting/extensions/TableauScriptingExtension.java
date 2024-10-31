@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.scripting.extensions;
 
+import com.ldtteam.tableau.scripting.ScriptingPlugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionAware;
 
@@ -45,6 +46,9 @@ public abstract class TableauScriptingExtension implements ExtensionAware {
      * @param <T> the type of the extension
      */
     public static <T> T register(final Project project, final String name, final Class<T> type, final Object... args) {
+        if (!project.getPlugins().hasPlugin(ScriptingPlugin.class))
+            project.getPlugins().apply(ScriptingPlugin.class);
+
         return get(project).getExtensions().create(name, type, args);
     }
 

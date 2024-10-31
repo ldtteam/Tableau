@@ -30,6 +30,8 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project target) {
         target.getPlugins().apply(NeoGradlePlugin.class);
+
+        configureUploadTask(target);
     }
 
     private TaskProvider<? extends Jar> getMainJar(Project project) {

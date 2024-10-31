@@ -18,8 +18,7 @@ curseForgeGradle = { module = "net.darkhax.curseforgegradle:CurseForgeGradle", v
 
 [bundles]
 neogradle = ["neogradle-userdev"]
-gradle-download = ["gradle-download"]
-crowdin = ["crowdin"]
+crowdin = ["crowdin", "gradle-download"]
 sonarqube = ["sonarqube"]
 shadow = ["shadow"]
 jetbrainsAnnotations = ["jetbrainsAnnotations"]

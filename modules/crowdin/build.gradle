@@ -13,8 +13,10 @@ plugins {
 
 dependencies {
     api project(':scripting')
+    api project(':common')
+    api project(':git')
 
-    api libs.bundles.gradle.download
+    api libs.bundles.crowdin
 }
 
 gradlePlugin {

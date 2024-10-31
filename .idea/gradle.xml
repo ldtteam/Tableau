@@ -11,7 +11,6 @@
             <option value="$PROJECT_DIR$/modules/changelog" />
             <option value="$PROJECT_DIR$/modules/common" />
             <option value="$PROJECT_DIR$/modules/crowdin" />
-            <option value="$PROJECT_DIR$/modules/crowdin-translation-management" />
             <option value="$PROJECT_DIR$/modules/curseforge" />
             <option value="$PROJECT_DIR$/modules/git" />
             <option value="$PROJECT_DIR$/modules/jarjar" />

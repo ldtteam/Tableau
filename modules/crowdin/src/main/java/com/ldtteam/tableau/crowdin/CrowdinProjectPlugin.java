@@ -3,14 +3,150 @@
  */
 package com.ldtteam.tableau.crowdin;
 
+import com.ldtteam.tableau.common.CommonPlugin;
+import com.ldtteam.tableau.crowdin.extensions.CrowdinExtension;
+import com.ldtteam.tableau.crowdin.tasks.MergeTranslations;
+import com.ldtteam.tableau.git.GitPlugin;
+import com.ldtteam.tableau.git.extensions.GitExtension;
+import com.ldtteam.tableau.scripting.ScriptingPlugin;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Transformer;
+import org.gradle.api.file.Directory;
+import org.gradle.api.tasks.Copy;
+import org.gradle.api.tasks.Delete;
+import org.gradle.api.tasks.TaskProvider;
 import org.jetbrains.annotations.NotNull;
+import org.zaproxy.gradle.crowdin.CrowdinPlugin;
+import org.zaproxy.gradle.crowdin.tasks.BuildProjectTranslation;
+
+import java.io.File;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class CrowdinProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        //TODO: Implement this method
+        target.getPlugins().apply(CrowdinPlugin.class);
+        target.getPlugins().apply(ScriptingPlugin.class);
+        target.getPlugins().apply(CommonPlugin.class);
+        target.getPlugins().apply(GitPlugin.class);
+
+        TableauScriptingExtension.register(target, CrowdinExtension.EXTENSION_NAME, CrowdinExtension.class);
+
+        target.afterEvaluate(ignored -> {
+            final CrowdinExtension crowdinExtension = CrowdinExtension.get(target);
+            final org.zaproxy.gradle.crowdin.CrowdinExtension crowdin = target.getExtensions().getByType(org.zaproxy.gradle.crowdin.CrowdinExtension.class);
+
+            if (crowdinExtension.getSourceFiles().isEmpty()) {
+                throw new InvalidUserDataException("No source files specified for Crowdin.");
+            }
+
+            boolean mergesTranslations = false;
+            if (crowdinExtension.getSourceFiles().getFiles().size() != 1) {
+                if (crowdinExtension.getTargetFiles().isEmpty()) {
+                    throw new InvalidUserDataException("No target files specified for Crowdin merging, yet multiple inputs are specified.");
+                }
+
+                final TaskProvider<MergeTranslations> mergeTranslations = target.getTasks().register("mergeTranslations", MergeTranslations.class, task -> {
+                    task.getSourceFiles().from(crowdinExtension.getSourceFiles());
+                    task.getTargetFiles().from(crowdinExtension.getTargetFiles());
+                });
+                mergesTranslations = true;
+
+                target.getTasks().named("processResources", processResources -> {
+                    processResources.dependsOn(mergeTranslations);
+                });
+            }
+
+            if (target.getProviders().environmentVariable("CROWDIN_API_KEY").isPresent()) {
+                crowdin.credentials(credentials -> {
+                    credentials.getToken().set(target.getProviders().environmentVariable("CROWDIN_API_KEY"));
+                });
+
+                crowdin.configuration(configuration -> {
+                    configuration.getFile().set(target.getRootProject().file("gradle/crowdin.yml"));
+                    configuration.getTokens().put("%crowdin_download_path%", crowdinExtension.getDownloadLocation().map(Directory::getAsFile).map(File::getAbsolutePath));
+
+                    if (crowdinExtension.getSplitByBranch().get()) {
+                        final GitExtension gitExtension = GitExtension.get(target);
+                        configuration.getTokens().put("%branch_name%", gitExtension.getBranch());
+                    }
+                });
+
+                target.getTasks().named(CrowdinPlugin.BUILD_PROJECT_TRANSLATION_TASK_NAME, BuildProjectTranslation.class, task -> {
+                    task.getWaitForBuilds().set(true);
+                });
+
+                boolean willBuildTranslations = false;
+                if (!crowdinExtension.getOnlyBuildOnBranchMatching().isPresent() || Pattern.matches(crowdinExtension.getOnlyBuildOnBranchMatching().get(), GitExtension.get(target).getBranch().get())) {
+                    target.getTasks().named("processResources", processResources -> {
+                        processResources.dependsOn(CrowdinPlugin.BUILD_PROJECT_TRANSLATION_TASK_NAME);
+                    });
+                    willBuildTranslations = true;
+                }
+
+                if (!crowdinExtension.getOnlyUploadOnBranchMatching().isPresent() || Pattern.matches(crowdinExtension.getOnlyUploadOnBranchMatching().get(), GitExtension.get(target).getBranch().get())) {
+                    target.getTasks().named("processResources", processResources -> {
+                        processResources.dependsOn(CrowdinPlugin.UPLOAD_SOURCE_FILES_TASK_NAME);
+                    });
+                    if (willBuildTranslations) {
+                        target.getTasks().named(CrowdinPlugin.BUILD_PROJECT_TRANSLATION_TASK_NAME, task -> {
+                            task.dependsOn(CrowdinPlugin.UPLOAD_SOURCE_FILES_TASK_NAME);
+                        });
+                    }
+
+                    if (mergesTranslations) {
+                        target.getTasks().named(CrowdinPlugin.UPLOAD_SOURCE_FILES_TASK_NAME, task -> {
+                            task.dependsOn("mergeTranslations");
+                        });
+                    }
+                }
+
+                final TaskProvider<Delete> deleteTranslationFilesInBuildDir = target.getTasks().register("deleteTranslationFilesInBuildDir", Delete.class, task -> {
+                    task.setGroup("Crowdin");
+                    task.dependsOn(target.getTasks().named(CrowdinPlugin.COPY_PROJECT_TRANSLATIONS_TASK_NAME));
+                    task.delete(target.getLayout().getBuildDirectory().dir("temp").map(dir -> dir.dir("translations")));
+                    task.setFollowSymlinks(true);
+                });
+
+                final TaskProvider<Copy> normalizeTranslationFilesInBuildDir = target.getTasks().register("normalizeTranslationFilesInBuildDir", Copy.class, task -> {
+                    task.setGroup("Crowdin");
+                    task.dependsOn(deleteTranslationFilesInBuildDir);
+                    task.from(crowdinExtension.getDownloadLocation());
+                    task.into(target.getLayout().getBuildDirectory().dir("temp").map(dir -> dir.dir("translations")));
+                    task.rename(s -> s.toLowerCase(Locale.ROOT));
+                });
+
+                final TaskProvider<Delete> deleteTranslationFilesInRuntimeDir = target.getTasks().register("deleteTranslationFilesInRuntimeDir", Delete.class, task -> {
+                    task.setGroup("Crowdin");
+                    task.dependsOn(normalizeTranslationFilesInBuildDir);
+                    task.delete(crowdinExtension.getDownloadLocation());
+                    task.setFollowSymlinks(true);
+                });
+
+                final TaskProvider<Copy> normalizeTranslationFilesInRuntimeDir = target.getTasks().register("normalizeTranslationFilesInRuntimeDir", Copy.class, task -> {
+                    task.setGroup("Crowdin");
+                    task.dependsOn(deleteTranslationFilesInRuntimeDir);
+                    task.from(target.getLayout().getBuildDirectory().dir("temp").map(dir -> dir.dir("translations")));
+                    task.into(crowdinExtension.getDownloadLocation());
+                    task.rename(s -> s.toLowerCase(Locale.ROOT));
+                });
+
+                target.getTasks().named(CrowdinPlugin.COPY_PROJECT_TRANSLATIONS_TASK_NAME, task -> {
+                    task.dependsOn(CrowdinPlugin.UPLOAD_SOURCE_FILES_TASK_NAME);
+                });
+                target.getTasks().named("processResources", processResources -> {
+                    processResources.dependsOn(normalizeTranslationFilesInRuntimeDir);
+                });
+                target.getTasks().named("sourcesJar", sourcesJar -> {
+                    sourcesJar.dependsOn(normalizeTranslationFilesInRuntimeDir);
+                });
+            }
+        });
     }
 }

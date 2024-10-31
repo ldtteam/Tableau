@@ -3,6 +3,7 @@
  */
 package com.ldtteam.tableau.scripting;
 
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,6 @@ public class ScriptingProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        //TODO: Implement this method
+        target.getExtensions().create(TableauScriptingExtension.EXTENSION_NAME, TableauScriptingExtension.class);
     }
 }

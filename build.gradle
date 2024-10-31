@@ -30,7 +30,6 @@ dependencies {
     api(project(':utilities'))
     api(project(':local-file-configuration'))
     api(project(':crowdin'))
-    api(project(':crowdin-translation-management'))
 }
 
 gradlePlugin {
