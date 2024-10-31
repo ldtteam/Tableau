@@ -1,9 +1,9 @@
 package com.ldtteam.tableau.common.extensions;
 
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
-import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 
 import javax.inject.Inject;
@@ -33,7 +33,8 @@ public abstract class ModExtension {
     @Inject
     public ModExtension(final Project project) {
         versioning = project.getObjects().newInstance(Versioning.class);
-        getModId().convention(UtilityFunctions.get(project).getProperty("modId"));
+
+        getPublisher().convention("ldtteam");
     }
 
     /**
@@ -58,14 +59,24 @@ public abstract class ModExtension {
     public abstract Property<String> getModId();
 
     /**
+     * @return The minecraft version.
+     */
+    public abstract Property<String> getMinecraftVersion();
+
+    /**
+     * @return The mod publisher.
+     */
+    public abstract Property<String> getPublisher();
+
+    /**
      * Mod versioning configuration.
      */
     public abstract static class Versioning {
 
         @Inject
-        public Versioning(final Project project) {
-            getVersion().convention(UtilityFunctions.get(project).getProperty("modVersion").orElse("0.0.1"));
-            getSuffix().convention(UtilityFunctions.get(project).getProperty("modVersionSuffix").orElse("alpha"));
+        public Versioning() {
+            getVersion().convention("0.0.0");
+            getSuffix().convention("alpha");
         }
 
         /**

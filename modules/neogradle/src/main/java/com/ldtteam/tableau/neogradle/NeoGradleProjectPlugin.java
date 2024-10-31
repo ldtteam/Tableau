@@ -7,7 +7,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
+import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.neoforged.gradle.dsl.common.runs.run.RunManager;
@@ -36,6 +38,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         configureLibraryConfigurations(target);
         configureSourceSets(target);
         configureRuns(target);
+        configureResourceProcessing(target);
     }
 
     /**
@@ -43,11 +46,21 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
      */
     private void configureSourceSets(@NotNull Project target) {
         final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
-        sourceSetExtension.getSourceSets().configureEach(sourceSet -> {
+        sourceSetExtension.getSourceSets().configureEach(sourceSetConfig -> {
             final NeoGradleSourceSetConfigurationExtension extension = target.getObjects()
-                    .newInstance(NeoGradleSourceSetConfigurationExtension.class, target, sourceSet);
+                    .newInstance(NeoGradleSourceSetConfigurationExtension.class, target, sourceSetConfig);
 
-            sourceSet.getExtensions().add(NeoGradleSourceSetConfigurationExtension.EXTENSION_NAME, extension);
+            sourceSetConfig.getExtensions().add(NeoGradleSourceSetConfigurationExtension.EXTENSION_NAME, extension);
+
+            final SourceSet sourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(sourceSetConfig.getName());
+            final Configuration implementation = target.getConfigurations().maybeCreate(sourceSet.getImplementationConfigurationName());
+            final NeoGradleExtension neoGradleExtension = NeoGradleExtension.get(target);
+
+            //Register the neogradle dependency for the source set.
+            implementation.getDependencies().addLater(
+                    neoGradleExtension.getNeoForgeVersion().map("net.neoforged:neoforge:%s"::formatted)
+                            .map(target.getDependencies()::create)
+            );
         });
     }
 
@@ -239,5 +252,13 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         }
 
         return target.getConfigurations().getByName("%sLibrary".formatted(sourceSet.getName()));
+    }
+
+    /**
+     * Configures the resource processing for the given project.
+     */
+    private void configureResourceProcessing(final Project project) {
+        final ResourceProcessingExtension resourceProcessing = ResourceProcessingExtension.get(project);
+        resourceProcessing.getExtensions().create(NeoGradleResourceProcessingExtension.EXTENSION_NAME, NeoGradleResourceProcessingExtension.class, project, resourceProcessing);
     }
 }

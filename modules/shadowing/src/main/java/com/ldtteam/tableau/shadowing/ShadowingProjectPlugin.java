@@ -4,9 +4,18 @@
 package com.ldtteam.tableau.shadowing;
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin;
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
+import com.ldtteam.tableau.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
+import com.ldtteam.tableau.shadowing.extensions.ShadowingExtension;
+import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.tasks.bundling.Jar;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class ShadowingProjectPlugin implements Plugin<Project> {
 
@@ -17,9 +26,14 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
+        target.getPlugins().apply(NeoGradlePlugin.class);
         target.getPlugins().apply(ShadowPlugin.class);
 
+        TableauScriptingExtension.register(target, ShadowingExtension.EXTENSION_NAME, ShadowingExtension.class);
+
         configureContainedConfiguration(target);
+        configureJarTask(target);
+        configureShadowJarTask(target);
     }
 
     /**
@@ -29,5 +43,44 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
      */
     private void configureContainedConfiguration(Project project) {
         project.getConfigurations().maybeCreate(CONTAINED_CONFIGURATION_NAME).setTransitive(false);
+    }
+
+    /**
+     * Configures the jar task to use the slim classifier.
+     * <p>
+     *     This ensures that the shadowed jar is not overwritten by the original jar.
+     * </p>
+     * @param project the project to configure
+     */
+    private void configureJarTask(Project project) {
+        project.getTasks().named("jar", Jar.class, jar -> {
+            jar.getArchiveClassifier().set("slim");
+        });
+    }
+
+    /**
+     * Configures the shadowJar task.
+     * <p>
+     *     Ensures that the shadowed jar is created with the correct classifier and contains the correct dependencies.
+     * </p>
+     *
+     * @param project the project to configure
+     */
+    private void configureShadowJarTask(Project project) {
+        final NeoGradleExtension neoGradle = NeoGradleExtension.get(project);
+        final SourceSetExtension sourceSets = SourceSetExtension.get(project);
+        final ShadowingExtension shadowing = ShadowingExtension.get(project);
+
+        project.getTasks().named("shadowJar", ShadowJar.class, shadowJar -> {
+            shadowJar.getArchiveClassifier().set(neoGradle.getPrimaryJarClassifier());
+
+            sourceSets.getUniversalJarSourceSets().get().forEach(sourceSet -> {
+                shadowJar.from(sourceSet.getOutput());
+            });
+
+            shadowJar.setConfigurations(List.of(project.getConfigurations().getByName(CONTAINED_CONFIGURATION_NAME)));
+
+            shadowing.getRenamedNamespaces().get().forEach(shadowJar::relocate);
+        });
     }
 }

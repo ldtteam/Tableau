@@ -6,9 +6,12 @@ package com.ldtteam.tableau.jarjar;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.jarjar.extensions.JarJarExtension;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
+import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
+import net.neoforged.gradle.common.tasks.JarJar;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.tasks.bundling.Jar;
 import org.jetbrains.annotations.NotNull;
 
 public class JarJarProjectPlugin implements Plugin<Project> {
@@ -22,9 +25,11 @@ public class JarJarProjectPlugin implements Plugin<Project> {
     public void apply(@NotNull Project target) {
         target.getPlugins().apply(NeoGradlePlugin.class);
 
-        NeoGradleExtension.get(target).getExtensions().create(JarJarExtension.EXTENSION_NAME, JarJarExtension.class, target);
+        NeoGradleExtension.get(target).getExtensions().create(JarJarExtension.EXTENSION_NAME, JarJarExtension.class);
 
         configureContainedConfiguration(target);
+        configureJarTask(target);
+        configureJarJarTask(target);
     }
 
     /**
@@ -37,6 +42,42 @@ public class JarJarProjectPlugin implements Plugin<Project> {
         project.afterEvaluate(evaluatedProject -> {
             final JarJarExtension jarJar = JarJarExtension.get(evaluatedProject);
             configuration.setTransitive(!jarJar.getUsesNoneTransitiveJarJar().get());
+        });
+    }
+
+    /**
+     * Configures the jar task to use the slim classifier.
+     * <p>
+     *     This ensures that the jar-in-jar'ed jar is not overwritten by the original jar.
+     * </p>
+     * @param project the project to configure
+     */
+    private void configureJarTask(Project project) {
+        project.getTasks().named("jar", Jar.class, jar -> {
+            jar.getArchiveClassifier().set("slim");
+        });
+    }
+
+    /**
+     * Configures the jarjar task.
+     * <p>
+     *     Ensures that the primary sourcesets are included and the contained configuration is used.
+     * </p>
+     *
+     * @param project the project to configure
+     */
+    private void configureJarJarTask(Project project) {
+        final SourceSetExtension sourceSets = SourceSetExtension.get(project);
+        final NeoGradleExtension neoGradle = NeoGradleExtension.get(project);
+
+        project.getTasks().named("jarjar", JarJar.class, jar -> {
+            jar.getArchiveClassifier().set(neoGradle.getPrimaryJarClassifier());
+
+            sourceSets.getUniversalJarSourceSets().get().forEach(sourceSet -> {
+                jar.from(sourceSet.getOutput());
+            });
+
+            jar.configuration(project.getConfigurations().getByName(CONTAINED_CONFIGURATION_NAME));
         });
     }
 }

@@ -81,6 +81,11 @@ public abstract class SourceSetExtension {
                             .map(isPartOfUniversalJar -> isPartOfUniversalJar ? sourceSet : null)
             );
 
+            getPublishedSourceSets().add(
+                    configuration.getIsPublished()
+                            .map(isPublished -> isPublished ? sourceSet : null)
+            );
+
             implementation.fromDependencyCollector(configuration.getDependencies().getImplementation());
             api.fromDependencyCollector(configuration.getDependencies().getApi());
         });
@@ -126,6 +131,13 @@ public abstract class SourceSetExtension {
     public abstract ListProperty<SourceSet> getUniversalJarSourceSets();
 
     /**
+     * Gets the source sets that are published, individually.
+     *
+     * @return The source sets.
+     */
+    public abstract ListProperty<SourceSet> getPublishedSourceSets();
+
+    /**
      * Contains the configuration for a source set.
      */
     public abstract static class SourceSetConfiguration implements Named, ExtensionAware {
@@ -155,6 +167,13 @@ public abstract class SourceSetExtension {
          * @return The property.
          */
         public abstract Property<Boolean> getIsPartOfUniversalJar();
+
+        /**
+         * Indicates whether the source set is published.
+         *
+         * @return The property.
+         */
+        public abstract Property<Boolean> getIsPublished();
 
         /**
          * @return the dependencies for the source set.

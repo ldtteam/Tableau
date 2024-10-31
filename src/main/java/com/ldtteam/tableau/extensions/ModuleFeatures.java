@@ -1,8 +1,6 @@
 package com.ldtteam.tableau.extensions;
 
-import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;
-import org.gradle.api.initialization.Settings;
 import org.gradle.api.provider.Property;
 
 import javax.inject.Inject;
@@ -24,17 +22,25 @@ public abstract class ModuleFeatures {
      * @return The feature extension.
      */
     public static ModuleFeatures get(Project project) {
+        //In case the settings plugin is not loaded.
+        if (project.getGradle().getExtensions().findByType(ModuleFeatures.class) == null) {
+            return project.getObjects().newInstance(ModuleFeatures.class);
+        }
+
         return project.getGradle().getExtensions().getByType(ModuleFeatures.class);
     }
 
     @Inject
-    public ModuleFeatures(final Settings settings) {
-        getUsesCrowdin().convention(UtilityFunctions.get(settings).getUsesProperty("crowdin"));
-        getUsesCrowdInTranslationManagement().convention(UtilityFunctions.get(settings).getUsesProperty("crowdinTranslationManagement"));
-        getUsesSonarQube().convention(UtilityFunctions.get(settings).getUsesProperty("sonarQube"));
-        getUsesShadowing().convention(UtilityFunctions.get(settings).getUsesProperty("shadowing"));
-        getUsesJarJar().convention(UtilityFunctions.get(settings).getUsesProperty("jarjar"));
-        getUsesCurse().convention(UtilityFunctions.get(settings).getUsesProperty("curse"));
+    public ModuleFeatures() {
+        getUsesCrowdin().convention(false);
+        getUsesCrowdInTranslationManagement().convention(false);
+        getUsesSonarQube().convention(false);
+        getUsesShadowing().convention(false);
+        getUsesJarJar().convention(false);
+        getUsesCurse().convention(false);
+        usesParchment().convention(false);
+        usesGit().convention(false);
+        usesTesting().convention(false);
     }
 
     /**
@@ -92,4 +98,11 @@ public abstract class ModuleFeatures {
      * @return The property for whether the project uses git.
      */
     public abstract Property<Boolean> usesGit();
+
+    /**
+     * Gets the property for whether the project uses testing.
+     *
+     * @return The property for whether the project uses testing.
+     */
+    public abstract Property<Boolean> usesTesting();
 }

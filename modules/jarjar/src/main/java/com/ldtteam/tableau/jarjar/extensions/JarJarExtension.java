@@ -1,7 +1,6 @@
 package com.ldtteam.tableau.jarjar.extensions;
 
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
-import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 
@@ -25,8 +24,8 @@ public abstract class JarJarExtension {
     public static final String EXTENSION_NAME = "jarjar";
 
     @Inject
-    public JarJarExtension(final Project project) {
-        getUsesNoneTransitiveJarJar().convention(UtilityFunctions.get(project).getUsesProperty("noneTransitiveJarJar"));
+    public JarJarExtension() {
+        getUsesNoneTransitiveJarJar().convention(true);
     }
 
     /**

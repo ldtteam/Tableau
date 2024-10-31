@@ -13,17 +13,14 @@ plugins {
 
 dependencies {
     api project(':scripting')
-    api project(':neogradle')
-
-    api libs.bundles.shadow
 }
 
 gradlePlugin {
     // Define the plugin
     plugins {
-        "shadowing" {
-            id = 'com.ldtteam.tableau.shadowing'
-            implementationClass = 'com.ldtteam.tableau.shadowing.ShadowingPlugin'
+        "resource-processing" {
+            id = 'com.ldtteam.tableau.resource-processing'
+            implementationClass = 'com.ldtteam.tableau.resource.processing.ResourceProcessingPlugin'
         }
     }
 }

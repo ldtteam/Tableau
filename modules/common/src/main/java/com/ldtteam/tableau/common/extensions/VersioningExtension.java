@@ -76,11 +76,11 @@ public abstract class VersioningExtension {
 
         @Inject
         public MinecraftBasedVersioning(final Project project) {
-            getEnabled().convention(UtilityFunctions.get(project).getUsesProperty("minecraftBasedVersioning"));
-            getMinecraftVersion().convention(UtilityFunctions.get(project).getProperty("minecraftVersion"));
-            getMinecraftVersionElementIndex().convention(UtilityFunctions.get(project).getIntegerProperty("minecraftVersionElementIndex"));
-            getSourceVersionElementIndex().convention(UtilityFunctions.get(project).getIntegerProperty("sourceVersionElementIndex"));
-            getSourceVersionName().convention(UtilityFunctions.get(project).getProperty("sourceVersionName"));
+            getEnabled().convention(false);
+            getMinecraftVersion().convention(ModExtension.get(project).getMinecraftVersion());
+            getMinecraftVersionElementIndex().convention(1);
+            getSourceVersionElementIndex().convention(1);
+            getSourceVersionName();
         }
 
         /**

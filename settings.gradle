@@ -20,6 +20,7 @@ dependencyResolutionManagement {
 rootProject.name = 'Tableau'
 include('plugin')
 
+//All of the modules.
 include('utilities')
 project(':utilities').projectDir = file('modules/utilities')
 include('local-file-configuration')
@@ -50,3 +51,7 @@ include('java')
 project(':java').projectDir = file('modules/java')
 include('scripting')
 project(':scripting').projectDir = file('modules/scripting')
+include('jetbrains-annotations')
+project(':jetbrains-annotations').projectDir = file('modules/jetbrains-annotations')
+include('resource-processing')
+project(':resource-processing').projectDir = file('modules/resource-processing')

@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.java.extensions;
 
+import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;
@@ -31,14 +32,19 @@ public abstract class JavaExtension {
 
     @Inject
     public JavaExtension(final Project project) {
-        getJavaVersion().convention(UtilityFunctions.get(project).getIntegerProperty("javaVersion"));
-
         final JavaPluginExtension java = project.getExtensions().getByType(JavaPluginExtension.class);
         java.getToolchain().getLanguageVersion().set(getJavaVersion().map(JavaLanguageVersion::of));
+
+        getAutomaticModuleName().convention(ModExtension.get(project).getModId());
     }
 
     /**
      * @return the Java version
      */
     public abstract Property<Integer> getJavaVersion();
+
+    /**
+     * @return the automatic module name
+     */
+    public abstract Property<String> getAutomaticModuleName();
 }

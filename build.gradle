@@ -12,6 +12,8 @@ plugins {
 }
 
 dependencies {
+    api(project(':resource-processing'))
+    api(project(':jetbrains-annotations'))
     api(project(':scripting'))
     api(project(':java'))
     api(project(':sourceset-management'))

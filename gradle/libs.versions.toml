@@ -4,6 +4,7 @@ gradle-download = "5.+"
 crowdin = "0.+"
 sonarqube = "5.+"
 shadow = "8.+"
+jetbrainsAnnotations = "+"
 
 [libraries]
 neogradle-userdev = { module = "net.neoforged.gradle:userdev", version.ref = "neogradle" }
@@ -11,6 +12,7 @@ gradle-download = { module = "de.undercouch:gradle-download-task", version.ref =
 crowdin = { module = "org.zaproxy.gradle:gradle-plugin-crowdin", version.ref = "crowdin" }
 sonarqube = { module = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin", version.ref = "sonarqube" }
 shadow = { module = "com.gradleup.shadow:shadow-gradle-plugin", version.ref = "shadow" }
+jetbrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
 
 [bundles]
 neogradle = ["neogradle-userdev"]
@@ -18,3 +20,4 @@ gradle-download = ["gradle-download"]
 crowdin = ["crowdin"]
 sonarqube = ["sonarqube"]
 shadow = ["shadow"]
+jetbrainsAnnotations = ["jetbrainsAnnotations"]
