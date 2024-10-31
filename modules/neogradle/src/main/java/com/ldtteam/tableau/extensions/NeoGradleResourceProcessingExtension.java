@@ -61,7 +61,13 @@ public abstract class NeoGradleResourceProcessingExtension {
      */
     public abstract Property<Boolean> getInterpolateVersions();
 
+    /**
+     * @return The minimal Minecraft version.
+     */
     public abstract Property<String> getMinimalMinecraftVersion();
 
+    /**
+     * @return The minimal Forge version.
+     */
     public abstract Property<String> getMinimalForgeVersion();
 }

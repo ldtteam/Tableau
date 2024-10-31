@@ -12,6 +12,9 @@ import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
+import net.neoforged.gradle.common.extensions.MinecraftExtension;
+import net.neoforged.gradle.dsl.common.extensions.AccessTransformers;
+import net.neoforged.gradle.dsl.common.extensions.InterfaceInjections;
 import net.neoforged.gradle.dsl.common.runs.run.RunManager;
 import net.neoforged.gradle.userdev.UserDevPlugin;
 import org.gradle.api.Project;
@@ -39,6 +42,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         configureSourceSets(target);
         configureRuns(target);
         configureResourceProcessing(target);
+        configureAccessTransformers(target);
+        configureInterfaceInjections(target);
     }
 
     /**
@@ -260,5 +265,33 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
     private void configureResourceProcessing(final Project project) {
         final ResourceProcessingExtension resourceProcessing = ResourceProcessingExtension.get(project);
         resourceProcessing.getExtensions().create(NeoGradleResourceProcessingExtension.EXTENSION_NAME, NeoGradleResourceProcessingExtension.class, project, resourceProcessing);
+    }
+
+    /**
+     * Configures the access transformers for the given project.
+     */
+    private void configureAccessTransformers(final Project project) {
+        final NeoGradleExtension extension = NeoGradleExtension.get(project);
+
+        final MinecraftExtension minecraft = project.getExtensions().getByType(MinecraftExtension.class);
+        final AccessTransformers accessTransformers = minecraft.getAccessTransformers();
+
+        accessTransformers.files(extension.getAccessTransformers());
+
+        //TODO: Consider how and when to expose the access transformers as artifacts.
+    }
+
+    /**
+     * Configures the interface injections for the given project.
+     */
+    private void configureInterfaceInjections(final Project project) {
+        final NeoGradleExtension extension = NeoGradleExtension.get(project);
+
+        final MinecraftExtension minecraft = project.getExtensions().getByType(MinecraftExtension.class);
+        final InterfaceInjections interfaceInjections = minecraft.getInterfaceInjections();
+
+        interfaceInjections.files(extension.getInterfaceInjections());
+
+        //TODO: Consider how and when to expose the interface injections as artifacts.
     }
 }

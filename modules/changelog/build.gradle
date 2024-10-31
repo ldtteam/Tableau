@@ -13,23 +13,14 @@ plugins {
 
 dependencies {
     api project(':scripting')
-    api project(':utilities')
-
-    api project(':shadowing')
-    api project(':jarjar')
-
-    api project(':common')
-    api project(':neogradle')
-
-    api libs.bundles.curseForgeGradle
 }
 
 gradlePlugin {
     // Define the plugin
     plugins {
-        "curseforge" {
-            id = 'com.ldtteam.tableau.curseforge'
-            implementationClass = 'com.ldtteam.tableau.curseforge.CurseforgePlugin'
+        "changelog" {
+            id = 'com.ldtteam.tableau.changelog'
+            implementationClass = 'com.ldtteam.tableau.changelog.ChangelogPlugin'
         }
     }
 }

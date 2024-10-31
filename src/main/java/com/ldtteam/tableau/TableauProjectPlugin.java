@@ -1,5 +1,6 @@
 package com.ldtteam.tableau;
 
+import com.ldtteam.tableau.changelog.ChangelogPlugin;
 import com.ldtteam.tableau.common.CommonPlugin;
 import com.ldtteam.tableau.crowdin.CrowdinPlugin;
 import com.ldtteam.tableau.crowdin.translation.management.CrowdinTranslationManagementPlugin;
@@ -38,6 +39,7 @@ public class TableauProjectPlugin implements Plugin<Project> {
         target.getPlugins().apply(NeoGradlePlugin.class);
         target.getPlugins().apply(JetbrainsAnnotationsPlugin.class);
         target.getPlugins().apply(MavenPublishingPlugin.class);
+        target.getPlugins().apply(ChangelogPlugin.class);
 
         FeaturePluginManager.applyFeaturePlugin(target, GitPlugin.class, ModuleFeatures::usesGit);
         FeaturePluginManager.applyFeaturePlugin(target, ParchmentPlugin.class, ModuleFeatures::usesParchment);

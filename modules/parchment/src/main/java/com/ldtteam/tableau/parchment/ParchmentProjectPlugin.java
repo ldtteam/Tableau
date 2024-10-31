@@ -11,6 +11,6 @@ public class ParchmentProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        //TODO: Implement this method
+        throw new IllegalStateException("Not implemented yet");
     }
 }

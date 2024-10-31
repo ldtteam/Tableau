@@ -82,6 +82,20 @@ public abstract class NeoGradleExtension implements ExtensionAware {
     }
 
     /**
+     * @return The access transformers to apply to the project.
+     */
+    public abstract ConfigurableFileCollection getInterfaceInjections();
+
+    /**
+     * Adds an access transformer to the project.
+     *
+     * @param file the access transformer file
+     */
+    public void interfaceInjection(Object file) {
+        getInterfaceInjections().from(file);
+    }
+
+    /**
      * @return The version of NeoForge to use.
      */
     public abstract Property<String> getNeoForgeVersion();

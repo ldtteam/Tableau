@@ -27,6 +27,7 @@ public class JavaProjectPlugin implements Plugin<Project> {
         TableauScriptingExtension.register(target, JavaExtension.EXTENSION_NAME, JavaExtension.class, target);
 
         configureJarTask(target);
+        configurePublishedJars(target);
     }
 
     /**

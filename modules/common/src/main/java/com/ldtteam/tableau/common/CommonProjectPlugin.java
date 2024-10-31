@@ -9,8 +9,13 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.BasePluginExtension;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.Copy;
+import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.api.tasks.javadoc.Javadoc;
+import org.gradle.external.javadoc.StandardJavadocDocletOptions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -36,6 +41,15 @@ public class CommonProjectPlugin implements Plugin<Project> {
         configureRepositories(target);
         configureBase(target);
         configureFmlInterpolationIntegration(target);
+
+        target.getTasks().withType(Copy.class).configureEach(task -> task.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
+
+        target.getTasks()
+                .withType(Javadoc.class)
+                .matching(task -> task.getName().contains("api"))
+                .configureEach(task -> ((StandardJavadocDocletOptions) task.getOptions()).addStringOption("Xdoclint:none", "-quiet"));
+
+        target.getTasks().withType(Jar.class).configureEach(jar -> jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
     }
 
     /**
