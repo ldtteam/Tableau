@@ -23,6 +23,10 @@ public abstract class JetbrainsAnnotationsSourceSetExtension {
      */
     public static final String EXTENSION_NAME = "jetbrains";
 
+    public JetbrainsAnnotationsSourceSetExtension() {
+        getInjectAnnotations().convention(true);
+    }
+
     /**
      * @return Indicates whether the JetBrains annotations are enabled for the source set.
      */

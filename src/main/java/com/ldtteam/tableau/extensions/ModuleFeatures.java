@@ -33,14 +33,13 @@ public abstract class ModuleFeatures {
     @Inject
     public ModuleFeatures() {
         getUsesCrowdin().convention(false);
-        getUsesCrowdInTranslationManagement().convention(false);
         getUsesSonarQube().convention(false);
         getUsesShadowing().convention(false);
         getUsesJarJar().convention(false);
         getUsesCurse().convention(false);
-        usesParchment().convention(false);
-        usesGit().convention(false);
-        usesTesting().convention(false);
+        getUsesParchment().convention(false);
+        getUsesGit().convention(false);
+        getUsesTesting().convention(false);
     }
 
     /**
@@ -49,13 +48,6 @@ public abstract class ModuleFeatures {
      * @return The property for whether the project uses crowdin.
      */
     public abstract Property<Boolean> getUsesCrowdin();
-
-    /**
-     * Gets the property for whether the project uses crowdin in translation management.
-     *
-     * @return The property for whether the project uses crowdin in translation management.
-     */
-    public abstract Property<Boolean> getUsesCrowdInTranslationManagement();
 
     /**
      * Gets the property for whether the project uses sonarqube.
@@ -90,19 +82,19 @@ public abstract class ModuleFeatures {
      *
      * @return The property for whether the project uses parchment.
      */
-    public abstract Property<Boolean> usesParchment();
+    public abstract Property<Boolean> getUsesParchment();
 
     /**
      * Gets the property for whether the project uses git.
      *
      * @return The property for whether the project uses git.
      */
-    public abstract Property<Boolean> usesGit();
+    public abstract Property<Boolean> getUsesGit();
 
     /**
      * Gets the property for whether the project uses testing.
      *
      * @return The property for whether the project uses testing.
      */
-    public abstract Property<Boolean> usesTesting();
+    public abstract Property<Boolean> getUsesTesting();
 }

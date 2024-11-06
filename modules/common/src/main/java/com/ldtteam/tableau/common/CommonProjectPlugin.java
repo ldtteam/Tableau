@@ -30,8 +30,8 @@ public class CommonProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
+        target.getPlugins().apply("base");
         target.getPlugins().apply("jacoco");
-        target.getPlugins().apply("maven-publish");
         target.getPlugins().apply("idea");
         target.getPlugins().apply("eclipse");
 
@@ -40,7 +40,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
         configureVersioning(target);
         configureRepositories(target);
         configureBase(target);
-        configureFmlInterpolationIntegration(target);
 
         target.getTasks().withType(Copy.class).configureEach(task -> task.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
 
@@ -50,6 +49,12 @@ public class CommonProjectPlugin implements Plugin<Project> {
                 .configureEach(task -> ((StandardJavadocDocletOptions) task.getOptions()).addStringOption("Xdoclint:none", "-quiet"));
 
         target.getTasks().withType(Jar.class).configureEach(jar -> jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
+
+        target.afterEvaluate(ignored -> {
+            if (!ModExtension.get(target).getModId().isPresent()) {
+                throw new IllegalStateException("Mod ID is not set. Please set the mod ID in the build.gradle file.");
+            }
+        });
     }
 
     /**
@@ -125,18 +130,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
     private void configureBase(final Project project) {
         final BasePluginExtension base = project.getExtensions().getByType(BasePluginExtension.class);
         base.getArchivesName().set(ModExtension.get(project).getModId());
-    }
-
-    /**
-     * Configures the FML interpolation integration for the project.
-     * Sets the file.jarVersion property to the project version.
-     *
-     * @param project The project.
-     */
-    @SuppressWarnings("unchecked")
-    private void configureFmlInterpolationIntegration(final Project project) {
-        final Map<String, Object> projectProperties = (Map<String, Object>) project.getProperties();
-        projectProperties.put("file", Map.of("jarVersion", project.getVersion()));
     }
 
     /**

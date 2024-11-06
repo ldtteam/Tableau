@@ -10,6 +10,7 @@ import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.file.DuplicatesStrategy;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +64,10 @@ public class JavaProjectPlugin implements Plugin<Project> {
                 ));
             });
         });
+
+        final JavaPluginExtension java = project.getExtensions().getByType(JavaPluginExtension.class);
+        java.withSourcesJar();
+        java.withJavadocJar();
 
         project.getTasks().named("sourcesJar", Jar.class, jar -> {
             jar.getArchiveClassifier().set("sources");

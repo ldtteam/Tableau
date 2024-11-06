@@ -33,7 +33,7 @@ public abstract class NeoGradleResourceProcessingExtension {
         resourceProcessing.getProperties().putAll(
                 getInterpolateVersions().map(interpolate -> {
                     if (!interpolate) {
-                        return null;
+                        return Map.of();
                     }
 
                     final ModExtension mod = ModExtension.get(project);

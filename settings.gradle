@@ -18,7 +18,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'Tableau'
-include('plugin')
 
 //All of the modules.
 include('utilities')
@@ -57,3 +56,5 @@ include('maven-publishing')
 project(':maven-publishing').projectDir = file('modules/maven-publishing')
 include('changelog')
 project(':changelog').projectDir = file('modules/changelog')
+include('bootstrap')
+project(':bootstrap').projectDir = file('bootstrap')

@@ -14,5 +14,9 @@ public class TableauSettingsPlugin implements Plugin<Settings> {
 
         ModuleFeatures moduleFeatures = target.getGradle().getExtensions().create(ModuleFeatures.EXTENSION_NAME, ModuleFeatures.class);
         target.getExtensions().add(ModuleFeatures.EXTENSION_NAME, moduleFeatures);
+
+        target.getGradle().beforeProject(project -> {
+            project.getPlugins().apply(TableauPlugin.class);
+        });
     }
 }

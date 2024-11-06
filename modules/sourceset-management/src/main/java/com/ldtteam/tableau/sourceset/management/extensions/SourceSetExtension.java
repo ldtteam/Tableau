@@ -7,6 +7,7 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.dsl.Dependencies;
 import org.gradle.api.artifacts.dsl.DependencyCollector;
 import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -17,6 +18,7 @@ import org.gradle.api.tasks.SourceSetContainer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -53,9 +55,9 @@ public abstract class SourceSetExtension {
 
                 return project.getObjects().newInstance(
                         SourceSetConfiguration.class,
+                        project.getObjects(),
                         name,
-                        sourceSet.getJava(),
-                        sourceSet.getResources()
+                        sourceSet
                 );
             }
         });
@@ -98,6 +100,8 @@ public abstract class SourceSetExtension {
 
             sourceSet.getResources().srcDir(modExtension.getModId().map("src/datagen/generated/%s"::formatted));
         });
+
+        getPublishedSourceSets().convention(List.of(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)));
     }
 
     /**
@@ -142,15 +146,33 @@ public abstract class SourceSetExtension {
      */
     public abstract static class SourceSetConfiguration implements Named, ExtensionAware {
 
+        private final ObjectFactory objectFactory;
         private final String name;
+        private final SourceSet sourceSet;
         private final SourceDirectorySet java;
         private final SourceDirectorySet resources;
 
+        private final SourceSetDependencies dependencies;
+
         @Inject
-        public SourceSetConfiguration(String name, SourceDirectorySet java, SourceDirectorySet resources) {
+        public SourceSetConfiguration(ObjectFactory objectFactory, String name, SourceSet sourceSet) {
+            this.objectFactory = objectFactory;
             this.name = name;
-            this.java = java;
-            this.resources = resources;
+            this.sourceSet = sourceSet;
+            this.java = sourceSet.getJava();
+            this.resources = sourceSet.getResources();
+
+            this.dependencies = objectFactory.newInstance(SourceSetDependencies.class);
+
+            getIsPartOfUniversalJar().convention(SourceSet.isMain(sourceSet));
+            getIsPublished().convention(SourceSet.isMain(sourceSet));
+        }
+
+        /**
+         * @return the source set.
+         */
+        public SourceSet getSourceSet() {
+            return sourceSet;
         }
 
         /**
@@ -178,8 +200,9 @@ public abstract class SourceSetExtension {
         /**
          * @return the dependencies for the source set.
          */
-        @Inject
-        public abstract SourceSetDependencies getDependencies();
+        public SourceSetDependencies getDependencies() {
+            return dependencies;
+        }
 
         /**
          * @return the java source directory.

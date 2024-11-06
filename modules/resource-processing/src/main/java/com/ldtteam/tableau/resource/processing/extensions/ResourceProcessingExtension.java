@@ -36,7 +36,7 @@ public abstract class ResourceProcessingExtension implements ExtensionAware {
     public ResourceProcessingExtension(final Project project) {
         this.project = project;
 
-        isEnabled().convention(true);
+        getIsEnabled().convention(true);
 
         project.afterEvaluate(ignored -> {
             project.getTasks().named("processResources", ProcessResources.class, task -> {
@@ -51,7 +51,7 @@ public abstract class ResourceProcessingExtension implements ExtensionAware {
         });
     }
 
-    public abstract Property<Boolean> isEnabled();
+    public abstract Property<Boolean> getIsEnabled();
 
     /**
      * @return The properties to extend the resource processing.

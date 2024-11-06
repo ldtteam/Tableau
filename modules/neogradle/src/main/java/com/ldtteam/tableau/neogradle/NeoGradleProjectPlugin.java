@@ -13,8 +13,10 @@ import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExte
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.neoforged.gradle.common.extensions.MinecraftExtension;
+import net.neoforged.gradle.common.util.ProjectUtils;
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers;
 import net.neoforged.gradle.dsl.common.extensions.InterfaceInjections;
+import net.neoforged.gradle.dsl.common.extensions.Minecraft;
 import net.neoforged.gradle.dsl.common.runs.run.RunManager;
 import net.neoforged.gradle.userdev.UserDevPlugin;
 import org.gradle.api.Project;
@@ -153,7 +155,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                             return List.of("--username", "Dev%s".formatted(randomAppendix));
                         } else {
                             //When not using random player names, we don't need to add any arguments.
-                            return null;
+                            return List.of();
                         }
                     })
             );
@@ -183,7 +185,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                     extension.getAdditionalDataGenMods().map(mods -> {
                         if (mods.isEmpty()) {
                             //When no additional data gen mods are set, we don't need to add any arguments.
-                            return null;
+                            return List.of();
                         }
 
                         //When additional data gen mods are set, we need to add the arguments for each mod.
@@ -229,25 +231,24 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             );
 
             //After evaluation, add the library configurations to the run.
-            target.afterEvaluate(ignored -> {
-                sourceSetExtension.getSourceSets()
-                        .stream()
-                        .filter(config -> NeoGradleSourceSetConfigurationExtension.get(config).getIncludeInLibraries().get())
-                        .map(config -> sourceSetContainer.getByName(config.getName()))
-                        .map(sourceSet -> getLibraryConfiguration(target, sourceSet))
-                        .forEach(config -> run.getDependencies().getRuntime().add(config));
-            });
+            sourceSetExtension.getSourceSets()
+                    .stream()
+                    .filter(config -> NeoGradleSourceSetConfigurationExtension.get(config).getIncludeInLibraries().get())
+                    .map(config -> sourceSetContainer.getByName(config.getName()))
+                    .map(sourceSet -> getLibraryConfiguration(target, sourceSet))
+                    .forEach(config -> run.getDependencies().getRuntime().add(config));
         });
     }
 
     /**
      * Gets the library configuration for the given source set.
      * <p>
-     *     If the source set is the main source set, the configuration is named "library".
-     *     If the source set is not the main source set, the configuration is named "%sLibrary".formatted(sourceSet.getName()).
-     *     If the source set is missing, then an exception is thrown.
+     * If the source set is the main source set, the configuration is named "library".
+     * If the source set is not the main source set, the configuration is named "%sLibrary".formatted(sourceSet.getName()).
+     * If the source set is missing, then an exception is thrown.
      * </p>
-     * @param target The project to get the configuration from.
+     *
+     * @param target    The project to get the configuration from.
      * @param sourceSet The source set to get the configuration for.
      * @return The library configuration.
      */
@@ -273,7 +274,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
     private void configureAccessTransformers(final Project project) {
         final NeoGradleExtension extension = NeoGradleExtension.get(project);
 
-        final MinecraftExtension minecraft = project.getExtensions().getByType(MinecraftExtension.class);
+        final Minecraft minecraft = project.getExtensions().getByType(Minecraft.class);
         final AccessTransformers accessTransformers = minecraft.getAccessTransformers();
 
         accessTransformers.files(extension.getAccessTransformers());
@@ -287,7 +288,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
     private void configureInterfaceInjections(final Project project) {
         final NeoGradleExtension extension = NeoGradleExtension.get(project);
 
-        final MinecraftExtension minecraft = project.getExtensions().getByType(MinecraftExtension.class);
+        final Minecraft minecraft = project.getExtensions().getByType(Minecraft.class);
         final InterfaceInjections interfaceInjections = minecraft.getInterfaceInjections();
 
         interfaceInjections.files(extension.getInterfaceInjections());

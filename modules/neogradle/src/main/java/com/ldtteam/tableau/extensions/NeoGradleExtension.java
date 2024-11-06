@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.extensions;
 
+import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
@@ -10,6 +11,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.bundling.Jar;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,21 +41,16 @@ public abstract class NeoGradleExtension implements ExtensionAware {
         }
 
         final VersioningExtension versioning = VersioningExtension.get(project);
+        final ModExtension modExtension = ModExtension.get(project);
 
         getPrimaryJarClassifier().convention("universal");
         getNeoForgeVersion().convention(
-            versioning.getMinecraft().getEnabled().flatMap(enabled -> {
-                if (enabled) {
-                    return versioning.getMinecraft().getMinecraftVersion().map(version -> {
-                        //The minecraft version is formatted like: a.b.c
-                        //The NeoForge version is formatted like: b.c.+
-                        final String[] parts = version.split("\\.");
-                        return "%s.%s.+".formatted(parts[1], parts[2]);
-                    });
-                } else {
-                    return null;
-                }
-            }).orElse("+")
+            modExtension.getMinecraftVersion().flatMap(enabled -> versioning.getMinecraft().getMinecraftVersion().map(version -> {
+                //The minecraft version is formatted like: a.b.c
+                //The NeoForge version is formatted like: b.c.+
+                final String[] parts = version.split("\\.");
+                return "%s.%s.+".formatted(parts[1], parts[2]);
+            })).orElse("+")
         );
 
         getUseRandomPlayerNames().convention(false);
@@ -65,6 +62,8 @@ public abstract class NeoGradleExtension implements ExtensionAware {
                 manifest.attributes(Map.of("FMLModType", getIsFmlLibrary().map(isFmlLibrary -> isFmlLibrary ? "LIBRARY" : "MOD")));
             });
         });
+
+        getAdditionalDataGenMods().convention(List.of());
     }
 
     /**

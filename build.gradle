@@ -41,3 +41,29 @@ gradlePlugin {
         }
     }
 }
+
+allprojects { Project it ->
+    it.plugins.apply('java')
+    it.plugins.apply('maven-publish')
+
+    it.version = '1.0.0-SNAPSHOT'
+    it.group = 'com.ldtteam.tableau'
+
+    it.publishing {
+        publications {
+            all {
+                suppressAllPomMetadataWarnings()
+            }
+        }
+
+        repositories {
+            maven {
+                url = uri('https://ldtteam.jfrog.io/artifactory/tableau/')
+                credentials {
+                    username = System.getenv('ARTIFACTORY_USERNAME')
+                    password = System.getenv('ARTIFACTORY_PASSWORD')
+                }
+            }
+        }
+    }
+}

@@ -11,12 +11,10 @@ public class TableauPlugin implements Plugin<Object> {
     public void apply(final @NotNull Object target) {
         if (target instanceof Project project) {
             project.getPlugins().apply(TableauProjectPlugin.class);
-        }
-
-        if (target instanceof Settings settings) {
+        } else if (target instanceof Settings settings) {
             settings.getPlugins().apply(TableauSettingsPlugin.class);
+        } else {
+            throw new IllegalArgumentException("Unsupported target type: " + target.getClass().getName());
         }
-
-        throw new IllegalArgumentException("Unsupported target type: " + target.getClass().getName());
     }
 }

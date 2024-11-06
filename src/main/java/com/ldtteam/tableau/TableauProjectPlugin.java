@@ -3,7 +3,6 @@ package com.ldtteam.tableau;
 import com.ldtteam.tableau.changelog.ChangelogPlugin;
 import com.ldtteam.tableau.common.CommonPlugin;
 import com.ldtteam.tableau.crowdin.CrowdinPlugin;
-import com.ldtteam.tableau.crowdin.translation.management.CrowdinTranslationManagementPlugin;
 import com.ldtteam.tableau.curseforge.CurseForgePlugin;
 import com.ldtteam.tableau.extensions.ModuleFeatures;
 import com.ldtteam.tableau.features.FeaturePluginManager;
@@ -41,13 +40,12 @@ public class TableauProjectPlugin implements Plugin<Project> {
         target.getPlugins().apply(MavenPublishingPlugin.class);
         target.getPlugins().apply(ChangelogPlugin.class);
 
-        FeaturePluginManager.applyFeaturePlugin(target, GitPlugin.class, ModuleFeatures::usesGit);
-        FeaturePluginManager.applyFeaturePlugin(target, ParchmentPlugin.class, ModuleFeatures::usesParchment);
+        FeaturePluginManager.applyFeaturePlugin(target, GitPlugin.class, ModuleFeatures::getUsesGit);
+        FeaturePluginManager.applyFeaturePlugin(target, ParchmentPlugin.class, ModuleFeatures::getUsesParchment);
         FeaturePluginManager.applyFeaturePlugin(target, ShadowingPlugin.class, ModuleFeatures::getUsesShadowing);
         FeaturePluginManager.applyFeaturePlugin(target, JarJarPlugin.class, ModuleFeatures::getUsesJarJar);
         FeaturePluginManager.applyFeaturePlugin(target, CurseForgePlugin.class, ModuleFeatures::getUsesCurse);
         FeaturePluginManager.applyFeaturePlugin(target, CrowdinPlugin.class, ModuleFeatures::getUsesCrowdin);
-        FeaturePluginManager.applyFeaturePlugin(target, CrowdinTranslationManagementPlugin.class, ModuleFeatures::getUsesCrowdInTranslationManagement);
         FeaturePluginManager.applyFeaturePlugin(target, SonarQubePlugin.class, ModuleFeatures::getUsesSonarQube);
 
     }
