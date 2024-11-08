@@ -86,14 +86,20 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
                 feature.withJavadocJar();
             });
 
-            getUniversalJarSourceSets().add(
+            getUniversalJarSourceSets().addAll(
                     configuration.getIsPartOfUniversalJar()
                             .map(isPartOfUniversalJar -> isPartOfUniversalJar ? sourceSet : null)
+                            .filter(Objects::nonNull)
+                            .map(Collections::singletonList)
+                            .orElse(Collections.emptyList())
             );
 
-            getPublishedSourceSets().add(
+            getPublishedSourceSets().addAll(
                     configuration.getIsPublished()
                             .map(isPublished -> isPublished ? sourceSet : null)
+                            .filter(Objects::nonNull)
+                            .map(Collections::singletonList)
+                            .orElse(Collections.emptyList())
             );
 
             implementation.fromDependencyCollector(configuration.getDependencies().getImplementation());
