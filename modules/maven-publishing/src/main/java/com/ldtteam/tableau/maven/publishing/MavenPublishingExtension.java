@@ -14,6 +14,7 @@ import org.gradle.api.publish.maven.*;
 import org.gradle.internal.instrumentation.api.annotations.ToBeReplacedByLazyProperty;
 
 import javax.inject.Inject;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -161,7 +162,7 @@ public class MavenPublishingExtension {
 
         final ModExtension mod = ModExtension.get(project);
 
-        pom.getUrl().set(mod.getUrl());
+        pom.getUrl().set(mod.getRepositoryUrl().map(URI::toString));
 
         pom.organization(organization -> {
             organization.getName().set(mod.getPublisher());

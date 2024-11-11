@@ -16,6 +16,7 @@ dependencies {
     api project(':common')
     api project(':resource-processing')
     api project(':sourceset-management')
+    api project(':dependencies')
 
     api libs.bundles.neogradle
 }

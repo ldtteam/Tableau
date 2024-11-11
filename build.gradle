@@ -12,6 +12,7 @@ plugins {
 }
 
 dependencies {
+    api(project(':dependencies'))
     api(project(':changelog'))
     api(project(':maven-publishing'))
     api(project(':resource-processing'))
