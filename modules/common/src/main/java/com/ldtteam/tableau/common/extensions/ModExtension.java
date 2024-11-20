@@ -3,10 +3,10 @@ package com.ldtteam.tableau.common.extensions;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 
 import javax.inject.Inject;
+import java.net.URI;
 
 /**
  * Mod extension, handles the project configuration for the mod.
@@ -54,14 +54,29 @@ public abstract class ModExtension {
     }
 
     /**
+     * @return The minecraft version.
+     */
+    public abstract Property<String> getMinecraftVersion();
+
+    /**
      * @return The mod id.
      */
     public abstract Property<String> getModId();
 
     /**
-     * @return The minecraft version.
+     * @return The mod display name.
      */
-    public abstract Property<String> getMinecraftVersion();
+    public abstract Property<String> getModName();
+
+    /**
+     * @return The mod description.
+     */
+    public abstract Property<String> getModDescription();
+
+    /**
+     * @return The mod logo.
+     */
+    public abstract Property<String> getModLogo();
 
     /**
      * @return The mod publisher.
@@ -69,9 +84,24 @@ public abstract class ModExtension {
     public abstract Property<String> getPublisher();
 
     /**
-     * @return The mod url, is the location where documentation and support can be found.
+     * @return The website for the mod.
      */
-    public abstract Property<String> getUrl();
+    public abstract Property<URI> getDisplayUrl();
+
+    /**
+     * @return The repository url, where the source can be found.
+     */
+    public abstract Property<URI> getRepositoryUrl();
+
+    /**
+     * @return The issue tracker url, where issues may be filed for the mod.
+     */
+    public abstract Property<URI> getIssueTrackerUrl();
+
+    /**
+     * @return The license used for the mod.
+     */
+    public abstract Property<String> getLicense();
 
     /**
      * Mod versioning configuration.

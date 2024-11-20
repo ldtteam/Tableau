@@ -43,6 +43,8 @@ public abstract class NeoGradleExtension implements ExtensionAware {
         final VersioningExtension versioning = VersioningExtension.get(project);
         final ModExtension modExtension = ModExtension.get(project);
 
+        getAutoGenerateModsToml().convention(true);
+
         getPrimaryJarClassifier().convention("universal");
         getNeoForgeVersion().convention(
             modExtension.getMinecraftVersion().flatMap(enabled -> versioning.getMinecraft().getMinecraftVersion().map(version -> {
@@ -98,6 +100,11 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      * @return The version of NeoForge to use.
      */
     public abstract Property<String> getNeoForgeVersion();
+
+    /**
+     * @return Whether to automatically generate a neoforge.mods.toml during build.
+     */
+    public abstract Property<Boolean> getAutoGenerateModsToml();
 
     /**
      * @return The classifier for the primary jar.

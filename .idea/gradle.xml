@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/modules/common" />
             <option value="$PROJECT_DIR$/modules/crowdin" />
             <option value="$PROJECT_DIR$/modules/curseforge" />
+            <option value="$PROJECT_DIR$/modules/dependencies" />
             <option value="$PROJECT_DIR$/modules/git" />
             <option value="$PROJECT_DIR$/modules/jarjar" />
             <option value="$PROJECT_DIR$/modules/java" />
