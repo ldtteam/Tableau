@@ -65,4 +65,4 @@ jobs:
 
       - id: build
         name: "🏗️ Build"
-        run: ./gradlew --build-cache build -Pversion=${{ needs.tag.outputs.tag }}
+        run: ./gradlew --build-cache build publishPlugins --validate-only -Pgradle.publish.key=${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }} -Pversion=${{ needs.tag.outputs.tag }}
