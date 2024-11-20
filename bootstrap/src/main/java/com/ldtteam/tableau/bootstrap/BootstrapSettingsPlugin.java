@@ -8,19 +8,24 @@ import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 import org.gradle.plugin.use.PluginDependencySpec;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 public class BootstrapSettingsPlugin implements Plugin<Settings> {
 
     @Override
     public void apply(Settings target) {
+        final String version = this.getClass().getPackage().getImplementationVersion();
+
+        LoggerFactory.getLogger(BootstrapSettingsPlugin.class).warn("Setting up Bootstrap settings for {}", version);
+
+        target.getPluginManagement().getRepositories().mavenLocal();
         target.getPluginManagement().getRepositories().maven(repo -> {
             repo.setUrl("https://ldtteam.jfrog.io/artifactory/tableau/");
             repo.setName("Tableau");
         });
 
-        final PluginDependencySpec pluginDependencySpec = target.getPluginManagement().getPlugins().id("com.ldtteam.tableau");
-        pluginDependencySpec.version("1.0.0-SNAPSHOT");
-
-        target.getPlugins().apply("com.ldtteam.tableau");
+        target.getPluginManagement().plugins(plugins -> {
+            plugins.id("com.ldtteam.tableau").version(version);
+        });
     }
 }

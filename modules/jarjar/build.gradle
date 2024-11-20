@@ -22,7 +22,7 @@ gradlePlugin {
     plugins {
         "jarjar" {
             id = 'com.ldtteam.tableau.jarjar'
-            implementationClass = 'com.ldtteam.tableau.jarjar.JarjarPlugin'
+            implementationClass = 'com.ldtteam.tableau.jarjar.JarJarPlugin'
         }
     }
 }

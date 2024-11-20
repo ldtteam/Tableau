@@ -1,0 +1,68 @@
+name: Build
+
+on:
+  merge_group:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - labeled
+      - unlabeled
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+  packages: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    outputs:
+      tag: ${{ steps.tag.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: '0'
+
+      - name: Bump version and push tag
+        id: tag
+        uses: anothrNick/github-tag-action@1.71.0 # Don't use @master or @v1 unless you're happy to test the latest version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DEFAULT_BUMP: patch
+          GIT_API_TAGGING: false
+
+  publish:
+    needs:
+      - tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: '0'
+
+      - id: setupJava
+        name: "🔧 Setup Java"
+        run: |
+          echo "JAVA_HOME=$(echo $JAVA_HOME_21_X64)" >> "$GITHUB_ENV"
+
+      - id: setupGradle
+        name: "🔧 Setup Gradle"
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - id: build
+        name: "🏗️ Build"
+        run: ./gradlew --build-cache build publishPlugins --validate-only -Pgradle.publish.key=${{ secrets.GRADLE_PLUGIN_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PLUGIN_PUBLISH_SECRET }} -Pversion=${{ needs.tag.outputs.tag }}

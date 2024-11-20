@@ -29,7 +29,7 @@ gradlePlugin {
     plugins {
         "curseforge" {
             id = 'com.ldtteam.tableau.curseforge'
-            implementationClass = 'com.ldtteam.tableau.curseforge.CurseforgePlugin'
+            implementationClass = 'com.ldtteam.tableau.curseforge.CurseForgePlugin'
         }
     }
 }
