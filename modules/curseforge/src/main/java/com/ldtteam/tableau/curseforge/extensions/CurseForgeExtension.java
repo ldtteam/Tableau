@@ -1,6 +1,5 @@
 package com.ldtteam.tableau.curseforge.extensions;
 
-import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import net.darkhax.curseforgegradle.Constants;
@@ -136,18 +135,19 @@ public abstract class CurseForgeExtension {
         /**
          * The relationships of the project on CurseForge.
          * <p>
-         *     The key is is the slug of the project in the relationship and the value is the kind of relationship.
-         *     As values you can use:
-         *     <ul>
-         *         <li>embeddedLibrary</li>
-         *         <li>incompatible</li>
-         *         <li>optionalDependency</li>
-         *         <li>requiredDependency</li>
-         *         <li>tool</li>
-         *     </ul>
+         * The key is the slug of the project in the relationship and the value is the kind of relationship.
+         * Possible values you can use:
          * </p>
+         * <ul>
+         *     <li>embeddedLibrary</li>
+         *     <li>incompatible</li>
+         *     <li>optionalDependency</li>
+         *     <li>requiredDependency</li>
+         *     <li>tool</li>
+         * </ul>
          */
-        public MapProperty<String, String> getRelationships() {
+        public MapProperty<String, String> getRelationships()
+        {
             return this.relationships;
         }
 
