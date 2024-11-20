@@ -1,6 +1,5 @@
 package com.ldtteam.tableau.neogradle.model;
 
-import org.gradle.api.artifacts.component.ComponentIdentifier;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.PathSensitive;
@@ -14,28 +13,44 @@ import java.io.File;
 @SuppressWarnings("ClassCanBeRecord") // Because of Gradle configuration cache this file cannot be converted to a record due to missing getters.
 public class ResolvedDependency
 {
-    private final String id;
+    /**
+     * The version range of the dependency.
+     */
+    private final String versionRange;
 
+    /**
+     * The jar file.
+     */
     private final File file;
 
     /**
      * Default constructor.
      *
-     * @param id   The dependency identifier.
-     * @param file The jar file.
+     * @param versionRange The version range of the dependency.
+     * @param file         The jar file.
      */
-    public ResolvedDependency(final String id, final File file)
+    public ResolvedDependency(final String versionRange, final File file)
     {
-        this.id = id;
+        this.versionRange = versionRange;
         this.file = file;
     }
 
+    /**
+     * Get the version range of the dependency.
+     *
+     * @return the maven version range.
+     */
     @Input
-    public String getId()
+    public String getVersionRange()
     {
-        return id;
+        return versionRange;
     }
 
+    /**
+     * Get the jar file.
+     *
+     * @return the file in classpath where the jar is located.
+     */
     @InputFile
     @PathSensitive(PathSensitivity.NONE)
     public File getFile()

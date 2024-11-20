@@ -10,11 +10,13 @@ import com.ldtteam.tableau.dependencies.extensions.DependenciesExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
+import com.ldtteam.tableau.neogradle.model.CombinedDependency;
 import com.ldtteam.tableau.neogradle.tasks.GenerateModsTomlTask;
 import com.ldtteam.tableau.neogradle.model.ResolvedDependency;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
+import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension.SourceSetConfiguration;
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers;
 import net.neoforged.gradle.dsl.common.extensions.InterfaceInjections;
 import net.neoforged.gradle.dsl.common.extensions.Minecraft;
@@ -24,6 +26,11 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.Rule;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
+import org.gradle.api.artifacts.component.ModuleComponentSelector;
+import org.gradle.api.artifacts.result.DependencyResult;
+import org.gradle.api.artifacts.result.ResolvedArtifactResult;
+import org.gradle.api.internal.provider.BiProvider;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.*;
 import org.gradle.language.jvm.tasks.ProcessResources;
@@ -32,8 +39,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NeoGradleProjectPlugin implements Plugin<Project> {
@@ -95,7 +100,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
                 //Check if the source set is marked to be included in the libraries.
                 if (domainObjectName.equals("library")) {
-                    final SourceSetExtension.SourceSetConfiguration mainSourceSetConfig = sourceSetExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+                    final SourceSetConfiguration mainSourceSetConfig = sourceSetExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
                     final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(mainSourceSetConfig);
                     final SourceSet mainSourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(SourceSet.MAIN_SOURCE_SET_NAME);
 
@@ -122,7 +127,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                 //We know that a source set configuration exists for the given source set name.
                 //So we also know a neogradle extension exists for the source set configuration.
                 //And we know that the source set itself will exist.
-                final SourceSetExtension.SourceSetConfiguration sourceSetConfig = sourceSetExtension.getSourceSets().getByName(sourceSetName);
+                final SourceSetConfiguration sourceSetConfig = sourceSetExtension.getSourceSets().getByName(sourceSetName);
                 final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(sourceSetConfig);
                 final SourceSet sourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(sourceSetName);
 
@@ -322,12 +327,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             task.getIssueTrackerUrl().set(mod.getIssueTrackerUrl());
             task.getLicense().set(mod.getLicense());
 
-            final Configuration requiredConfiguration = dependencies.getRequiredConfiguration();
-            final Configuration optionalConfiguration = dependencies.getOptionalConfiguration();
-            task.getRequiredDependencies().set(resolveDependencies(requiredConfiguration));
-            task.getOptionalDependencies().set(resolveDependencies(optionalConfiguration));
-            task.getRequiredResolvedComponents().set(requiredConfiguration.getIncoming().getResolutionResult().getRootComponent());
-            task.getOptionalResolvedComponents().set(optionalConfiguration.getIncoming().getResolutionResult().getRootComponent());
+            task.getRequiredDependencies().set(resolveDependencies(dependencies.getRequiredConfiguration()));
+            task.getOptionalDependencies().set(resolveDependencies(dependencies.getOptionalConfiguration()));
         });
 
         if (neogradle.getAutoGenerateModsToml().get()) {
@@ -345,11 +346,40 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
      * @param configuration The configuration to look for dependencies in.
      * @return The set provider.
      */
-    private Provider<Set<ResolvedDependency>> resolveDependencies(final Configuration configuration)
+    private Provider<List<ResolvedDependency>> resolveDependencies(final Configuration configuration)
     {
-        return configuration.getIncoming()
-                 .getArtifacts()
-                 .getResolvedArtifacts()
-                 .map(m -> m.stream().map(m2 -> new ResolvedDependency(m2.getId().getComponentIdentifier().getDisplayName(), m2.getFile())).collect(Collectors.toSet()));
+        return new BiProvider<>(CombinedDependency.class,
+          configuration.getIncoming().getArtifacts().getResolvedArtifacts(),
+          configuration.getIncoming().getResolutionResult().getRootComponent(),
+          CombinedDependency::new).map(dependency -> dependency.artifacts()
+                                                       .stream()
+                                                       .map(resolvedArtifact -> new ResolvedDependency(dependency.component()
+                                                                                                         .getDependencies()
+                                                                                                         .stream()
+                                                                                                         .map(DependencyResult::getRequested)
+                                                                                                         .filter(f -> f instanceof ModuleComponentSelector)
+                                                                                                         .map(ModuleComponentSelector.class::cast)
+                                                                                                         .filter(f -> componentMatches(f, resolvedArtifact))
+                                                                                                         .map(m -> m.getVersionConstraint().getRequiredVersion())
+                                                                                                         .findFirst()
+                                                                                                         .orElse(null), resolvedArtifact.getFile()))
+                                                       .filter(f -> f.getVersionRange() != null)
+                                                       .toList());
+    }
+
+    /**
+     * Check whether the given component selector matches the provided resolved artifact.
+     *
+     * @param selector The input component selector.
+     * @param artifact The resolved artifact.
+     * @return True if the artifact identifier matches the component selector.
+     */
+    private static boolean componentMatches(final ModuleComponentSelector selector, final ResolvedArtifactResult artifact)
+    {
+        if (artifact.getId().getComponentIdentifier() instanceof ModuleComponentIdentifier artifactIdentifier)
+        {
+            return selector.getModuleIdentifier().equals(artifactIdentifier.getModuleIdentifier());
+        }
+        return false;
     }
 }
