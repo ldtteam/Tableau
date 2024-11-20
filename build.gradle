@@ -46,23 +46,32 @@ allprojects { Project it ->
     it.plugins.apply('java')
     it.plugins.apply('maven-publish')
 
-    it.version = '1.0.0-SNAPSHOT'
+    it.version = it.findProperty("version")
+    if (it.version == null) {
+        it.version = "0.0.0-LOCAL"
+    }
     it.group = 'com.ldtteam.tableau'
 
     it.publishing {
         publications {
-            all {
+            configureEach {
                 suppressAllPomMetadataWarnings()
             }
         }
 
         repositories {
             maven {
-                url = uri('https://ldtteam.jfrog.io/artifactory/tableau/')
+                name = "LDTTeam-Tableau"
+                url = uri('https://ldtteam.jfrog.io/artifactory/tableau-publishing/')
                 credentials {
                     username = System.getenv('ARTIFACTORY_USERNAME')
                     password = System.getenv('ARTIFACTORY_PASSWORD')
                 }
+            }
+
+            maven {
+                name = "Directory"
+                url = rootProject.layout.projectDirectory.dir("repo")
             }
         }
     }
