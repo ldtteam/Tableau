@@ -52,6 +52,11 @@ allprojects { Project it ->
     }
     it.group = 'com.ldtteam.tableau'
 
+    it.java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
     it.publishing {
         publications {
             configureEach {
