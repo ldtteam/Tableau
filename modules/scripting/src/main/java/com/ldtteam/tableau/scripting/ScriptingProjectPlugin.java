@@ -8,7 +8,20 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Core scripting logic plugin for projects.
+ * Allows for an extensible scripting extension as the root for our DSL.
+ */
 public class ScriptingProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new instance of the plugin.
+     */
+    @Inject
+    public ScriptingProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
