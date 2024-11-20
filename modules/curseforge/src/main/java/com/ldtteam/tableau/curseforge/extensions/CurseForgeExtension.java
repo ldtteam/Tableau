@@ -100,8 +100,8 @@ public abstract class CurseForgeExtension {
     /**
      * The relationships of the project on CurseForge.
      * <p>
-     *     The key is is the slug of the project in the relationship and the value is the kind of relationship.
-     *     As values you can use:
+     *     The key is the slug of the project in the relationship and the value is the kind of relationship.
+     *     As values, you can use:
      *     <ul>
      *         <li>embeddedLibrary</li>
      *         <li>incompatible</li>
@@ -109,7 +109,6 @@ public abstract class CurseForgeExtension {
      *         <li>requiredDependency</li>
      *         <li>tool</li>
      *     </ul>
-     * </p>
      */
     public abstract MapProperty<String, String> getRelationships();
 

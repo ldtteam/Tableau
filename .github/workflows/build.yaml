@@ -37,8 +37,9 @@ jobs:
           WITH_V: false
           DEFAULT_BUMP: patch
           GIT_API_TAGGING: false
+          DRY_RUN: true
 
-  publish:
+  build:
     needs:
       - tag
     runs-on: ubuntu-latest

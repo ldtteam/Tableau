@@ -4,15 +4,22 @@ import com.ldtteam.tableau.scripting.ScriptingPlugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionAware;
 
+import javax.inject.Inject;
+
 /**
  * Core class that defines the root of the tableau scripting DSL.
  * This class does not provide any functionality, other than being the root of the DSL.
  * <p>
  *     Statically this class provides an API to register an retrieve DSL extensions for a given project.
- * </p>
- *
  */
 public abstract class TableauScriptingExtension implements ExtensionAware {
+
+    /**
+     * Creates a new root DSL scripting extension.
+     */
+    @Inject
+    public TableauScriptingExtension() {
+    }
 
     /**
      * Gets the TableauScripting extension for the given project.
@@ -44,6 +51,7 @@ public abstract class TableauScriptingExtension implements ExtensionAware {
      * @param type the type of the extension
      * @param args the arguments to pass to the extension
      * @param <T> the type of the extension
+     * @return The instance of the extension that has been registered.
      */
     public static <T> T register(final Project project, final String name, final Class<T> type, final Object... args) {
         if (!project.getPlugins().hasPlugin(ScriptingPlugin.class))
