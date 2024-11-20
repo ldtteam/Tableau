@@ -54,7 +54,7 @@ public abstract class CurseForgeExtension {
     }
 
     /**
-     * The id of the project on CurseForge.
+     * @return The id of the project on CurseForge.
      */
     public abstract Property<Integer> getId();
 
@@ -136,7 +136,7 @@ public abstract class CurseForgeExtension {
          * The relationships of the project on CurseForge.
          * <p>
          * The key is the slug of the project in the relationship and the value is the kind of relationship.
-         * Possible values you can use:
+         * As values, you can use:
          * </p>
          * <ul>
          *     <li>embeddedLibrary</li>
