@@ -13,7 +13,6 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
-import org.gradle.api.Transformer;
 import org.gradle.api.file.Directory;
 import org.gradle.api.problems.Problems;
 import org.gradle.api.tasks.Copy;
@@ -26,7 +25,6 @@ import org.zaproxy.gradle.crowdin.tasks.BuildProjectTranslation;
 import javax.inject.Inject;
 import java.io.File;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -108,6 +106,9 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
 
                 target.getTasks().named(CrowdinPlugin.BUILD_PROJECT_TRANSLATION_TASK_NAME, BuildProjectTranslation.class, task -> {
                     task.getWaitForBuilds().set(true);
+                    task.getExportApprovedOnly().set(crowdinExtension.getExportApprovedOnly());
+                    task.getSkipUntranslatedFiles().set(crowdinExtension.getSkipUntranslatedFiles());
+                    task.getSkipUntranslatedStrings().set(crowdinExtension.getSkipUntranslatedStrings());
                 });
 
                 boolean willBuildTranslations = false;

@@ -83,4 +83,31 @@ public abstract class CrowdinExtension {
      * </p>
      */
     public abstract Property<String> getOnlyUploadOnBranchMatching();
+
+    /**
+     * Whether to only export approved translations.
+     * <p>
+     *     If not specified, defaults to false.
+     * </p>
+     * @return Whether to allow only approved translations.
+     */
+    public abstract Property<Boolean> getExportApprovedOnly();
+
+    /**
+     * Whether to skip untranslated translation files.
+     * <p>
+     *     If not specified, defaults to false.
+     * </p>
+     * @return Whether to skip untranslated translations files.
+     */
+    public abstract Property<Boolean> getSkipUntranslatedFiles();
+
+    /**
+     * Whether to skip untranslated translation strings.
+     * <p>
+     *     If not specified, defaults to false.
+     * </p>
+     * @return Whether to skip untranslated translations strings.
+     */
+    public abstract Property<Boolean> getSkipUntranslatedStrings();
 }
