@@ -8,6 +8,7 @@ import com.ldtteam.tableau.curseforge.extensions.CurseForgeExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.jarjar.JarJarPlugin;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.shadowing.ShadowingPlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.darkhax.curseforgegradle.Constants;
@@ -23,13 +24,26 @@ import org.gradle.api.tasks.TaskProvider;
 import org.gradle.jvm.tasks.Jar;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.util.Locale;
 
+/**
+ * Defines the CurseForge module plugin for {@link Project projects}
+ */
 public class CurseForgeProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public CurseForgeProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
         target.getPlugins().apply(NeoGradlePlugin.class);
+
+        TableauScriptingExtension.register(target, CurseForgeExtension.EXTENSION_NAME, CurseForgeExtension.class, target);
 
         configureUploadTask(target);
     }

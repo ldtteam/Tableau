@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A task that merges translations generated or pre-existing by datagen.
+ */
 @CacheableTask
 public abstract class MergeTranslations extends DefaultTask {
 
@@ -20,6 +23,11 @@ public abstract class MergeTranslations extends DefaultTask {
         setDescription("Merges the source translations into one translation set, and then writes that set to all targets.");
     }
 
+    /**
+     * Creates a merged translation as the task action.
+     *
+     * @throws Exception when the merge fails, or when the merged translations could not be written.
+     */
     @SuppressWarnings("unchecked")
     @TaskAction
     public void mergeTranslations() throws Exception {
@@ -38,10 +46,26 @@ public abstract class MergeTranslations extends DefaultTask {
         }
     }
 
+    /**
+     * The source files from which the translations should be merged.
+     * <p>
+     *     The collection is processed in order.
+     *     Translation keys which already exist in earlier files, will get overridden by values
+     *     of later files.
+     *
+     * @return The source files which should be merged.
+     */
     @InputFiles
     @PathSensitive(PathSensitivity.NONE)
     public abstract ConfigurableFileCollection getSourceFiles();
 
+    /**
+     * The files to which the merged results should be written.
+     * <p>
+     *     This is marked as an input, because multiple distinct outputs can not exist.
+     *
+     * @return The output files.
+     */
     @InputFiles
     @PathSensitive(PathSensitivity.NONE)
     public abstract ConfigurableFileCollection getTargetFiles();

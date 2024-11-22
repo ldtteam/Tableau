@@ -7,6 +7,12 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Plugin for the common module.
+ * <p>
+ *     Can be applied to any {@link org.gradle.api.plugins.PluginAware} but will only
+ *     operate on {@link Project projects}
+ */
 public class CommonPlugin implements Plugin<Object> {
 
     @Override

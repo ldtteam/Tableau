@@ -19,6 +19,11 @@ import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * The project plugin for the Java module.
+ * <p>
+ *     Configures the jar tasks and the relevant publishing tasks.
+ */
 public class JavaProjectPlugin implements Plugin<Project> {
 
     @Override

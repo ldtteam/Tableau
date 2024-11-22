@@ -30,6 +30,11 @@ public abstract class JavaExtension {
      */
     public static final String EXTENSION_NAME = "java";
 
+    /**
+     * Creates a new extension for the given project.
+     *
+     * @param project The project to create the extension for.
+     */
     @Inject
     public JavaExtension(final Project project) {
         final JavaPluginExtension java = project.getExtensions().getByType(JavaPluginExtension.class);
@@ -39,11 +44,15 @@ public abstract class JavaExtension {
     }
 
     /**
+     * Configures the java version to use as SDK.
+     *
      * @return the Java version
      */
     public abstract Property<Integer> getJavaVersion();
 
     /**
+     * Configures the automatic module name that should be used.
+     *
      * @return the automatic module name
      */
     public abstract Property<String> getAutomaticModuleName();

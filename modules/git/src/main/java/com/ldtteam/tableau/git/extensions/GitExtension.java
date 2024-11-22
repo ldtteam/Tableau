@@ -34,6 +34,11 @@ public abstract class GitExtension {
      */
     public static final String EXTENSION_NAME = "git";
 
+    /**
+     * Creates a new git extension model.
+     *
+     * @param project The project for the model.
+     */
     @Inject
     public GitExtension(@NotNull Project project) {
         this.getBranch().set(project.getProviders().of(CurrentBranchValueSource.class, noneValueSourceSpec -> { }));
@@ -116,6 +121,9 @@ public abstract class GitExtension {
         }
     }
 
+    /**
+     * Lazy value source for the origin remote url.
+     */
     public abstract static class OriginRemoteUrlValueSource implements ValueSource<String, ValueSourceParameters.None> {
 
         @Inject
@@ -132,8 +140,18 @@ public abstract class GitExtension {
         }
     }
 
+    /**
+     * A developer of the project.
+     *
+     * @param count The commit count of that developer.
+     * @param name The name of the developer.
+     * @param email The email of the developer.
+     */
     public record Developer(int count, String name, String email) {}
 
+    /**
+     * Lazy value source for the developers of the project.
+     */
     public abstract static class DevelopersValueSource implements ValueSource<List<Developer>, ValueSourceParameters.None> {
 
             @Inject
@@ -170,6 +188,9 @@ public abstract class GitExtension {
             }
     }
 
+    /**
+     * Lazy value source for the year of the first commit.
+     */
     public abstract static class FirstCommitYearValueSource implements ValueSource<Integer, ValueSourceParameters.None> {
 
         @Inject

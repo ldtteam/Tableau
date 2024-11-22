@@ -30,6 +30,9 @@ public abstract class ModuleFeatures {
         return project.getGradle().getExtensions().getByType(ModuleFeatures.class);
     }
 
+    /**
+     * Creates a new features model
+     */
     @Inject
     public ModuleFeatures() {
         getUsesCrowdin().convention(false);

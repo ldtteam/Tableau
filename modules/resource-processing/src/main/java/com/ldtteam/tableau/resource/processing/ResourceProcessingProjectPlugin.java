@@ -9,7 +9,19 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Configures the resource processing module for {@link Project}
+ */
 public class ResourceProcessingProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public ResourceProcessingProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {

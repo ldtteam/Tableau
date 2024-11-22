@@ -57,6 +57,11 @@ allprojects { Project it ->
         withJavadocJar()
     }
 
+    it.tasks.named('javadoc', Javadoc.class, { Javadoc task ->
+        task.failOnError = true
+        task.options.addStringOption('Werror', '-quiet')
+    })
+
     it.publishing {
         publications {
             configureEach {

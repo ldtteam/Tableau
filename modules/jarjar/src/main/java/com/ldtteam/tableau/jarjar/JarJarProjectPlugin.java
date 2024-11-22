@@ -14,12 +14,27 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.tasks.bundling.Jar;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Project plugin for JarJar.
+ * <p>
+ *     Configures the contained configuration, the jar task and the jarjar task.
+ *     Sets the jar task to have the slim classifier and the jarjar task to use the contained configuration.
+ */
 public class JarJarProjectPlugin implements Plugin<Project> {
 
     /**
      * Name of the configuration used by the jarjar plugin that contains the dependencies to be jar-in-jar'ed.
      */
     public static final String CONTAINED_CONFIGURATION_NAME = "contained";
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public JarJarProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
@@ -49,7 +64,6 @@ public class JarJarProjectPlugin implements Plugin<Project> {
      * Configures the jar task to use the slim classifier.
      * <p>
      *     This ensures that the jar-in-jar'ed jar is not overwritten by the original jar.
-     * </p>
      * @param project the project to configure
      */
     private void configureJarTask(Project project) {
@@ -62,7 +76,6 @@ public class JarJarProjectPlugin implements Plugin<Project> {
      * Configures the jarjar task.
      * <p>
      *     Ensures that the primary sourcesets are included and the contained configuration is used.
-     * </p>
      *
      * @param project the project to configure
      */

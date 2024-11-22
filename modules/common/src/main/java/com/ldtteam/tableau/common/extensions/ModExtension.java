@@ -38,6 +38,8 @@ public abstract class ModExtension {
     }
 
     /**
+     * The versioning model for this mod.
+     *
      * @return The versioning configuration.
      */
     public Versioning getVersioning() {
@@ -54,27 +56,37 @@ public abstract class ModExtension {
     }
 
     /**
+     * The current mod id for the mod.
+     * <p>
+     *     Not configuring the mod id, will likely result in an error during the build.
+     *
      * @return The mod id.
      */
     public abstract Property<String> getModId();
 
     /**
+     * The current main minecraft version against which the mod is build.
+     *
      * @return The minecraft version.
      */
     public abstract Property<String> getMinecraftVersion();
 
     /**
+     * The display name of the team or contributor who publishes the mod.
+     *
      * @return The mod publisher.
      */
     public abstract Property<String> getPublisher();
 
     /**
+     * The url of the website where documentation or source code can be found for the project.
+     *
      * @return The mod url, is the location where documentation and support can be found.
      */
     public abstract Property<String> getUrl();
 
     /**
-     * Mod versioning configuration.
+     * Mod versioning configuration model.
      */
     public abstract static class Versioning {
 
@@ -85,11 +97,23 @@ public abstract class ModExtension {
         }
 
         /**
+         * The semver or maven compatible version string.
+         * <p>
+         *     Mods should generally use maven versioning.
+         * <p>
+         *     The default value is 0.0.0
+         *
          * @return The mod version.
          */
         public abstract Property<String> getVersion();
 
         /**
+         * The version suffix.
+         * <p>
+         *     This should generally be something like -SNAPSHOT, -RELEASE or empty.
+         * <p>
+         *     Might also indicate the branch that was used as source to build this version of the mod.
+         *
          * @return The mod version suffix.
          */
         public abstract Property<String> getSuffix();

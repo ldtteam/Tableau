@@ -25,12 +25,20 @@ public abstract class ChangelogExtension {
     public static final String EXTENSION_NAME = "changelog";
 
     /**
-     * The header to use for the changelog.
+     * A property that holds the header of the changelog.
+     * <p>
+     *     Is optional and will prevent the output header task from running if not set.
+     *
+     * @return The header to use for the changelog.
      */
     public abstract Property<String> getHeader();
 
     /**
-     * The footer to use for the changelog.
+     * A property that holds the footer of the changelog.
+     * <p>
+     *     Is optional and will prevent the output footer task from running if not set.
+     *
+     * @return The footer to use for the changelog.
      */
     public abstract Property<String> getFooter();
 }

@@ -13,6 +13,12 @@ import java.util.function.Function;
 public class FeaturePluginManager {
 
     /**
+     * Private constructor as this is a utility class.
+     */
+    private FeaturePluginManager() {
+    }
+
+    /**
      * Apply a feature if it is enabled.
      *
      * @param project       The project to apply the feature to.
