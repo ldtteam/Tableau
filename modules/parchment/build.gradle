@@ -13,6 +13,8 @@ plugins {
 
 dependencies {
     api project(':scripting')
+    api project(':common')
+    api project(':neogradle')
 }
 
 gradlePlugin {

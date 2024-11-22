@@ -7,6 +7,8 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
 /**
  * Plugin for the common module.
  * <p>
@@ -14,6 +16,13 @@ import org.jetbrains.annotations.NotNull;
  *     operate on {@link Project projects}
  */
 public class CommonPlugin implements Plugin<Object> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public CommonPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Object target) {

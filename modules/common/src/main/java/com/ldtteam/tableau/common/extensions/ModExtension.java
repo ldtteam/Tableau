@@ -30,6 +30,11 @@ public abstract class ModExtension {
 
     private final Versioning versioning;
 
+    /**
+     * Creates a new mod extension model.
+     *
+     * @param project The project for the model.
+     */
     @Inject
     public ModExtension(final Project project) {
         versioning = project.getObjects().newInstance(Versioning.class);
@@ -90,6 +95,9 @@ public abstract class ModExtension {
      */
     public abstract static class Versioning {
 
+        /**
+         * Creates a new versioning model.
+         */
         @Inject
         public Versioning() {
             getVersion().convention("0.0.0");

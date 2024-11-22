@@ -29,6 +29,12 @@ public abstract class CrowdinExtension {
      */
     public static final String EXTENSION_NAME = "crowdin";
 
+    /**
+     * Creates a new Crowdin extension model.
+     *
+     * @param project The project for the model.
+     */
+    @SuppressWarnings("UnstableApiUsage")
     @Inject
     public CrowdinExtension(Project project) {
         final ModExtension mod = ModExtension.get(project);
@@ -72,7 +78,8 @@ public abstract class CrowdinExtension {
      * A regex pattern that needs to match the branch name for the build crowdin build to be triggered.
      * <p>
      *     If not specified, the build will be triggered on all branches.
-     * </p>
+     *
+     * @return {@code true} if the build should only be triggered on matching branches.
      */
     public abstract Property<String> getOnlyBuildOnBranchMatching();
 
@@ -80,7 +87,8 @@ public abstract class CrowdinExtension {
      * A regex pattern that needs to match the branch name for the upload to crowdin to be triggered.
      * <p>
      *     If not specified, the upload will be triggered on all branches.
-     * </p>
+     *
+     * @return {@code true} if the upload should only be triggered on matching branches.
      */
     public abstract Property<String> getOnlyUploadOnBranchMatching();
 
@@ -88,7 +96,7 @@ public abstract class CrowdinExtension {
      * Whether to only export approved translations.
      * <p>
      *     If not specified, defaults to false.
-     * </p>
+     *
      * @return Whether to allow only approved translations.
      */
     public abstract Property<Boolean> getExportApprovedOnly();
@@ -97,7 +105,7 @@ public abstract class CrowdinExtension {
      * Whether to skip untranslated translation files.
      * <p>
      *     If not specified, defaults to false.
-     * </p>
+     *
      * @return Whether to skip untranslated translations files.
      */
     public abstract Property<Boolean> getSkipUntranslatedFiles();
@@ -106,7 +114,7 @@ public abstract class CrowdinExtension {
      * Whether to skip untranslated translation strings.
      * <p>
      *     If not specified, defaults to false.
-     * </p>
+     *
      * @return Whether to skip untranslated translations strings.
      */
     public abstract Property<Boolean> getSkipUntranslatedStrings();

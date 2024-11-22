@@ -7,7 +7,21 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * The root plugin for the NeoGradle module.
+ * <p>
+ *     Can be applied to any {@link org.gradle.api.plugins.PluginAware} but will only interact with {@link Project projects}
+ */
 public class NeoGradlePlugin implements Plugin<Object> {
+
+    /**
+     * Creates a new instance of the NeoGradle plugin.
+     */
+    @Inject
+    public NeoGradlePlugin() {
+    }
 
     @Override
     public void apply(@NotNull Object target) {

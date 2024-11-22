@@ -9,10 +9,24 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Project plugin for the utilities module.
+ * <p>
+ *     Configures the project with the utility functions.
+ */
 public class UtilitiesProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public UtilitiesProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
-        TableauScriptingExtension.register(target, UtilityFunctions.EXTENSION_NAME, UtilityFunctions.class, target);
+        TableauScriptingExtension.register(target, UtilityFunctions.EXTENSION_NAME, UtilityFunctions.class);
     }
 }

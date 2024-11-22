@@ -6,6 +6,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.tasks.*;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -18,6 +19,10 @@ import java.util.Set;
 @CacheableTask
 public abstract class MergeTranslations extends DefaultTask {
 
+    /**
+     * Creates a new merge translations task.
+     */
+    @Inject
     public MergeTranslations() {
         setGroup("Crowdin");
         setDescription("Merges the source translations into one translation set, and then writes that set to all targets.");

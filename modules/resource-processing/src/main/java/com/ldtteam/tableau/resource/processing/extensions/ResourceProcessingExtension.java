@@ -47,7 +47,7 @@ public abstract class ResourceProcessingExtension implements ExtensionAware {
         project.afterEvaluate(ignored -> {
             //Get all source sets.
             final SourceSetContainer container = project.getExtensions().getByType(SourceSetContainer.class);
-            container.all(sourceSet -> {
+            container.configureEach(sourceSet -> {
 
                 //For each source set get its process resources task
                 project.getTasks().named(sourceSet.getProcessResourcesTaskName(), ProcessResources.class, task -> {

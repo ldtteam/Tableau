@@ -51,6 +51,11 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
 
     private final NamedDomainObjectContainer<SourceSetConfiguration> sourceSets;
 
+    /**
+     * Creates a new extension.
+     *
+     * @param project The project.
+     */
     @SuppressWarnings("UnstableApiUsage")
     @Inject
     public SourceSetExtension(final Project project) {
@@ -119,6 +124,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
     }
 
     /**
+     * The source sets which are configured for use with Tableau.
+     *
      * @return the source sets that are configured.
      */
     public NamedDomainObjectContainer<SourceSetConfiguration> getSourceSets() {
@@ -460,6 +467,13 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
 
         private final SourceSetDependencies dependencies;
 
+        /**
+         * Creates a new source set configuration.
+         *
+         * @param objectFactory The object factory.
+         * @param name          The name of the source set.
+         * @param sourceSet     The source set.
+         */
         @Inject
         public SourceSetConfiguration(ObjectFactory objectFactory, String name, SourceSet sourceSet) {
             this.name = name;
@@ -474,6 +488,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         }
 
         /**
+         * The gradle source set that this configuration is for.
+         *
          * @return the source set.
          */
         public SourceSet getSourceSet() {
@@ -481,6 +497,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         }
 
         /**
+         * The name of the source set.
+         *
          * @return the name of the source set.
          */
         @Override
@@ -503,6 +521,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         public abstract Property<Boolean> getIsPublished();
 
         /**
+         * The dependencies for the source set.
+         *
          * @return the dependencies for the source set.
          */
         public SourceSetDependencies getDependencies() {
@@ -510,6 +530,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         }
 
         /**
+         * The java source directory configuration.
+         *
          * @return the java source directory.
          */
         public SourceDirectorySet getJava() {
@@ -526,6 +548,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         }
 
         /**
+         * The resources source directory configuration.
+         *
          * @return the resources source directory.
          */
         public SourceDirectorySet getResources() {
@@ -561,11 +585,22 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
     public abstract static class SourceSetDependencies implements Dependencies {
 
         /**
+         * Creates a new source set dependencies model.
+         */
+        @Inject
+        public SourceSetDependencies() {
+        }
+
+        /**
+         * The implementation dependencies.
+         *
          * @return the implementation dependencies.
          */
         public abstract DependencyCollector getImplementation();
 
         /**
+         * The api dependencies.
+         *
          * @return the api dependencies.
          */
         public abstract DependencyCollector getApi();

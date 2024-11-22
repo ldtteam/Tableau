@@ -8,6 +8,8 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
 /**
  * Core project plugin for the changelog module.
  * <p>
@@ -15,6 +17,13 @@ import org.jetbrains.annotations.NotNull;
  *     The output tasks will only run if there is a footer or header registered.
  */
 public class ChangelogProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public ChangelogProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {

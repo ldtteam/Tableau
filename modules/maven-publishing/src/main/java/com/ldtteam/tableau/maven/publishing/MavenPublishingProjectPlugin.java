@@ -13,7 +13,22 @@ import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Maven publishing project plugin.
+ * <p>
+ *     Configures a projects maven publishing system.
+ *     Can read information from the git module, or from the common module.
+ */
 public class MavenPublishingProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public MavenPublishingProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
@@ -26,11 +41,17 @@ public class MavenPublishingProjectPlugin implements Plugin<Project> {
         configurePublication(target);
     }
 
-    public void configurePublication(Project project) {
+    /**
+     * Configures the publication of the project.
+     *
+     * @param project The project to configure.
+     */
+    private void configurePublication(Project project) {
         final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
         final MavenPublishingExtension mavenPublishing = MavenPublishingExtension.get(project);
 
         project.afterEvaluate(ignored -> {
+            //This needs to be in an after evaluate block to ensure that the project has been configured.
             publishing.getPublications().create("default", MavenPublication.class, publication -> {
                 publication.from(project.getComponents().getByName("java"));
                 publication.pom(mavenPublishing::configure);

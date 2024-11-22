@@ -4,6 +4,8 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 
+import javax.inject.Inject;
+
 /**
  * The changelog extension, configures properties related to how the changelog is generated.
  */
@@ -23,6 +25,13 @@ public abstract class ChangelogExtension {
      * The name of the extension.
      */
     public static final String EXTENSION_NAME = "changelog";
+
+    /**
+     * Creates a new instance of the changelog extension.
+     */
+    @Inject
+    public ChangelogExtension() {
+    }
 
     /**
      * A property that holds the header of the changelog.

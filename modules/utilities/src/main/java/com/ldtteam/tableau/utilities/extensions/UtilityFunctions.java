@@ -4,18 +4,14 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
 
 import javax.inject.Inject;
-import java.util.*;
 
 /**
  * A collection of utility functions exposed to the build script through the "opc" extension.
  */
 public abstract class UtilityFunctions implements ExtensionAware {
-
-    private final ProviderFactory providerFactory;
 
     /**
      * The name of the extension.
@@ -35,15 +31,11 @@ public abstract class UtilityFunctions implements ExtensionAware {
         return (UtilityFunctions) extensionAware.getExtensions().getByName(EXTENSION_NAME);
     }
 
+    /**
+     * Creates a new instance of the utility functions.
+     */
     @Inject
-    public UtilityFunctions(Object object) {
-        switch (object) {
-            case ProviderFactory factory -> this.providerFactory = factory;
-            case Project project -> this.providerFactory = project.getProviders();
-            case Settings settings -> this.providerFactory = settings.getProviders();
-            case null, default ->
-                    throw new IllegalArgumentException("The object must be a ProviderFactory, a Project or a Settings.");
-        }
+    public UtilityFunctions() {
     }
 
     /**
@@ -99,28 +91,5 @@ public abstract class UtilityFunctions implements ExtensionAware {
         }
 
         return versionBuilder.toString();
-    }
-
-    /**
-     * Determines the next major version based on the current version.
-     *
-     * @param currentVersion The current version.
-     * @return The next major version.
-     */
-    public String determineNextMajorVersion(final String currentVersion) {
-        final String[] parts = splitVersionNumber(currentVersion);
-        final int major = Integer.parseInt(parts[0]);
-        return "%d.0.0".formatted(major + 1);
-    }
-
-    /**
-     * Builds a supported version range based on the current version.
-     *
-     * @param version The current version.
-     * @return The supported version range.
-     */
-    public String buildSupportedVersionRange(final String version) {
-        final String nextMajorVersion = determineNextMajorVersion(version);
-        return "[%s, %s)".formatted(version, nextMajorVersion);
     }
 }

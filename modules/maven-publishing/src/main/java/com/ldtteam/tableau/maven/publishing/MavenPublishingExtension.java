@@ -55,6 +55,11 @@ public class MavenPublishingExtension {
 
     private PublishingMode publishingMode = PublishingMode.UNKNOWN;
 
+    /**
+     * Creates a new Maven publishing extension.
+     *
+     * @param project the project to create the extension for
+     */
     @Inject
     public MavenPublishingExtension(final Project project) {
         this.project = project;
@@ -74,7 +79,6 @@ public class MavenPublishingExtension {
      * Configures the publishing system to publish the project to the LDTTeam Maven repository.
      * <p>
      *     Also configures the POM to publish to the LDTTeam Maven repository.
-     * </p>
      */
     public void publishToLDTTeamMaven() {
         //LDTTeam always overrides configured POM settings
@@ -102,7 +106,6 @@ public class MavenPublishingExtension {
      * Configures the publishing system to publish the project to the local Maven repository.
      * <p>
      *     Also configures the POM to publish to the local Maven repository, if it has not already been set to the LDTTeam Maven repository.
-     * </p>
      */
     public void publishToGithub() {
         if (publishingMode.includedInMaven()) {
@@ -133,7 +136,6 @@ public class MavenPublishingExtension {
      * Configures the publishing system to publish the project to the local Maven repository.
      * <p>
      *     Does **not** configure the POM to publish to the local Maven repository.
-     * </p>
      */
     public void publishLocally() {
         if (publishingMode.includedInMaven()) {
@@ -168,10 +170,14 @@ public class MavenPublishingExtension {
         });
 
         pom.setPackaging("jar");
-
-
     }
 
+    /**
+     * The {@link MavenPom} implementation that delegates to the actual POM and applies additional configuration.
+     *
+     * @param project the project to which this POM belongs
+     * @param delegate the actual {@link MavenPom} to delegate to
+     */
     public record POM(Project project, MavenPom delegate) implements MavenPom {
 
         @ToBeReplacedByLazyProperty

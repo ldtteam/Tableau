@@ -30,6 +30,11 @@ public abstract class VersioningExtension {
     private final MinecraftBasedVersioning minecraft;
     private final ModExtension.Versioning mod;
 
+    /**
+     * Creates a new versioning extension model.
+     *
+     * @param project The project for the model.
+     */
     @Inject
     public VersioningExtension(final Project project) {
         minecraft = project.getObjects().newInstance(MinecraftBasedVersioning.class, project);
@@ -78,6 +83,11 @@ public abstract class VersioningExtension {
      */
     public static abstract class MinecraftBasedVersioning {
 
+        /**
+         * Creates a new minecraft based versioning model.
+         *
+         * @param project The project for the model.
+         */
         @Inject
         public MinecraftBasedVersioning(final Project project) {
             getEnabled().convention(false);

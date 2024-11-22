@@ -4,6 +4,8 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.provider.MapProperty;
 
+import javax.inject.Inject;
+
 /**
  * Represents the shadowing extension.
  */
@@ -24,6 +26,10 @@ public abstract class ShadowingExtension {
      */
     public static final String EXTENSION_NAME = "shadowing";
 
+    /**
+     * Creates a new shadowing extension.
+     */
+    @Inject
     public ShadowingExtension() {
     }
 

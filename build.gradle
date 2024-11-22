@@ -26,7 +26,6 @@ dependencies {
     api(project(':jarjar'))
     api(project(':shadowing'))
     api(project(':common'))
-    api(project(':sonarqube'))
     api(project(':utilities'))
     api(project(':local-file-configuration'))
     api(project(':crowdin'))

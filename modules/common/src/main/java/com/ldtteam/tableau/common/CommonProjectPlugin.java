@@ -108,7 +108,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
      *     This will set the version of the project to the version of the mod.
      *     If the minecraft based versioning is enabled, the version will be set to the minecraft based version.
      *     If the minecraft based versioning is disabled, the version will be set to the version of the mod.
-     * </p>
      *
      * @param target The target project.
      */

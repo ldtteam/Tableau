@@ -41,8 +41,10 @@ public abstract class GitExtension {
      */
     @Inject
     public GitExtension(@NotNull Project project) {
-        this.getBranch().set(project.getProviders().of(CurrentBranchValueSource.class, noneValueSourceSpec -> { }));
-        this.getGitUrl().set(project.getProviders().of(OriginRemoteUrlValueSource.class, noneValueSourceSpec -> { }));
+        this.getBranch().set(project.getProviders().of(CurrentBranchValueSource.class, noneValueSourceSpec -> {
+        }));
+        this.getGitUrl().set(project.getProviders().of(OriginRemoteUrlValueSource.class, noneValueSourceSpec -> {
+        }));
         this.getGithubUrl().set(this.getGitUrl().map(it -> {
             //Remove the ".git" suffix
             if (it.endsWith(".git")) {
@@ -51,8 +53,10 @@ public abstract class GitExtension {
 
             return it;
         }));
-        this.getDevelopers().set(project.getProviders().of(DevelopersValueSource.class, noneValueSourceSpec -> { }));
-        this.getInitialCommitYear().set(project.getProviders().of(FirstCommitYearValueSource.class, noneValueSourceSpec -> { }));
+        this.getDevelopers().set(project.getProviders().of(DevelopersValueSource.class, noneValueSourceSpec -> {
+        }));
+        this.getInitialCommitYear().set(project.getProviders().of(FirstCommitYearValueSource.class, noneValueSourceSpec -> {
+        }));
         this.getRepositoryName().set(this.getGithubUrl().map(it -> {
             //Extract the repository name from the url.
             final int lastSlash = it.lastIndexOf('/');
@@ -107,6 +111,20 @@ public abstract class GitExtension {
      */
     public abstract static class CurrentBranchValueSource implements ValueSource<String, ValueSourceParameters.None> {
 
+        /**
+         * Creates a new value source.
+         */
+        @Inject
+        public CurrentBranchValueSource() {
+        }
+
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         *     Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
         @Inject
         abstract ExecOperations getExecOperations();
 
@@ -126,6 +144,20 @@ public abstract class GitExtension {
      */
     public abstract static class OriginRemoteUrlValueSource implements ValueSource<String, ValueSourceParameters.None> {
 
+        /**
+         * Creates a new value source.
+         */
+        @Inject
+        public OriginRemoteUrlValueSource() {
+        }
+
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         *     Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
         @Inject
         abstract ExecOperations getExecOperations();
 
@@ -144,48 +176,63 @@ public abstract class GitExtension {
      * A developer of the project.
      *
      * @param count The commit count of that developer.
-     * @param name The name of the developer.
+     * @param name  The name of the developer.
      * @param email The email of the developer.
      */
-    public record Developer(int count, String name, String email) {}
+    public record Developer(int count, String name, String email) {
+    }
 
     /**
      * Lazy value source for the developers of the project.
      */
     public abstract static class DevelopersValueSource implements ValueSource<List<Developer>, ValueSourceParameters.None> {
 
-            @Inject
-            abstract ExecOperations getExecOperations();
+        /**
+         * Creates a new value source.
+         */
+        @Inject
+        public DevelopersValueSource() {
+        }
 
-            public List<Developer> obtain() {
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                getExecOperations().exec(it -> {
-                    it.setCommandLine("git", "shortlog", "-sne");
-                    it.setStandardOutput(output);
-                });
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         * Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
+        @Inject
+        abstract ExecOperations getExecOperations();
 
-                final String outputString = output.toString(Charset.defaultCharset());
-                //The output is formatted like:
-                // 100 Author Name <email>
-                //   2 Author Name <email>
-                //We need to parse that into a list of developers.
-                return outputString.lines().map(line -> {
-                    //First extract the email:
-                    final int emailStart = line.indexOf('<');
-                    final int emailEnd = line.lastIndexOf('>');
-                    final String email = line.substring(emailStart + 1, emailEnd).trim();
+        public List<Developer> obtain() {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            getExecOperations().exec(it -> {
+                it.setCommandLine("git", "shortlog", "-sne");
+                it.setStandardOutput(output);
+            });
 
-                    //Then extract the name, it starts at the first none whitespace and numeric character and ends at the first '<' character.:
-                    final int nameStart = line.length() - line.replaceFirst("( |\\d)+", "").length();
-                    final int nameEnd = line.indexOf('<') - 1;
-                    final String name = line.substring(nameStart, nameEnd).trim();
+            final String outputString = output.toString(Charset.defaultCharset());
+            //The output is formatted like:
+            // 100 Author Name <email>
+            //   2 Author Name <email>
+            //We need to parse that into a list of developers.
+            return outputString.lines().map(line -> {
+                //First extract the email:
+                final int emailStart = line.indexOf('<');
+                final int emailEnd = line.lastIndexOf('>');
+                final String email = line.substring(emailStart + 1, emailEnd).trim();
 
-                    //Finally extract the count:
-                    final int count = Integer.parseInt(line.substring(0, nameStart).trim());
+                //Then extract the name, it starts at the first none whitespace and numeric character and ends at the first '<' character.:
+                final int nameStart = line.length() - line.replaceFirst("( |\\d)+", "").length();
+                final int nameEnd = line.indexOf('<') - 1;
+                final String name = line.substring(nameStart, nameEnd).trim();
 
-                    return new Developer(count, name, email);
-                }).toList();
-            }
+                //Finally extract the count:
+                final int count = Integer.parseInt(line.substring(0, nameStart).trim());
+
+                return new Developer(count, name, email);
+            }).toList();
+        }
     }
 
     /**
@@ -193,6 +240,20 @@ public abstract class GitExtension {
      */
     public abstract static class FirstCommitYearValueSource implements ValueSource<Integer, ValueSourceParameters.None> {
 
+        /**
+         * Creates a new value source.
+         */
+        @Inject
+        public FirstCommitYearValueSource() {
+        }
+
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         *     Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
         @Inject
         abstract ExecOperations getExecOperations();
 

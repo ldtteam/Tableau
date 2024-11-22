@@ -8,7 +8,22 @@ import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Plugin for the utilities module.
+ * <p>
+ *     Can be applied to any {@link org.gradle.api.plugins.PluginAware} object
+ *     but will only operate on {@link Project} and {@link Settings} instances.
+ */
 public class UtilitiesPlugin implements Plugin<Object> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public UtilitiesPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Object target) {

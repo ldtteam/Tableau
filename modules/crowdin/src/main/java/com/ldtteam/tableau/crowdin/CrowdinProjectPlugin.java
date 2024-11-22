@@ -37,6 +37,8 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
 
     /**
      * Creates a new plugin instance.
+     *
+     * @param problems The {@link Problems} handler to use.
      */
     @Inject
     public CrowdinProjectPlugin(Problems problems) {

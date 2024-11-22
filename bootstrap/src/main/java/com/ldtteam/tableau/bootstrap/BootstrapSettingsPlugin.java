@@ -7,6 +7,8 @@ import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+
 /**
  * Defines the core settings plugin for bootstrapping Tableau.
  * <p>
@@ -18,6 +20,13 @@ import org.slf4j.LoggerFactory;
  *     It will pull the version to load from its own published manifest.
  */
 public class BootstrapSettingsPlugin implements Plugin<Settings> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public BootstrapSettingsPlugin() {
+    }
 
     @Override
     public void apply(Settings target) {
