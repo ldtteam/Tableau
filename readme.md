@@ -1,7 +1,6 @@
-<h1 align="center" style="text-align: center;">Tableau</h1>
-==================
-
 <!--suppress HtmlDeprecatedAttribute -->
+<h1 align="center" style="text-align: center;">Tableau</h1>
+
 <div align="center">
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ldtteam/Tableau/publish.yaml?branch=main&logo=github)][Build Workflow]
@@ -17,3 +16,8 @@ Tableau is a collection of Gradle plugins that provide a common set of functiona
 
 
 
+[Build Workflow]: https://github.com/ldtteam/Tableau/actions/workflows/publish.yaml
+[GitHub Releases]: https://github.com/ldtteam/Tableau/tags
+[GitHub Issues]: https://github.com/ldtteam/Tableau/issues?q=is%3Aopen+is%3Aissue+label%3Abug
+[Maven]: https://ldtteam.jfrog.io/ui/native/tableau-publishing/com/ldtteam/tableau/
+[Discord]: https://discord.gg/Pd5vYh5K
