@@ -25,7 +25,6 @@
             <option value="$PROJECT_DIR$/modules/resource-processing" />
             <option value="$PROJECT_DIR$/modules/scripting" />
             <option value="$PROJECT_DIR$/modules/shadowing" />
-            <option value="$PROJECT_DIR$/modules/sonarqube" />
             <option value="$PROJECT_DIR$/modules/sourceset-management" />
             <option value="$PROJECT_DIR$/modules/utilities" />
           </set>
