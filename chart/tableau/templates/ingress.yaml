@@ -23,7 +23,7 @@ spec:
         {{- range .Values.ingress.hosts }}
         - {{ . | quote }}
         {{- end }}
-      secretName: "minecolonies-website-tls"
+      secretName: "{{ $fullName }}-tls"
   rules:
     {{- range .Values.ingress.hosts }}
     - host: {{ . | quote }}
