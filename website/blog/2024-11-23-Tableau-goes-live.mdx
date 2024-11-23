@@ -1,0 +1,95 @@
+---
+slug: tableau-goes-live
+tags: [gradle, modules, infrastructure]
+title: Tableau goes live
+created: 2024-11-23
+authors: [orion]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Tableau is now live and ready for use. You can now use it to manage your modding projects.
+
+## Tableau Released!
+
+Welcome to our first (pre-)release of Tableau, the modding project management tool. We are excited to share this with you and hope you will find it useful.
+The basic concept of Tableau is to provide a way to manage your modding projects in a more structured way. It is designed to work with different modding frameworks and provide a unified way to manage your projects.
+As a core idea we wanted to introduce a completely declarative way to manage your projects. You tell Tableau what you want, and it takes care of the rest.
+
+<!-- truncate -->
+
+### Features
+
+With this initial pre-release we already support a large amount of features some highlights are:
+- Handling of core mod properties
+- Interpolation of properties in resources
+- Crowdin integration
+- Automatic CurseForge file uploads
+- Extraction of information from Git
+- Support for configuring Maven Publishing
+    - Publishing to the LDTTeam Maven
+    - Publishing to GitHub Releases and Packages
+    - Publishing to a Local Directory
+    - Extraction of information for the POM from the Git repository
+    - Extraction of information for the POM from other Tableau modules
+- Support for NeoGradle project management
+    - Other Modding Frameworks to follow
+    - Other Modding Platforms to follow
+- Support for Parchment
+- Support for direct source set management (no need for a `sourceSets` block, or a `dependencies` block)
+
+### Getting started
+To get started apply the Tableau bootstrap plugin to your project. The bootstrap module is supposed to be released on the Gradle Plugins portal. Once it is released, you can apply it to your `settings.gradle` like this:
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy settings.gradle
+plugins {
+    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin settings.gradle.kts
+plugins {
+    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+}
+```
+</TabItem>
+</Tabs>
+
+However, right now it is not released yet, and you need to pull the bootstrap module from the Tableau Maven repository. To do this, you need to add the following to your `settings.gradle` file:
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+```groovy settings.gradle
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url "https://ldtteam.jfrog.io/artifactory/tableau/"
+        }
+    }
+}
+
+plugins {
+    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+}
+```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+```kotlin settings.gradle.kts
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url = uri("https://ldtteam.jfrog.io/artifactory/tableau/")
+        }
+    }
+}
+
+plugins {
+    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+}
+```
+    </TabItem>
+</Tabs>

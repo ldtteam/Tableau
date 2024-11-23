@@ -1,19 +1,19 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+gradle:
+  label: Gradle
+  permalink: /gradle
+  description: All posts related to our work on Gradle plugins
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+modules:
+  label: Modules
+  permalink: /modules
+  description: All posts related to our modules
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+platforms:
+  label: Platforms
+  permalink: /platforms
+  description: All posts related to the modding platforms we support
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+infrastructure:
+  label: Infrastructure
+  permalink: /infrastructure
+  description: All posts related to our infrastructure

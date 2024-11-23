@@ -1,0 +1,135 @@
+---
+sidebar_label: Getting started
+title: Start using Tableau
+slug: getting-started
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+To start using tableau you will need to apply to tableau plugin and configure it for your project.
+This short guide will help you set up your project.
+
+To set up a basic Tableau environment follow the following steps:
+1. Apply the Tableau bootstrap plugin to your `settings.gradle`-file.
+2. Configure the Tableau plugin in each project to your needs.
+
+If that all goes a bit fast for you, don't worry, we will guide you through the process step by step.
+
+## Applying the Bootstrap Module
+There are going to be two ways to apply the Tableau bootstrap plugin, through the plugin portal, and through the Tableau Maven repository.
+
+:::warning
+For now the project is pending approval on the Gradle Plugin Portal, so you will need to use the Tableau Maven repository.
+:::
+
+### Using the Gradle Plugin Portal
+To apply the Tableau bootstrap plugin to your project, you can use the Gradle Plugin Portal.
+You need to apply the plugin to the `settings` of your project, which you can do as follows:
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy settings.gradle
+plugins {
+    // Replace the version with the latest version,
+    // which you can find here: https://github.com/ldtteam/Tableau/tags
+    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin settings.gradle.kts
+plugins {
+    // Replace the version with the latest version,
+    // which you can find here: https://github.com/ldtteam/Tableau/tags
+    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+}
+```
+</TabItem>
+</Tabs>
+
+### Using the Tableau Maven Repository
+If you want to use the Tableau Maven repository, you need to add the repository to your `settings.gradle` file, and then apply the plugin.
+You can do this as follows:
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+```groovy settings.gradle
+pluginManagement {
+    repositories {
+        maven {
+            url "https://ldtteam.jfrog.io/artifactory/tableau/"
+        }
+    }
+}
+
+plugins {
+    // Replace the version with the latest version,
+    // which you can find here: https://github.com/ldtteam/Tableau/tags
+    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+}
+```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+```kotlin settings.gradle.kts
+pluginManagement {
+    repositories {
+        maven {
+            url = uri("https://ldtteam.jfrog.io/artifactory/tableau/")
+        }
+    }
+}
+
+plugins {
+    // Replace the version with the latest version,
+    // which you can find here: https://github.com/ldtteam/Tableau/tags
+    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+}
+```
+    </TabItem>
+</Tabs>
+
+The Tableau maven is a virtual repository that contains all the Tableau modules, as well as their dependencies and transitive dependencies.
+This means to develop a mod using Tableau and its modules for plugins you only need to add the Tableau Maven repository to your project.
+
+All modules in Tableau that add a dependency to your projects, will add the relevant repositories to your project automatically, so this is likely the only repository you will need to add.
+
+## Configuring the basics
+To get started you will need to tell Tableau about the mod in your project.
+To do this, you need to add the following to your `build` file:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+```groovy build.gradle
+tableau {
+    mod {
+        // Mod information
+        modid = 'modid' // Use your own modid here.
+        minecraftVersion = '1.21.3' // Or any other minecraft version.
+        publisher = 'SomePublisher' // Use your own name here.
+        url = 'https://github.com/someorg/modid' // Use your own URL here.
+    }
+}
+```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+```kotlin build.gradle.kts
+tableau {
+    mod {
+        // Mod information
+        modid.set("modid") // Use your own modid here.
+        minecraftVersion.set("1.21.3") // Or any other minecraft version.
+        publisher.set("SomePublisher") // Use your own name here.
+        url.set("https://github.com/someorg/modid") // Use your own URL here.
+    }
+}
+```
+    </TabItem>
+</Tabs>
+
+This configures the minecraft version against you want to compile your mod, the mod-id, the publisher, and the URL of the mod.
+With this configuration the system will set up a NeoGradle workspace using the latest available NeoForge version for the specified Minecraft version.
+It also will provide basic interpolation of this information for your mods.toml file, and other resources.
+
+This is the basic setup for a Tableau project, and you can now start configuring your project further using the Tableau DSL.
+See the relevant guides of the modules you want to use for more information on how to configure them.
+
+_Happy modding!_
