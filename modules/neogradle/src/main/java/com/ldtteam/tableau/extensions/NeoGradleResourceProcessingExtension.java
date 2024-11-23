@@ -33,6 +33,8 @@ public abstract class NeoGradleResourceProcessingExtension {
      */
     @Inject
     public NeoGradleResourceProcessingExtension(Project project, ResourceProcessingExtension resourceProcessing) {
+        getInterpolateVersions().convention(true);
+
         //Configure the minimal versions.
         final ModExtension modExtension = ModExtension.get(project);
         getMinimalMinecraftVersion().convention(modExtension.getMinecraftVersion());
