@@ -89,6 +89,10 @@ pluginManagement {
         }
     }
 }
+
+plugins {
+    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+}
 ```
 
 The version above is just an example, you should replace it with the latest version available on the [Maven Repository][Maven].
