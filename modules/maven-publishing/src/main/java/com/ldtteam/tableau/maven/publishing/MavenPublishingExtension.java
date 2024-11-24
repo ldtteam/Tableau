@@ -341,6 +341,8 @@ public class MavenPublishingExtension {
 
         /**
          * Configures distribution to happen via a custom repository.
+         *
+         * @param repositoryUrl the URL of the repository
          */
         public void distributeOnCustomRepo(String repositoryUrl) {
             distributionManagement(distributionManagement -> {
