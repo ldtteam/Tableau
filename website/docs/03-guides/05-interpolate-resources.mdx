@@ -1,0 +1,184 @@
+---
+sidebar_label: Interpolate resources
+title: Interpolate resources
+slug: interpolate-resources
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+In this guide, you will learn how to interpolate resources in your project using Tableau.
+The main goal of resource interpolation is to provide a consistent and easy way to create metadata files for your project.
+
+An example of this is your `neoforge.mods.toml` file, which contains metadata about your mod.
+In particular, it contains the mod ID, version, and other information that is used by NeoForge to identify your mod.
+As well as the versions of NeoForge and Minecraft that your mod is compatible with.
+
+The goal of this guide is it to explain how Tableau helps with this process, and how you can use it to your advantage.
+
+## Configuring Tableaus interpolation targets
+By default, Tableau will not interpolate any resources, however its interpolation mechanism is active.
+To add resources as interpolation targets, you need to configure the `resourceProcessing` block in the Tableau DSL:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                matching += ["**/**.json"]
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                matching += ["**/**.json"]
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+alternatively, you can use the `matching` method to add resources to the interpolation targets:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                matching("**/**.json")
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                matching("**/**.json")
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+The result of either of these methods is that the glob pattern `**/**.json` is added to the list of resources that Tableau will interpolate.
+In this example all `.json` files in your projects resources of the `main`-sourceset will be interpolated.
+
+### Interpolating your mods toml files
+To interpolate your mods `neoforge.mods.toml` file, you can use the `modsToml` method in the `processingResources` block:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                modsToml()
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                modsToml()
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+This will interpolate the `neoforge.mods.toml`, and `mods.toml` file in your resources, and replace any placeholders with the values configured.
+
+### Interpolating all files
+To interpolate all files in your resources, you can use the `all` method in the `processingResources` block:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                all()
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                all()
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+This will interpolate all files in your resources, and replace any placeholders with the values configured.
+
+## Configuring values for interpolation
+Tableau will interpolate resources using the values configured in the `properties` map of the `processResources` block in the Tableau DSL.
+The key of the map is the placeholder that will be replaced, and the value is the value that will replace the placeholder.
+
+You can add your own values to the `properties` map:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                properties += [
+                    myPropertyOne: "some_value",
+                    myPropertyTwo: "1.0.0"
+                ]
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                properties.put("myPropertyOne", "some_value")
+                properties.put("myPropertyTwo", "1.0.0")
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+### Adding the project information as a properties
+Tableau has a shortcut to add the project properties as interpolation properties, using the `fromProject` method:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                fromProject()
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                fromProject()
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+:::info
+This will add all properties of the project to the interpolation properties.
+
+Additionally, this will also add the version of the project as `version` to the properties.
+:::
+
+### Adding NeoGradle information as properties
+

@@ -1,0 +1,330 @@
+---
+sidebar_label: Publishing to Maven
+title: Publishing your mod to a Maven repository
+slug: publish-to-maven
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Publishing your mod to a Maven repository is a great way to share your mod with other developers. Maven is a popular platform for sharing Java libraries and projects, and it is used by many Java developers to share their projects with the community.
+Gradle has built-in support for publishing your mod to a Maven repository, and this guide will show you how you can publish your mod to a Maven repository using Tableau.
+
+## Prerequisites
+Before you can publish your mod to a Maven repository, you need to have a Maven repository to publish to. You can use a public Maven repository like [Maven Central](https://search.maven.org/) or [JitPack](https://jitpack.io/), or you can set up your own Maven repository using a tool like [Nexus Repository Manager](https://www.sonatype.com/nexus-repository-oss).
+Please collect the following information:
+
+- The URL of the Maven repository
+- Your username and password for the Maven repository
+
+:::danger
+Keep your username and password safe and do not share them with anyone!
+:::
+
+## Configuring Tableau
+To publish your mod to a Maven repository, you need to configure Tableau's Maven module.
+To do this, edit the `build.gradle` file of your project and add the following configuration to the `tableau` block:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            maven {
+                publishTo("https://maven.example.com/repository/maven-releases/")
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            maven {
+                publishTo("https://maven.example.com/repository/maven-releases/")
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+This is enough configuration of the project to get started with publishing your mod to a Maven repository.
+
+## Configuring the publishing
+It is highly recommended that you properly configure your publishing metadata and repository.
+You will need address two aspects: Configuring the correct publishing location, and the POM file itself.
+
+### Publishing location
+In the [Configuring Tableau](#configuring-tableau) section, you have already configured the publishing location.
+However, as of writing there are three other options you could use, instead of `publishTo`:
+- Publishing locally
+- Publishing to GitHub Packages.
+- Publishing to the LDTTeam repository.
+
+#### Publishing locally
+To publish locally, you can use the `publishLocally` method:
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            publishLocally()
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            publishLocally()
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+This will ensure that the mod is published to the `repo` directory in the project root.
+
+#### Publishing to GitHub Packages
+To publish to GitHub Packages, you can use the `publishToGithub` method:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            publishToGithub()
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            publishToGithub()
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+When you this method you need to supply the GitHub username and token as environment variables:
+- `GITHUB_USERNAME` -> Your GitHub username.
+- `GITHUB_TOKEN` -> A GitHub token with the `write:packages` scope.
+
+#### Publishing to the LDTTeam repository
+To publish to the LDTTeam repository, you can use the `publishToLDTTeam` method:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            publishToLDTTeam()
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            publishToLDTTeam()
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+When you this method you need to supply the LDTTeam username and token as environment variables:
+- `LDTTeamJfrogUsername` -> Your LDTTeam username.
+- `LDTTeamJfrogPassword` -> Your LDTTeam password, or token.
+
+### POM file
+Configuring a POM file correctly ensures that your mod is published correctly, and that other modders have a place to find information about your mod.
+
+:::info
+The `pom` in the `maven` block extends a Gradle `MavenPom` object, which is a representation of a Maven POM file.
+You can find more information about the `MavenPom` object in the [Gradle documentation](https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPom.html).
+
+However, the pom in Tableau also comes with a set of special methods, which are not available in the Gradle documentation, but are Tableau specific.
+These methods help you configure the POM file for your mod.
+:::
+
+#### Configuring a license
+The maven POM indicates what license your project has to consumers.
+You can configure the license using the `licenses` method:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            pom {
+                licenses {
+                    license {
+                        name = "Project custom license"
+                        url = "https://somelice.url/path/to/license"
+                    }
+                }
+            }
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            pom {
+                licenses {
+                    license {
+                        name.set("Project custom license")
+                        url.set("https://somelice.url/path/to/license")
+                    }
+                }
+            }
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+Alternatively, you can use the license shortcut methods Tableau provides, to configure common licenses for your project.
+
+##### Configuring your project for a GNU GPL license
+To configure your project for a GNU GPL license, you can use the `usingGnu3License` method:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            pom {
+                usingGnu3License()
+            }
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            pom {
+                usingGnu3License()
+            }
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+##### Configuring your project for a MIT license
+To configure your project for a MIT license, you can use the `usingMitLicense` method:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            pom {
+                usingMitLicense()
+            }
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            pom {
+                usingMitLicense()
+            }
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+#### Configuring your distribution management
+The distribution management section of the POM file indicates where the project is distributed and can be downloaded from.
+You can configure the distribution management using the `distributionManagement` method:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            pom {
+                distributionManagement {
+                    //Replace with maven url
+                    downloadUrl = "https://maven.example.com/repository/maven-releases/"
+                }
+            }
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            pom {
+                distributionManagement {
+                    //Replace with maven url
+                    downloadUrl.set("https://maven.example.com/repository/maven-releases/")
+                }
+            }
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+:::tip
+If you followed the guides under [Publishing location](#publishing-location), then the distribution management is already configured for you.
+:::
+
+#### Configuring using Git
+The POM file can also be configured using information from your git repository.
+You can configure the POM file to use information from your git repository using the `usingGit` method:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        maven {
+            pom {
+                usingGit()
+            }
+        }
+    }
+    ```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        maven {
+            pom {
+                usingGit()
+            }
+        }
+    }
+    ```
+</TabItem>
+</Tabs>
+
+This will configure the following information:
+
+- Source Control Management
+- Developers
+- Contributors (Which are the top 5 contributors to the project)
+- Issue Management (Automatically set to GitHub Issues)
+- Inception Year
+- Ci Management (Automatically set to GitHub Actions)
+- Organization (Automatically set to the GitHub organization)
+
+
+

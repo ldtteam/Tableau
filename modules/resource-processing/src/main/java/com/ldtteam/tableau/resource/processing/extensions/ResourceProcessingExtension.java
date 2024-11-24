@@ -101,6 +101,15 @@ public abstract class ResourceProcessingExtension implements ExtensionAware {
     public abstract ListProperty<String> getMatching();
 
     /**
+     * Adds a matching pattern.
+     *
+     * @param patterns The patterns to add.
+     */
+    public void matching(String... patterns) {
+        getMatching().addAll(patterns);
+    }
+
+    /**
      * Interpolates the mods.toml files.
      * Regardless of whether this is neoforge or mcf.
      */

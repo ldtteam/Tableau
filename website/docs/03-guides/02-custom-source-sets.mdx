@@ -1,0 +1,195 @@
+---
+sidebar_label: Custom SourceSets
+title: Using custom source sets
+slug: custom-sourcesets
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Tableau allows you to add custom source sets to your project. This can be useful if you want to separate your code into different modules or if you want to have a separate source set for your tests.
+By default, Tableau configures the following source sets:
+
+- `main`
+- `test`
+
+As these come from the Java plugin, you can use them as you would in a normal Gradle project.
+
+However, if you want to add your own modules to your project, you might want to consider adding custom source sets.
+This guide will describe how you can add custom source sets to your project, and how to configure them.
+
+## Adding custom source sets
+To add custom source sets to your project, you can use the `sourceSets` block of the Tableau DSL.
+This block allows you to add custom source sets to your project and configure them.
+
+The following example shows how you can add a custom source set to your project:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    sourceSets {
+        mySourceSet {
+            java {
+                srcDir 'src/mySourceSet/java'
+            }
+            resources {
+                srcDir 'src/mySourceSet/resources'
+            }
+        }
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    sourceSets {
+        create("mySourceSet") {
+            java.srcDir("src/mySourceSet/java")
+            resources.srcDir("src/mySourceSet/resources")
+        }
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+In this example, we add a custom source set called `mySourceSet` to our project.
+This source set has a Java source directory and a resources-directory.
+
+## Marking the source set as included in the primary jar
+By default, Tableau will not include the classes and resources of custom source sets in the primary jar.
+If you want to include the classes and resources of a custom source set in the primary jar, you can use the `isPartOfPrimaryJar` property of the source set:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    sourceSets {
+        mySourceSet {
+            isPartOfPrimaryJar = true
+        }
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    sourceSets {
+        create("mySourceSet") {
+            isPartOfPrimaryJar = true
+        }
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+In this example, we mark the `mySourceSet` source set as part of the primary jar.
+
+## Publishing the source set as a custom jar
+If you want to publish the classes and resources of a custom source set as a separate jar, you can use the `isPublished` property of the source set:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    sourceSets {
+        mySourceSet {
+            isPublished = true
+        }
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    sourceSets {
+        create("mySourceSet") {
+            isPublished = true
+        }
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+In this example, we mark the `mySourceSet` source set as published.
+This will cause the jar, javadoc and sources jar of the source set to be published configured repositories.
+
+## Add dependencies to the source set
+If you want to add dependencies to a custom source set, you can use the `dependencies` block of the source set:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    sourceSets {
+        mySourceSet {
+            dependencies {
+                implementation 'com.google.guava:guava:30.1-jre'
+            }
+        }
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    sourceSets {
+        create("mySourceSet") {
+            dependencies {
+                implementation("com.google.guava:guava:30.1-jre")
+            }
+        }
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+:::warning
+Please note that this system does not support extending the `implementation` and `api` configurations of each source set, yet.
+We are working on improving the API for this.
+
+If you want to achieve this, you can do so, as these configurations are just mirrors of the configurations of the project.
+So if you want to extend your configuration, use the normal Gradle way of doing so.
+:::
+
+In this example, we add a dependency to the `mySourceSet` source set.
+This system supports using version catalogs and other dependency management features of Gradle:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    sourceSets {
+        mySourceSet {
+            dependencies {
+                implementation platform('com.google.guava:guava-bom:30.1-jre')
+                implementation libs.bundles.guava
+            }
+        }
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    sourceSets {
+        create("mySourceSet") {
+            dependencies {
+                implementation(platform("com.google.guava:guava-bom:30.1-jre"))
+                implementation(libs.bundles.guava)
+            }
+        }
+    }
+}
+```
+</TabItem>
+</Tabs>

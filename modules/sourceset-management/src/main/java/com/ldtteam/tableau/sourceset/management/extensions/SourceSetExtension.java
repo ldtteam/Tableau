@@ -92,7 +92,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
             });
 
             getUniversalJarSourceSets().addAll(
-                    configuration.getIsPartOfUniversalJar()
+                    configuration.getIsPartOfPrimaryJar()
                             .map(isPartOfUniversalJar -> isPartOfUniversalJar ? sourceSet : null)
                             .filter(Objects::nonNull)
                             .map(Collections::singletonList)
@@ -140,7 +140,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
     public void api(final Action<SourceSetConfiguration> action) {
          create(JavaPlugin.API_CONFIGURATION_NAME, configuration -> {
             action.execute(configuration);
-            configuration.getIsPartOfUniversalJar().set(true);
+            configuration.getIsPartOfPrimaryJar().set(true);
          });
     }
 
@@ -483,7 +483,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
 
             this.dependencies = objectFactory.newInstance(SourceSetDependencies.class);
 
-            getIsPartOfUniversalJar().convention(SourceSet.isMain(sourceSet));
+            getIsPartOfPrimaryJar().convention(SourceSet.isMain(sourceSet));
             getIsPublished().convention(SourceSet.isMain(sourceSet));
         }
 
@@ -511,7 +511,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
          *
          * @return The property.
          */
-        public abstract Property<Boolean> getIsPartOfUniversalJar();
+        public abstract Property<Boolean> getIsPartOfPrimaryJar();
 
         /**
          * Indicates whether the source set is published.

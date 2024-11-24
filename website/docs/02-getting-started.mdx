@@ -28,7 +28,7 @@ To apply the Tableau bootstrap plugin to your project, you can use the Gradle Pl
 You need to apply the plugin to the `settings` of your project, which you can do as follows:
 <Tabs groupId="gradle-code">
 <TabItem value="groovy" label="Groovy">
-```groovy settings.gradle
+```groovy title="settings.gradle"
 plugins {
     // Replace the version with the latest version,
     // which you can find here: https://github.com/ldtteam/Tableau/tags
@@ -37,7 +37,7 @@ plugins {
 ```
 </TabItem>
 <TabItem value="kotlin" label="Kotlin">
-```kotlin settings.gradle.kts
+```kotlin title="settings.gradle.kts"
 plugins {
     // Replace the version with the latest version,
     // which you can find here: https://github.com/ldtteam/Tableau/tags
@@ -52,7 +52,7 @@ If you want to use the Tableau Maven repository, you need to add the repository 
 You can do this as follows:
 <Tabs groupId="gradle-code">
     <TabItem value="groovy" label="Groovy">
-```groovy settings.gradle
+```groovy title="settings.gradle"
 pluginManagement {
     repositories {
         maven {
@@ -69,7 +69,7 @@ plugins {
 ```
     </TabItem>
     <TabItem value="kotlin" label="Kotlin">
-```kotlin settings.gradle.kts
+```kotlin title="settings.gradle.kts"
 pluginManagement {
     repositories {
         maven {
@@ -98,7 +98,7 @@ To do this, you need to add the following to your `build` file:
 
 <Tabs groupId="gradle-code">
     <TabItem value="groovy" label="Groovy">
-```groovy build.gradle
+```groovy title="build.gradle"
 tableau {
     mod {
         // Mod information
@@ -111,7 +111,7 @@ tableau {
 ```
     </TabItem>
     <TabItem value="kotlin" label="Kotlin">
-```kotlin build.gradle.kts
+```kotlin title="build.gradle.kts"
 tableau {
     mod {
         // Mod information

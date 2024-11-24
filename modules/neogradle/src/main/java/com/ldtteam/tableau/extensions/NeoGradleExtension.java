@@ -75,7 +75,7 @@ public abstract class NeoGradleExtension implements ExtensionAware {
             jar.getArchiveClassifier().set(getPrimaryJarClassifier());
 
             jar.manifest(manifest -> {
-                manifest.attributes(Map.of("FMLModType", getIsFmlLibrary().map(isFmlLibrary -> isFmlLibrary ? "LIBRARY" : "MOD")));
+                manifest.attributes(Map.of("FMLModType", getIsLibrary().map(isFmlLibrary -> isFmlLibrary ? "LIBRARY" : "MOD")));
             });
         });
 
@@ -148,7 +148,7 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      *
      * @param mod the additional data gen mod
      */
-    public void dataGenMod(String mod) {
+    public void additionalDataGenMod(String mod) {
         getAdditionalDataGenMods().add(mod);
     }
 
@@ -157,5 +157,5 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      *
      * @return Indicates whether the project is an FML library.
      */
-    public abstract Property<Boolean> getIsFmlLibrary();
+    public abstract Property<Boolean> getIsLibrary();
 }

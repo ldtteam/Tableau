@@ -62,6 +62,17 @@ public abstract class GitExtension {
             final int lastSlash = it.lastIndexOf('/');
             return it.substring(lastSlash + 1);
         }));
+        this.getOrganizationName().set(this.getGithubUrl().map(it -> {
+            //Extract the organization name from the url.
+            final int lastSlash = it.lastIndexOf('/');
+            final int secondLastSlash = it.lastIndexOf('/', lastSlash - 1);
+            return it.substring(secondLastSlash + 1, lastSlash);
+        }));
+        this.getOrganizationUrl().set(this.getGithubUrl().map(it -> {
+            //Extract the organization url from the url.
+            final int lastSlash = it.lastIndexOf('/');
+            return it.substring(0, lastSlash);
+        }));
     }
 
     /**
@@ -105,6 +116,20 @@ public abstract class GitExtension {
      * @return The repository name property.
      */
     public abstract Property<String> getRepositoryName();
+
+    /**
+     * Gets the organization name property.
+     *
+     * @return The organization name property.
+     */
+    public abstract Property<String> getOrganizationName();
+
+    /**
+     * Gets the organization url property.
+     *
+     * @return The organization url property.
+     */
+    public abstract Property<String> getOrganizationUrl();
 
     /**
      * Lazy value source for the current branch.
