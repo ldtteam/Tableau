@@ -180,5 +180,71 @@ This will add all properties of the project to the interpolation properties.
 Additionally, this will also add the version of the project as `version` to the properties.
 :::
 
-### Adding NeoGradle information as properties
+### NeoGradle information as properties
+By default, the NeoGradle module will also add interpolation properties to the project.
+This includes the version of minecraft and NeoForge that the project is compatible with.
+
+You can configure each of these properties in the `neogradle` block of the `resourceProcessing` block:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                neogradle {
+                    minimalMinecraftVersion = "1.16.5"
+                    minimalForgeVersion = "1.0.0"
+                }
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                neogradle {
+                    minimalMinecraftVersion.set("1.16.5")
+                    minimalForgeVersion.set("1.0.0")
+                }
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+:::info
+By default, these values are set to the current minecraft version, and will resolve the relevant neoforge version if it is dynamic.
+:::
+
+#### Disabling NeoGradle interpolation
+If you do not want NeoGradle to add interpolation properties, you can disable it by setting the `interpolateVersions` property to `false`:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            resourceProcessing {
+                neogradle {
+                    interpolateVersions = false
+                }
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            resourceProcessing {
+                neogradle {
+                    interpolateVersions.set(false)
+                }
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+
+
 

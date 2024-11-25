@@ -33,6 +33,7 @@ public abstract class NeoGradleResourceProcessingExtension {
      */
     @Inject
     public NeoGradleResourceProcessingExtension(Project project, ResourceProcessingExtension resourceProcessing) {
+        //Configure the interpolate versions flag.
         getInterpolateVersions().convention(true);
 
         //Configure the minimal versions.
