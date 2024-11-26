@@ -41,6 +41,10 @@ public abstract class JavaExtension {
         java.getToolchain().getLanguageVersion().set(getJavaVersion().map(JavaLanguageVersion::of));
 
         getAutomaticModuleName().convention(ModExtension.get(project).getModId());
+
+        //By default, we run with the current JDKs java.
+        //noinspection UnstableApiUsage
+        getJavaVersion().convention(JavaLanguageVersion.current().asInt());
     }
 
     /**

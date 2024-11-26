@@ -70,6 +70,18 @@ public abstract class ModExtension {
     public abstract Property<String> getModId();
 
     /**
+     * The mod group.
+     * <p>
+     *     Generally the mod group is the name of the modding team or the name of the modding group, in reverse DNS order.
+     *     So, for example: com.ldtteam, or com.github.example-team
+     * <p>
+     *     Not configuring the mod group, will likely result in an error during the build.
+     *
+     * @return The mod group.
+     */
+    public abstract Property<String> getGroup();
+
+    /**
      * The current main minecraft version against which the mod is build.
      *
      * @return The minecraft version.

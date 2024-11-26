@@ -81,6 +81,15 @@ public class CommonProjectPlugin implements Plugin<Project> {
                             .solution("Configure the mod id, in tableau's mod block.");
                 });
             }
+
+            if (!ModExtension.get(target).getGroup().isPresent()) {
+                throw problems.forNamespace("tableau").throwing(spec -> {
+                    //TODO: Configure documentation link.
+                    spec.id("missing-mod-group", "Mod group is not configured.")
+                            .details("Without a specified mod group a lot of systems can not be configured.")
+                            .solution("Configure the mod group, in tableau's mod block.");
+                });
+            }
         });
     }
 
@@ -145,7 +154,10 @@ public class CommonProjectPlugin implements Plugin<Project> {
         }).orElse(minecraftBasedVersion));
 
         //Set the version of the project.
-        target.setVersion(projectVersion.toString());
+        target.setVersion(projectVersion);
+
+        //Set the group of the project.
+        target.setGroup(new ProjectGroup(ModExtension.get(target).getGroup()));
     }
 
     /**
@@ -165,6 +177,16 @@ public class CommonProjectPlugin implements Plugin<Project> {
         @Override
         public String toString() {
             return versionProvider().get();
+        }
+    }
+
+    /**
+     * A record to store the project group, returning only the project group when {@link Object#toString()} is called.
+     */
+    private record ProjectGroup(Provider<String> groupProvider) {
+        @Override
+        public String toString() {
+            return groupProvider().get();
         }
     }
 }

@@ -85,6 +85,20 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
             final Configuration api = project.getConfigurations()
                     .maybeCreate(sourceSet.getApiConfigurationName());
 
+            final Configuration tableauImplementation = project.getConfigurations()
+                    .maybeCreate(sourceSet.getImplementationConfigurationName() + "Tableau");
+            final Configuration tableauApi = project.getConfigurations()
+                    .maybeCreate(sourceSet.getApiConfigurationName() + "Tableau");
+
+            tableauImplementation.setCanBeResolved(true);
+            tableauApi.setCanBeResolved(true);
+
+            tableauImplementation.setCanBeConsumed(false);
+            tableauApi.setCanBeConsumed(false);
+
+            implementation.extendsFrom(tableauImplementation);
+            api.extendsFrom(tableauApi);
+
             java.registerFeature(sourceSet.getName(), feature -> {
                 feature.usingSourceSet(sourceSet);
                 feature.withSourcesJar();
@@ -107,20 +121,20 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
                             .orElse(Collections.emptyList())
             );
 
-            implementation.fromDependencyCollector(configuration.getDependencies().getImplementation());
-            api.fromDependencyCollector(configuration.getDependencies().getApi());
+            tableauImplementation.fromDependencyCollector(configuration.getDependencies().getImplementation());
+            tableauApi.fromDependencyCollector(configuration.getDependencies().getApi());
         });
 
         final SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
         getUniversalJarSourceSets().add(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME));
-
-        create(SourceSet.MAIN_SOURCE_SET_NAME, sourceSet -> {
-            final ModExtension modExtension = ModExtension.get(project);
-
-            sourceSet.getResources().srcDir(modExtension.getModId().map("src/datagen/generated/%s"::formatted));
-        });
-
         getPublishedSourceSets().convention(List.of(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)));
+
+        project.afterEvaluate(p -> {
+            //Run this in an afterEval, because we need a group configured, which is not available at apply and construction time.
+            final SourceSetConfiguration main = maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
+
+            main.getResources().srcDir(ModExtension.get(project).getModId().map("src/datagen/generated/%s"::formatted));
+        });
     }
 
     /**
@@ -527,6 +541,15 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
          */
         public SourceSetDependencies getDependencies() {
             return dependencies;
+        }
+
+        /**
+         * Configuration callback for the source sets dependencies
+         *
+         * @param action The configuration action.
+         */
+        public void dependencies(Action<SourceSetDependencies> action) {
+            action.execute(getDependencies());
         }
 
         /**

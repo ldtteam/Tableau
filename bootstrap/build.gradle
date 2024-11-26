@@ -13,16 +13,16 @@ plugins {
 }
 
 gradlePlugin {
-    website = "https://github.com/ldtteam/Tableau"
+    website = "https://tableau.ldtteam.com"
     vcsUrl = "https://github.com/ldtteam/Tableau.git"
 
     // Define the plugin
     plugins {
         "bootstrap" {
-            id = 'com.ldtteam.tableau.bootstrap'
+            id = 'com.ldtteam.tableau'
             implementationClass = 'com.ldtteam.tableau.bootstrap.BootstrapPlugin'
             displayName = "Tableau"
-            description = "This plugin bootstraps the use of Tableau. The LDTTeams Minecraft mod management plugin!"
+            description = "This plugin enables the use of Tableau. The LDTTeams Minecraft mod management plugin!"
             tags = ["minecraft", "neogradle", "modding", "automation"]
         }
     }

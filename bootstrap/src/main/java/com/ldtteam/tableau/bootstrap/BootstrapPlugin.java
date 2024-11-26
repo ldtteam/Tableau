@@ -7,6 +7,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 

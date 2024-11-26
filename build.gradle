@@ -35,10 +35,15 @@ gradlePlugin {
     // Define the plugin
     plugins {
         tableau {
-            id = 'com.ldtteam.tableau'
+            id = 'com.ldtteam.tableau.all'
             implementationClass = 'com.ldtteam.tableau.TableauPlugin'
         }
     }
+}
+
+def publishLocallyTask = tasks.register('publishLocally') {
+    it.group = "publishing"
+    it.description = "Publishes the project to the local repositories. Allows for the use of the bootstrap plugin in example projects."
 }
 
 allprojects { Project it ->
@@ -46,7 +51,7 @@ allprojects { Project it ->
     it.plugins.apply('maven-publish')
 
     it.version = it.findProperty("version")
-    if (it.version == null) {
+    if (it.version == null || it.version.toString() == "unspecified") {
         it.version = "0.0.0-LOCAL"
     }
     it.group = 'com.ldtteam.tableau'
@@ -84,4 +89,7 @@ allprojects { Project it ->
             }
         }
     }
+
+    publishLocallyTask.configure { t -> t.dependsOn(it.tasks.named('publishToMavenLocal')) }
+    publishLocallyTask.configure { t -> t.dependsOn(it.tasks.named('publishAllPublicationsToDirectoryRepository')) }
 }

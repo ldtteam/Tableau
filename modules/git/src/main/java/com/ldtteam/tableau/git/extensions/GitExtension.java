@@ -151,7 +151,7 @@ public abstract class GitExtension {
          * @return The exec operations.
          */
         @Inject
-        abstract ExecOperations getExecOperations();
+        public abstract ExecOperations getExecOperations();
 
         public String obtain() {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -160,7 +160,7 @@ public abstract class GitExtension {
                 it.setStandardOutput(output);
             });
 
-            return output.toString(Charset.defaultCharset());
+            return output.toString(Charset.defaultCharset()).trim();
         }
     }
 
@@ -184,7 +184,7 @@ public abstract class GitExtension {
          * @return The exec operations.
          */
         @Inject
-        abstract ExecOperations getExecOperations();
+        public abstract ExecOperations getExecOperations();
 
         public String obtain() {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -193,7 +193,7 @@ public abstract class GitExtension {
                 it.setStandardOutput(output);
             });
 
-            return output.toString(Charset.defaultCharset());
+            return output.toString(Charset.defaultCharset()).trim();
         }
     }
 
@@ -227,7 +227,7 @@ public abstract class GitExtension {
          * @return The exec operations.
          */
         @Inject
-        abstract ExecOperations getExecOperations();
+        public abstract ExecOperations getExecOperations();
 
         public List<Developer> obtain() {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -236,7 +236,7 @@ public abstract class GitExtension {
                 it.setStandardOutput(output);
             });
 
-            final String outputString = output.toString(Charset.defaultCharset());
+            final String outputString = output.toString(Charset.defaultCharset()).trim();
             //The output is formatted like:
             // 100 Author Name <email>
             //   2 Author Name <email>
@@ -280,7 +280,7 @@ public abstract class GitExtension {
          * @return The exec operations.
          */
         @Inject
-        abstract ExecOperations getExecOperations();
+        public abstract ExecOperations getExecOperations();
 
         public Integer obtain() {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -289,7 +289,7 @@ public abstract class GitExtension {
                 it.setStandardOutput(output);
             });
 
-            return Integer.parseInt(output.toString(Charset.defaultCharset()));
+            return Integer.parseInt(output.toString(Charset.defaultCharset()).trim());
         }
     }
 

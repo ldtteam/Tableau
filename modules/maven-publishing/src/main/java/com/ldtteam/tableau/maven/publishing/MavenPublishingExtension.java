@@ -176,7 +176,7 @@ public class MavenPublishingExtension {
         publishing.repositories(mavenRepositories -> {
             mavenRepositories.maven(mavenRepository -> {
                 mavenRepository.setUrl("file:///" + project.getRootProject().file("repo").getAbsolutePath());
-                mavenRepository.setName("Local Maven Repository");
+                mavenRepository.setName("Local-Repo-Directory");
             });
         });
     }
@@ -390,7 +390,7 @@ public class MavenPublishingExtension {
             });
 
             issueManagement(issueManagement -> {
-                issueManagement.getUrl().set(git.getGithubUrl() + "/issues");
+                issueManagement.getUrl().set(git.getGithubUrl().map(url -> url + "/issues"));
                 issueManagement.getSystem().set("GitHub");
             });
 
@@ -398,7 +398,7 @@ public class MavenPublishingExtension {
 
             ciManagement(ciManagement -> {
                 ciManagement.getSystem().set("GitHub Actions");
-                ciManagement.getUrl().set(git.getGithubUrl() + "/actions");
+                ciManagement.getUrl().set(git.getGithubUrl().map(url -> url + "/actions"));
             });
 
             organization(organization -> {

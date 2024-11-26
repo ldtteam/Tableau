@@ -32,7 +32,7 @@ You need to apply the plugin to the `settings` of your project, which you can do
 plugins {
     // Replace the version with the latest version,
     // which you can find here: https://github.com/ldtteam/Tableau/tags
-    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+    id 'com.ldtteam.tableau' version '1.0.0'
 }
 ```
 </TabItem>
@@ -41,7 +41,7 @@ plugins {
 plugins {
     // Replace the version with the latest version,
     // which you can find here: https://github.com/ldtteam/Tableau/tags
-    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+    id("com.ldtteam.tableau") version "1.0.0"
 }
 ```
 </TabItem>
@@ -64,7 +64,7 @@ pluginManagement {
 plugins {
     // Replace the version with the latest version,
     // which you can find here: https://github.com/ldtteam/Tableau/tags
-    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+    id 'com.ldtteam.tableau' version '1.0.0'
 }
 ```
     </TabItem>
@@ -81,7 +81,7 @@ pluginManagement {
 plugins {
     // Replace the version with the latest version,
     // which you can find here: https://github.com/ldtteam/Tableau/tags
-    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+    id("com.ldtteam.tableau") version "1.0.0"
 }
 ```
     </TabItem>
@@ -103,6 +103,7 @@ tableau {
     mod {
         // Mod information
         modid = 'modid' // Use your own modid here.
+        group = 'com.example' // Use your own group here.
         minecraftVersion = '1.21.3' // Or any other minecraft version.
         publisher = 'SomePublisher' // Use your own name here.
         url = 'https://github.com/someorg/modid' // Use your own URL here.
@@ -116,6 +117,7 @@ tableau {
     mod {
         // Mod information
         modid.set("modid") // Use your own modid here.
+        group.set("com.example") // Use your own group here.
         minecraftVersion.set("1.21.3") // Or any other minecraft version.
         publisher.set("SomePublisher") // Use your own name here.
         url.set("https://github.com/someorg/modid") // Use your own URL here.
