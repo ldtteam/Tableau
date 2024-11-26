@@ -45,7 +45,9 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
 
         TableauScriptingExtension.register(target, CurseForgeExtension.EXTENSION_NAME, CurseForgeExtension.class, target);
 
-        configureUploadTask(target);
+        target.afterEvaluate(ignore -> {
+            configureUploadTask(target);
+        });
     }
 
     private TaskProvider<? extends Jar> getMainJar(Project project) {
@@ -70,8 +72,14 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
         final SourceSetExtension sourceSets = SourceSetExtension.get(project);
         final ModExtension mod = ModExtension.get(project);
 
+        if (!curse.getId().isPresent()) {
+            project.getLogger().debug("Skipping CurseForge upload task as no project id is set.");
+            return;
+        }
+
         final TaskProvider<TaskPublishCurseForge> curseforge = project.getTasks().register("curseforge", TaskPublishCurseForge.class, task -> {
             task.apiToken = project.getProviders().environmentVariable("CURSE_API_KEY");
+            task.debugMode = curse.getDebug().get();
 
             final UploadArtifact artifact = task.upload(curse.getId(), mainJar);
             task.dependsOn(mainJar);

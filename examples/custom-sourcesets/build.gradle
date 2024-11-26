@@ -1,0 +1,29 @@
+tableau {
+    mod {
+        // Mod information
+        modid = 'modid' // Use your own modid here.
+        group = 'com.example' // Use your own group here.
+        minecraftVersion = '1.21.3' // Or any other minecraft version.
+        publisher = 'SomePublisher' // Use your own name here.
+        url = 'https://github.com/someorg/modid' // Use your own URL here.
+    }
+
+    sourceSets {
+        api {
+            isPartOfPrimaryJar = true
+            isPublished = true
+
+            java {
+                srcDirs = ["src/api/java_extra"]
+            }
+
+            resources {
+                srcDirs = ["src/api/resources_extra"]
+            }
+
+            dependencies {
+                implementation 'com.google.guava:guava:30.1-jre'
+            }
+        }
+    }
+}

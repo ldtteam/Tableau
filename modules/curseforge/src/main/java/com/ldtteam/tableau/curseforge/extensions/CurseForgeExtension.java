@@ -56,6 +56,8 @@ public abstract class CurseForgeExtension {
         getAdditionalMinecraftVersions().add(neoGradle.getMinimalMinecraftVersion());
 
         getUsesFancyDisplayName().convention(true);
+
+        getDebug().convention(false);
     }
 
     /**
@@ -157,6 +159,13 @@ public abstract class CurseForgeExtension {
     public void relationships(Action<? super Relationships> action) {
         action.execute(project.getObjects().newInstance(Relationships.class, getRelationships()));
     }
+
+    /**
+     * Whether to enable debug mode for the CurseForge plugin.
+     *
+     * @return whether to enable debug mode for the CurseForge plugin.
+     */
+    public abstract Property<Boolean> getDebug();
 
     /**
      * The DSL for configuring the relationships of the project on CurseForge.

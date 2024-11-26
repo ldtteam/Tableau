@@ -1,0 +1,68 @@
+---
+sidebar_label: CurseForge publishing
+title: Publish to CurseForge
+slug: curse-publishing
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+This example project configuration shows how to publish your mod to CurseForge.
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    mod {
+        // Mod information
+        modid = 'modid' // Use your own modid here.
+        group = 'com.example' // Use your own group here.
+        minecraftVersion = '1.21.3' // Or any other minecraft version.
+        publisher = 'SomePublisher' // Use your own name here.
+        url = 'https://github.com/someorg/modid' // Use your own URL here.
+    }
+
+    curse {
+        id = 123456 // Use your own CurseForge project ID here.
+
+        relationships {
+            // Add a relationship to another mod
+            tool("some-tool-slug")
+        }
+    }
+}
+```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    mod {
+        // Mod information
+        modid.set("modid") // Use your own modid here.
+        group.set("com.example") // Use your own group here.
+        minecraftVersion.set("1.21.3") // Or any other minecraft version.
+        publisher.set("SomePublisher") // Use your own name here.
+        url.set("https://github.com/someorg/modid") // Use your own URL here.
+    }
+
+    curse {
+        id.set(123456) // Use your own CurseForge project ID here.
+
+        relationships {
+            // Add a relationship to another mod
+            tool("some-tool-slug")
+        }
+    }
+}
+```
+    </TabItem>
+</Tabs>
+
+:::warning
+You need to set your CurseForge API in the CURSE_API_KEY environment variable.
+:::
+
+:::note
+You can find a full example of this project configuration in the [CurseForge Publishing Example](https://github.com/ldtteam/Tableau/tree/main/examples/curse-publish) on GitHub.
+:::
+
