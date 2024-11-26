@@ -1,5 +1,7 @@
 <!--suppress HtmlDeprecatedAttribute -->
-<h1 align="center" style="text-align: center;">Tableau</h1>
+<h1 align="center" style="text-align: center;">
+<img src="./logo-wide.png">
+</h1>
 
 <div align="center">
 
