@@ -55,13 +55,13 @@ You can apply the bootstrap module, or apply the core Tableau module directly.
 The bootstrap module is supposed to be released on Plugins portal, once it is released, you can apply it to your `settings` like this:
 ```groovy settings.gradle
 plugins {
-    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+    id 'com.ldtteam.tableau' version '1.0.0'
 }
 ```
 or when using Kotlin DSL:
 ```kotlin settings.gradle.kts
 plugins {
-    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+    id("com.ldtteam.tableau") version "1.0.0"
 }
 ```
 
@@ -78,7 +78,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'com.ldtteam.tableau.bootstrap' version '1.0.0'
+    id 'com.ldtteam.tableau' version '1.0.0'
 }
 ```
 or when using Kotlin DSL:
@@ -93,7 +93,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.ldtteam.tableau.bootstrap") version "1.0.0"
+    id("com.ldtteam.tableau") version "1.0.0"
 }
 ```
 
@@ -107,6 +107,7 @@ To do this, you need to add the following to your `build.gradle` file:
 tableau {
     mod {
         modId = "examplemod"
+        group = "com.example"
         minecraftVersion = "1.21.3"
         publisher = "LDTTeam"
         url = "https://github.com/someorg/examplemod"
@@ -118,6 +119,7 @@ or when using Kotlin DSL:
 tableau {
     mod {
         modId.set("examplemod")
+        group.set("com.example")
         minecraftVersion.set("1.21.3")
         publisher.set("LDTTeam")
         url.set("https://github.com/someorg/examplemod")
