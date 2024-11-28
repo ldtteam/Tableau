@@ -143,8 +143,6 @@ public abstract class CurseForgeExtension {
      *     <ul>
      *         <li>embeddedLibrary</li>
      *         <li>incompatible</li>
-     *         <li>optionalDependency</li>
-     *         <li>requiredDependency</li>
      *         <li>tool</li>
      *     </ul>
      * @return the relationships this project has with others
@@ -187,18 +185,18 @@ public abstract class CurseForgeExtension {
         /**
          * The relationships of the project on CurseForge.
          * <p>
-         *     The key is the slug of the project in the relationship and the value is the kind of relationship.
-         *     As values, you can use:
-         *     <ul>
-         *         <li>embeddedLibrary</li>
-         *         <li>incompatible</li>
-         *         <li>optionalDependency</li>
-         *         <li>requiredDependency</li>
-         *         <li>tool</li>
-         *     </ul>
+         * The key is the slug of the project in the relationship and the value is the kind of relationship.
+         * As values, you can use:
+         * </p>
+         * <ul>
+         *     <li>embeddedLibrary</li>
+         *     <li>incompatible</li>
+         *     <li>tool</li>
+         * </ul>
          * @return the relationships this project has with other published projects on CurseForge.
          */
-        public MapProperty<String, String> getRelationships() {
+        public MapProperty<String, String> getRelationships()
+        {
             return this.relationships;
         }
 
@@ -227,24 +225,6 @@ public abstract class CurseForgeExtension {
          */
         public void incompatible(String slug) {
             getRelationships().put(slug, Constants.RELATION_INCOMPATIBLE);
-        }
-
-        /**
-         * Marks the given project as an optional dependency.
-         *
-         * @param slug the slug of the project
-         */
-        public void optional(String slug) {
-            getRelationships().put(slug, Constants.RELATION_OPTIONAL);
-        }
-
-        /**
-         * Marks the given project as a required dependency.
-         *
-         * @param slug the slug of the project
-         */
-        public void required(String slug) {
-            getRelationships().put(slug, Constants.RELATION_REQUIRED);
         }
     }
 }

@@ -56,6 +56,7 @@ public abstract class NeoGradleExtension implements ExtensionAware {
 
         //Set the default values for the extension.
         getPrimaryJarClassifier().convention("universal");
+        getAutoGenerateModsToml().convention(true);
 
         //By default, we extract the latest neoforge version from the minecraft version.
         getNeoForgeVersion().convention(
@@ -121,6 +122,13 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      * @return The version of NeoForge to use.
      */
     public abstract Property<String> getNeoForgeVersion();
+
+    /**
+     * Whether to automatically build the neoforge.mods.toml or not.
+     *
+     * @return Whether to automatically generate a neoforge.mods.toml during build.
+     */
+    public abstract Property<Boolean> getAutoGenerateModsToml();
 
     /**
      * The classifier to use for the primary jar.

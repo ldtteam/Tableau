@@ -4,6 +4,7 @@ import com.ldtteam.tableau.changelog.ChangelogPlugin;
 import com.ldtteam.tableau.common.CommonPlugin;
 import com.ldtteam.tableau.crowdin.CrowdinPlugin;
 import com.ldtteam.tableau.curseforge.CurseForgePlugin;
+import com.ldtteam.tableau.dependencies.DependenciesPlugin;
 import com.ldtteam.tableau.extensions.ModuleFeatures;
 import com.ldtteam.tableau.features.FeaturePluginManager;
 import com.ldtteam.tableau.git.GitPlugin;
@@ -45,6 +46,7 @@ public class TableauProjectPlugin implements Plugin<Project> {
         target.getPlugins().apply(CommonPlugin.class);
         target.getPlugins().apply(JavaPlugin.class);
         target.getPlugins().apply(SourcesetManagementPlugin.class);
+        target.getPlugins().apply(DependenciesPlugin.class);
         target.getPlugins().apply(ResourceProcessingPlugin.class);
         target.getPlugins().apply(NeoGradlePlugin.class);
         target.getPlugins().apply(JetbrainsAnnotationsPlugin.class);

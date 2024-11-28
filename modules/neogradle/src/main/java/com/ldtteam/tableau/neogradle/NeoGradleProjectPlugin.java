@@ -6,14 +6,15 @@ package com.ldtteam.tableau.neogradle;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.dependencies.extensions.DependenciesExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
+import com.ldtteam.tableau.neogradle.tasks.GenerateModsTomlTask;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
-import net.neoforged.gradle.common.extensions.MinecraftExtension;
-import net.neoforged.gradle.common.util.ProjectUtils;
+import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension.SourceSetConfiguration;
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers;
 import net.neoforged.gradle.dsl.common.extensions.InterfaceInjections;
 import net.neoforged.gradle.dsl.common.extensions.Minecraft;
@@ -23,8 +24,8 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.Rule;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.SourceSetContainer;
+import org.gradle.api.tasks.*;
+import org.gradle.language.jvm.tasks.ProcessResources;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
@@ -57,6 +58,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         configureResourceProcessing(target);
         configureAccessTransformers(target);
         configureInterfaceInjections(target);
+        configureModsTomlGeneration(target);
     }
 
     /**
@@ -109,7 +111,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
                 //Check if the source set is marked to be included in the libraries.
                 if (domainObjectName.equals("library")) {
-                    final SourceSetExtension.SourceSetConfiguration mainSourceSetConfig = sourceSetExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+                    final SourceSetConfiguration mainSourceSetConfig = sourceSetExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
                     final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(mainSourceSetConfig);
                     final SourceSet mainSourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(SourceSet.MAIN_SOURCE_SET_NAME);
 
@@ -136,7 +138,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                 //We know that a source set configuration exists for the given source set name.
                 //So we also know a neogradle extension exists for the source set configuration.
                 //And we know that the source set itself will exist.
-                final SourceSetExtension.SourceSetConfiguration sourceSetConfig = sourceSetExtension.getSourceSets().getByName(sourceSetName);
+                final SourceSetConfiguration sourceSetConfig = sourceSetExtension.getSourceSets().getByName(sourceSetName);
                 final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(sourceSetConfig);
                 final SourceSet sourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(sourceSetName);
 
@@ -323,5 +325,39 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         interfaceInjections.files(extension.getInterfaceInjections());
 
         //TODO: Consider how and when to expose the interface injections as artifacts.
+    }
+
+    /**
+     * Configures the automatic mods toml generation for the given project.
+     */
+    private void configureModsTomlGeneration(final Project project) {
+        final ModExtension mod = ModExtension.get(project);
+        final NeoGradleExtension neogradle = NeoGradleExtension.get(project);
+        final DependenciesExtension dependencies = DependenciesExtension.get(project);
+
+        final TaskProvider<GenerateModsTomlTask> generationTask = project.getTasks().register("generateModsToml", GenerateModsTomlTask.class, (task) -> {
+            task.getNeoforgeVersion().set(neogradle.getNeoForgeVersion());
+            task.getMinecraftVersion().set(mod.getMinecraftVersion());
+            task.getModId().set(mod.getModId());
+            task.getModName().set(mod.getModName());
+            task.getModDescription().set(mod.getModDescription());
+            task.getModLogo().set(mod.getModLogo());
+            task.getModVersion().set(project.getVersion().toString());
+            task.getPublisher().set(mod.getPublisher());
+            task.getDisplayUrl().set(mod.getDisplayUrl());
+            task.getIssueTrackerUrl().set(mod.getIssueTrackerUrl());
+            task.getLicense().set(mod.getLicense());
+
+            task.getRequiredDependencies().set(dependencies.getAllRequiredDependencies());
+            task.getOptionalDependencies().set(dependencies.getAllOptionalDependencies());
+        });
+
+        if (neogradle.getAutoGenerateModsToml().get()) {
+            project.getTasks().named("processResources", ProcessResources.class).configure(task -> {
+                task.from(generationTask.get().getOutputFile(), (it) -> {
+                    it.into("META-INF");
+                });
+            });
+        }
     }
 }
