@@ -1,0 +1,245 @@
+---
+sidebar_label: NeoForge Configuration
+title: Configure NeoGradle and NeoForge
+slug: neoforge-configuration
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Developing a mod is a complex endeavor that requires a lot of tools and configurations. This guide will help you configure NeoGradle and NeoForge to work with your mod.
+We will cover the following topics:
+- Setting the exact version of NeoForge that you want to use
+- Registering Access-Transformers and Interface-Injections
+- Configuring Data-Generators
+- Creating a library instead of a mod
+- Using a random player name
+- Setting the primary jars classifier
+
+:::info
+All sections of this guide will happen in the `neogradle` block of the Tableau DSL.
+:::
+
+## Setting the exact version of NeoForge that you want to use
+By default, Tableau will configure NeoGradle to use the latest version of NeoForge.
+This is good if you just want to get started, or always want to use the latest version of NeoForge, with the newest features and bug fixes.
+However, if you want to use a specific version of NeoForge, you can do so by setting the `neoforgeVersion` property in the `neogradle` block of the Tableau DSL:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    neogradle {
+        //Use the lastest version of NeoForge
+        //Available under: https://project.neoforged.net
+        neoforgeVersion = '1.0.0'
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    neogradle {
+        //Use the lastest version of NeoForge
+        //Available under: https://project.neoforged.net
+        neoforgeVersion.set("1.0.0")
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+## Registering Access-Transformers and Interface-Injections
+NeoForge allows you to register Access-Transformers and Interface-Injections.
+Access-Transformers are used to modify the access level of fields, methods and classes as well as remove final modifiers from these as well.
+Interface-Injections are used to inject interfaces into classes, this allows you to add mixins to classes so that at compile time they are properly registered,
+ensuring that you do not need to do double casts: `((IMixinInterface) (Object) this).method()`.
+
+To register Access-Transformers and Interface-Injections, you can use the `accessTransformers` and `interfaceInjections` properties in the `neogradle` block of the Tableau DSL:
+
+:::warning
+We are improving the API and functionality in this area to ensure that the relevant files are also properly injected into the jar.
+Right now we recommend to put the files in your `resources` directory and use the `file` function to reference them.
+Then you can reference them properly from your `mods.toml` file.
+:::
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    neogradle {
+        accessTransformers += [file('src/path/to/your/AccessTransformer.at')]
+        interfaceInjections += [file('src/path/to/your/InterfaceInjection.json')]
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    neogradle {
+        accessTransformers.add(file("src/path/to/your/AccessTransformer.at"))
+        interfaceInjections.add(file("src/path/to/your/InterfaceInjection.json"))
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+Alternatively to add a single file you can use the `accessTransformer` and `interfaceInjection` methods:
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        neogradle {
+            accessTransformer(file('src/path/to/your/AccessTransformer.at'))
+            interfaceInjection(file('src/path/to/your/InterfaceInjection.json'))
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        neogradle {
+            accessTransformer(file("src/path/to/your/AccessTransformer.at"))
+            interfaceInjection(file("src/path/to/your/InterfaceInjection.json"))
+        }
+    }
+    ```
+    </TabItem>
+</Tabs>
+
+## Configuring Data-Generators
+NeoForge allows you to register Data-Generators.
+By default, only the Data-Generators of your own mod will run.
+If you want to run the Data-Generators of other mods as well, you can add their mod id to the `additionalDataGenMods` property in the `neogradle` block of the Tableau DSL:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    neogradle {
+        additionalDataGenMods += ['modid']
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    neogradle {
+        additionalDataGenMods.add("modid")
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+Alternatively to add a single mod you can use the `additionalDataGenMod` method:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title="build.gradle"
+    tableau {
+        neogradle {
+            additionalDataGenMod("modid")
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title="build.gradle.kts"
+    tableau {
+        neogradle {
+            additionalDataGenMod("modid")
+        }
+    }
+    ```
+    </TabItem>
+</Tabs>
+
+## Creating a library instead of a mod
+If you want to create a library instead of a mod, you can set the `isLibrary` property in the `neogradle` block of the Tableau DSL:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    neogradle {
+        isLibrary = true
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    neogradle {
+        isLibrary.set(true)
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+## Using a random player name
+When you want to run your client with a random player name, you can set the `useRandomPlayerName` property in the `neogradle` block of the Tableau DSL:
+
+:::info
+This is useful when you want to run multiple clients at the same time, for example when testing multiplayer.
+The name pattern used here is: `Dev<random number between 1 and 600>`.
+This means it is possible that there might be some overlap with other instances.
+
+Please note that this won't work if you have imported the run into your IDE, as the IDE will always use the same player name.
+:::
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    neogradle {
+        useRandomPlayerName = true
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    neogradle {
+        useRandomPlayerName.set(true)
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+## Setting the primary jars classifier
+By default, the primary jar of your mod will have the classifier `universal`.
+This is historically grown as in the past there were different jars for client and server.
+If you want to change the classifier of the primary jar, you can set the `primaryJarClassifier` property in the `neogradle` block of the Tableau DSL:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    neogradle {
+        //Any value is possible
+        primaryJarClassifier = 'mod'
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    neogradle {
+        //Any value is possible
+        primaryJarClassifier.set("mod")
+    }
+}
+```
+</TabItem>
+</Tabs>

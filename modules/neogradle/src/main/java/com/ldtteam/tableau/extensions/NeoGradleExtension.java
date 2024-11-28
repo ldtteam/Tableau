@@ -34,18 +34,31 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      */
     public static final String EXTENSION_NAME = "neogradle";
 
+    /**
+     * Creates a new instance of the NeoGradle extension.
+     *
+     * @param project the project to create the extension for
+     */
     @Inject
     public NeoGradleExtension(final Project project) {
+        //Automatically add the access transformer file if it exists.
         if (project.file("src/main/resources/META-INF/accesstransformer.cfg").exists()) {
             getAccessTransformers().from(project.file("src/main/resources/META-INF/accesstransformer.cfg"));
+        }
+
+        //Automatically add the interface injection file if it exists.
+        if (project.file("src/main/resources/META-INF/interface-injection.json").exists()) {
+            getAccessTransformers().from(project.file("src/main/resources/META-INF/interface-injection.json"));
         }
 
         final VersioningExtension versioning = VersioningExtension.get(project);
         final ModExtension modExtension = ModExtension.get(project);
 
+        //Set the default values for the extension.
+        getPrimaryJarClassifier().convention("universal");
         getAutoGenerateModsToml().convention(true);
 
-        getPrimaryJarClassifier().convention("universal");
+        //By default, we extract the latest neoforge version from the minecraft version.
         getNeoForgeVersion().convention(
             modExtension.getMinecraftVersion().flatMap(enabled -> versioning.getMinecraft().getMinecraftVersion().map(version -> {
                 //The minecraft version is formatted like: a.b.c
@@ -55,20 +68,25 @@ public abstract class NeoGradleExtension implements ExtensionAware {
             })).orElse("+")
         );
 
+        //Always default to a normal username.
         getUseRandomPlayerNames().convention(false);
 
+        //If we are a library we need to configure the manifest to be a library.
         project.getTasks().named("jar", Jar.class, jar -> {
             jar.getArchiveClassifier().set(getPrimaryJarClassifier());
 
             jar.manifest(manifest -> {
-                manifest.attributes(Map.of("FMLModType", getIsFmlLibrary().map(isFmlLibrary -> isFmlLibrary ? "LIBRARY" : "MOD")));
+                manifest.attributes(Map.of("FMLModType", getIsLibrary().map(isFmlLibrary -> isFmlLibrary ? "LIBRARY" : "MOD")));
             });
         });
 
+        //Default to no additional data gen mods.
         getAdditionalDataGenMods().convention(List.of());
     }
 
     /**
+     * Contains the access transformers to apply to the project.
+     *
      * @return The access transformers to apply to the project.
      */
     public abstract ConfigurableFileCollection getAccessTransformers();
@@ -83,6 +101,8 @@ public abstract class NeoGradleExtension implements ExtensionAware {
     }
 
     /**
+     * Contains the interface injections to apply to the project.
+     *
      * @return The access transformers to apply to the project.
      */
     public abstract ConfigurableFileCollection getInterfaceInjections();
@@ -97,6 +117,8 @@ public abstract class NeoGradleExtension implements ExtensionAware {
     }
 
     /**
+     * The neoforge version to use.
+     *
      * @return The version of NeoForge to use.
      */
     public abstract Property<String> getNeoForgeVersion();
@@ -107,16 +129,22 @@ public abstract class NeoGradleExtension implements ExtensionAware {
     public abstract Property<Boolean> getAutoGenerateModsToml();
 
     /**
+     * The classifier to use for the primary jar.
+     *
      * @return The classifier for the primary jar.
      */
     public abstract Property<String> getPrimaryJarClassifier();
 
     /**
+     * Whether, to use random player names, when starting the client.
+     *
      * @return Indicates whether the project should use random player names.
      */
     public abstract Property<Boolean> getUseRandomPlayerNames();
 
     /**
+     * The additional data gen mods to use.
+     *
      * @return The additional data gen mods to use.
      */
     public abstract ListProperty<String> getAdditionalDataGenMods();
@@ -126,12 +154,14 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      *
      * @param mod the additional data gen mod
      */
-    public void dataGenMod(String mod) {
+    public void additionalDataGenMod(String mod) {
         getAdditionalDataGenMods().add(mod);
     }
 
     /**
+     * Whether the project is an FML library.
+     *
      * @return Indicates whether the project is an FML library.
      */
-    public abstract Property<Boolean> getIsFmlLibrary();
+    public abstract Property<Boolean> getIsLibrary();
 }

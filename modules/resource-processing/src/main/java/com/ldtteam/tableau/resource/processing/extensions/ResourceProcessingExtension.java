@@ -6,6 +6,7 @@ import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.language.jvm.tasks.ProcessResources;
 
 import javax.inject.Inject;
@@ -32,6 +33,11 @@ public abstract class ResourceProcessingExtension implements ExtensionAware {
 
     private final Project project;
 
+    /**
+     * Creates a new plugin instance.
+     *
+     * @param project The project to create the instance in.
+     */
     @Inject
     public ResourceProcessingExtension(final Project project) {
         this.project = project;
@@ -39,21 +45,37 @@ public abstract class ResourceProcessingExtension implements ExtensionAware {
         getIsEnabled().convention(true);
 
         project.afterEvaluate(ignored -> {
-            project.getTasks().named("processResources", ProcessResources.class, task -> {
-                getMatching().get().forEach(match -> {
-                    task.filesMatching(match, fileCopyDetails -> {
-                        fileCopyDetails.expand(getProperties().get());
-                    });
-                });
+            //Get all source sets.
+            final SourceSetContainer container = project.getExtensions().getByType(SourceSetContainer.class);
+            container.configureEach(sourceSet -> {
 
-                task.getInputs().properties(getProperties().get());
+                //For each source set get its process resources task
+                project.getTasks().named(sourceSet.getProcessResourcesTaskName(), ProcessResources.class, task -> {
+                    //Configure interpolation. The following .get() calls is why this is in an afterEvaluate block.
+                    getMatching().get().forEach(match -> {
+                        task.filesMatching(match, fileCopyDetails -> {
+                            fileCopyDetails.expand(getProperties().get());
+                        });
+                    });
+
+                    task.getInputs().properties(getProperties().get());
+                });
             });
         });
     }
 
+    /**
+     * Indicates whether resource processing is enabled or not.
+     * <p>
+     *     When resource processing is enabled, then it needs to be ran before a run.
+     *
+     * @return True when enabled, false when not.
+     */
     public abstract Property<Boolean> getIsEnabled();
 
     /**
+     * The properties that should be interpolated during resource processing.
+     *
      * @return The properties to extend the resource processing.
      */
     public abstract MapProperty<String, Object> getProperties();
@@ -72,9 +94,20 @@ public abstract class ResourceProcessingExtension implements ExtensionAware {
     }
 
     /**
+     * A list of glob patterns that match file paths in the project which should receive interpolation.
+     *
      * @return The matching patterns, which select the files to interpolate.
      */
     public abstract ListProperty<String> getMatching();
+
+    /**
+     * Adds a matching pattern.
+     *
+     * @param patterns The patterns to add.
+     */
+    public void matching(String... patterns) {
+        getMatching().addAll(patterns);
+    }
 
     /**
      * Interpolates the mods.toml files.

@@ -44,6 +44,7 @@ public class MavenPublishingExtension {
         UNKNOWN,
         LDTTEAM,
         GITHUB,
+        CUSTOM,
         LOCAL;
 
         public boolean includedInMaven() {
@@ -56,6 +57,11 @@ public class MavenPublishingExtension {
 
     private PublishingMode publishingMode = PublishingMode.UNKNOWN;
 
+    /**
+     * Creates a new Maven publishing extension.
+     *
+     * @param project the project to create the extension for
+     */
     @Inject
     public MavenPublishingExtension(final Project project) {
         this.project = project;
@@ -75,9 +81,8 @@ public class MavenPublishingExtension {
      * Configures the publishing system to publish the project to the LDTTeam Maven repository.
      * <p>
      *     Also configures the POM to publish to the LDTTeam Maven repository.
-     * </p>
      */
-    public void publishToLDTTeamMaven() {
+    public void publishToLDTTeam() {
         //LDTTeam always overrides configured POM settings
         pom(POM::distributeOnLDTTeamMaven);
 
@@ -100,10 +105,41 @@ public class MavenPublishingExtension {
     }
 
     /**
+     * Configures the publishing system to publish the project to a custom Maven repository.
+     * <p>
+     *     Also configures the POM to publish to the custom Maven repository.
+     *
+     * @param repositoryName the name of the repository
+     * @param repositoryUrl the URL of the repository
+     */
+    public void publishTo(String repositoryName, String repositoryUrl) {
+        if (publishingMode.includedInMaven()) {
+            publishingMode = PublishingMode.CUSTOM;
+            pom(pom -> pom.distributeOnCustomRepo(repositoryUrl));
+        }
+
+        final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
+        final Provider<String> username = project.getProviders().environmentVariable("%s_USERNAME".formatted(repositoryName.toUpperCase(Locale.ROOT)));
+        final Provider<String> password = project.getProviders().environmentVariable("%S_TOKEN".formatted(repositoryName.toUpperCase(Locale.ROOT)));
+
+        if (username.isPresent() && password.isPresent()) {
+            publishing.repositories(mavenRepositories -> {
+                mavenRepositories.maven(mavenRepository -> {
+                    mavenRepository.setUrl(repositoryUrl);
+                    mavenRepository.credentials(credentials -> {
+                        credentials.setUsername(username.get());
+                        credentials.setPassword(password.get());
+                    });
+                    mavenRepository.setName(repositoryName);
+                });
+            });
+        }
+    }
+
+    /**
      * Configures the publishing system to publish the project to the local Maven repository.
      * <p>
      *     Also configures the POM to publish to the local Maven repository, if it has not already been set to the LDTTeam Maven repository.
-     * </p>
      */
     public void publishToGithub() {
         if (publishingMode.includedInMaven()) {
@@ -134,7 +170,6 @@ public class MavenPublishingExtension {
      * Configures the publishing system to publish the project to the local Maven repository.
      * <p>
      *     Does **not** configure the POM to publish to the local Maven repository.
-     * </p>
      */
     public void publishLocally() {
         if (publishingMode.includedInMaven()) {
@@ -145,7 +180,7 @@ public class MavenPublishingExtension {
         publishing.repositories(mavenRepositories -> {
             mavenRepositories.maven(mavenRepository -> {
                 mavenRepository.setUrl("file:///" + project.getRootProject().file("repo").getAbsolutePath());
-                mavenRepository.setName("Local Maven Repository");
+                mavenRepository.setName("Local-Repo-Directory");
             });
         });
     }
@@ -169,10 +204,14 @@ public class MavenPublishingExtension {
         });
 
         pom.setPackaging("jar");
-
-
     }
 
+    /**
+     * The {@link MavenPom} implementation that delegates to the actual POM and applies additional configuration.
+     *
+     * @param project the project to which this POM belongs
+     * @param delegate the actual {@link MavenPom} to delegate to
+     */
     public record POM(Project project, MavenPom delegate) implements MavenPom {
 
         @ToBeReplacedByLazyProperty
@@ -305,6 +344,17 @@ public class MavenPublishingExtension {
         }
 
         /**
+         * Configures distribution to happen via a custom repository.
+         *
+         * @param repositoryUrl the URL of the repository
+         */
+        public void distributeOnCustomRepo(String repositoryUrl) {
+            distributionManagement(distributionManagement -> {
+                distributionManagement.getDownloadUrl().set(repositoryUrl);
+            });
+        }
+
+        /**
          * Configures the POM using information stored in git.
          */
         public void usingGit() {
@@ -329,6 +379,8 @@ public class MavenPublishingExtension {
             contributors(contributors -> {
                 List<GitExtension.Developer> developerList = new ArrayList<>(git.getDevelopers().get());
 
+                developerList.sort(Comparator.comparing(GitExtension.Developer::count).reversed());
+
                 if (developerList.size() > 5) {
                     developerList = developerList.subList(0, 5);
                 }
@@ -342,7 +394,7 @@ public class MavenPublishingExtension {
             });
 
             issueManagement(issueManagement -> {
-                issueManagement.getUrl().set(git.getGithubUrl() + "/issues");
+                issueManagement.getUrl().set(git.getGithubUrl().map(url -> url + "/issues"));
                 issueManagement.getSystem().set("GitHub");
             });
 
@@ -350,7 +402,12 @@ public class MavenPublishingExtension {
 
             ciManagement(ciManagement -> {
                 ciManagement.getSystem().set("GitHub Actions");
-                ciManagement.getUrl().set(git.getGithubUrl() + "/actions");
+                ciManagement.getUrl().set(git.getGithubUrl().map(url -> url + "/actions"));
+            });
+
+            organization(organization -> {
+                organization.getName().set(git.getOrganizationName());
+                organization.getUrl().set(git.getOrganizationUrl());
             });
         }
     }

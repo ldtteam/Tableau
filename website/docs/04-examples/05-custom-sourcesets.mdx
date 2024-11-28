@@ -1,0 +1,86 @@
+---
+sidebar_label: Custom SourceSets
+title: Manage Custom SourceSets
+slug: custom-sourcesets
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+This example project configuration shows how to add and publish a custom source set.
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    mod {
+        // Mod information
+        modid = 'modid' // Use your own modid here.
+        group = 'com.example' // Use your own group here.
+        minecraftVersion = '1.21.3' // Or any other minecraft version.
+        publisher = 'SomePublisher' // Use your own name here.
+        url = 'https://github.com/someorg/modid' // Use your own URL here.
+    }
+
+    sourceSets {
+        api {
+            isPartOfPrimaryJar = true
+            isPublished = true
+
+            java {
+                srcDirs = ["src/api/java_extra"]
+            }
+
+            resources {
+                srcDirs = ["src/api/resources_extra"]
+            }
+
+            dependencies {
+                implementation 'com.google.guava:guava:30.1-jre'
+            }
+        }
+    }
+}
+```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    mod {
+        // Mod information
+        modid.set("modid") // Use your own modid here.
+        group.set("com.example") // Use your own group here.
+        minecraftVersion.set("1.21.3") // Or any other minecraft version.
+        publisher.set("SomePublisher") // Use your own name here.
+        url.set("https://github.com/someorg/modid") // Use your own URL here.
+    }
+
+    sourceSets {
+        api {
+            isPartOfPrimaryJar.set(true)
+            isPublished.set(true)
+
+            java {
+                srcDirs.set(listOf("src/api/java_extra"))
+            }
+
+                resources {
+                srcDirs.set(listOf("src/api/resources_extra"))
+            }
+
+            dependencies {
+                implementation("com.google.guava:guava:30.1-jre")
+            }
+        }
+    }
+}
+```
+    </TabItem>
+</Tabs>
+
+This will configure an `api` source set with custom source directories and dependencies.
+This source set will be included in the primary jar file and published as a seperate jar as well.
+
+:::note
+You can find a full example of this project configuration in the [Custom SourceSets Example](https://github.com/ldtteam/Tableau/tree/main/examples/custom-sourcesets) on GitHub.
+:::

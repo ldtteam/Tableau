@@ -23,9 +23,20 @@ import com.ldtteam.tableau.utilities.UtilitiesPlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.jetbrains.annotations.NotNull;
-import org.sonarqube.gradle.SonarQubePlugin;
 
+import javax.inject.Inject;
+
+/**
+ * Core plugin which will apply all modules and features when needed to a {@link Project}
+ */
 public class TableauProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public TableauProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
@@ -48,7 +59,6 @@ public class TableauProjectPlugin implements Plugin<Project> {
         FeaturePluginManager.applyFeaturePlugin(target, JarJarPlugin.class, ModuleFeatures::getUsesJarJar);
         FeaturePluginManager.applyFeaturePlugin(target, CurseForgePlugin.class, ModuleFeatures::getUsesCurse);
         FeaturePluginManager.applyFeaturePlugin(target, CrowdinPlugin.class, ModuleFeatures::getUsesCrowdin);
-        FeaturePluginManager.applyFeaturePlugin(target, SonarQubePlugin.class, ModuleFeatures::getUsesSonarQube);
 
     }
 }

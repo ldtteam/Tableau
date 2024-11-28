@@ -34,10 +34,17 @@ public abstract class GitExtension {
      */
     public static final String EXTENSION_NAME = "git";
 
+    /**
+     * Creates a new git extension model.
+     *
+     * @param project The project for the model.
+     */
     @Inject
     public GitExtension(@NotNull Project project) {
-        this.getBranch().set(project.getProviders().of(CurrentBranchValueSource.class, noneValueSourceSpec -> { }));
-        this.getGitUrl().set(project.getProviders().of(OriginRemoteUrlValueSource.class, noneValueSourceSpec -> { }));
+        this.getBranch().set(project.getProviders().of(CurrentBranchValueSource.class, noneValueSourceSpec -> {
+        }));
+        this.getGitUrl().set(project.getProviders().of(OriginRemoteUrlValueSource.class, noneValueSourceSpec -> {
+        }));
         this.getGithubUrl().set(this.getGitUrl().map(it -> {
             //Remove the ".git" suffix
             if (it.endsWith(".git")) {
@@ -46,12 +53,25 @@ public abstract class GitExtension {
 
             return it;
         }));
-        this.getDevelopers().set(project.getProviders().of(DevelopersValueSource.class, noneValueSourceSpec -> { }));
-        this.getInitialCommitYear().set(project.getProviders().of(FirstCommitYearValueSource.class, noneValueSourceSpec -> { }));
+        this.getDevelopers().set(project.getProviders().of(DevelopersValueSource.class, noneValueSourceSpec -> {
+        }));
+        this.getInitialCommitYear().set(project.getProviders().of(FirstCommitYearValueSource.class, noneValueSourceSpec -> {
+        }));
         this.getRepositoryName().set(this.getGithubUrl().map(it -> {
             //Extract the repository name from the url.
             final int lastSlash = it.lastIndexOf('/');
             return it.substring(lastSlash + 1);
+        }));
+        this.getOrganizationName().set(this.getGithubUrl().map(it -> {
+            //Extract the organization name from the url.
+            final int lastSlash = it.lastIndexOf('/');
+            final int secondLastSlash = it.lastIndexOf('/', lastSlash - 1);
+            return it.substring(secondLastSlash + 1, lastSlash);
+        }));
+        this.getOrganizationUrl().set(this.getGithubUrl().map(it -> {
+            //Extract the organization url from the url.
+            final int lastSlash = it.lastIndexOf('/');
+            return it.substring(0, lastSlash);
         }));
     }
 
@@ -98,12 +118,40 @@ public abstract class GitExtension {
     public abstract Property<String> getRepositoryName();
 
     /**
+     * Gets the organization name property.
+     *
+     * @return The organization name property.
+     */
+    public abstract Property<String> getOrganizationName();
+
+    /**
+     * Gets the organization url property.
+     *
+     * @return The organization url property.
+     */
+    public abstract Property<String> getOrganizationUrl();
+
+    /**
      * Lazy value source for the current branch.
      */
     public abstract static class CurrentBranchValueSource implements ValueSource<String, ValueSourceParameters.None> {
 
+        /**
+         * Creates a new value source.
+         */
         @Inject
-        abstract ExecOperations getExecOperations();
+        public CurrentBranchValueSource() {
+        }
+
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         *     Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
+        @Inject
+        public abstract ExecOperations getExecOperations();
 
         public String obtain() {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -112,14 +160,31 @@ public abstract class GitExtension {
                 it.setStandardOutput(output);
             });
 
-            return output.toString(Charset.defaultCharset());
+            return output.toString(Charset.defaultCharset()).trim();
         }
     }
 
+    /**
+     * Lazy value source for the origin remote url.
+     */
     public abstract static class OriginRemoteUrlValueSource implements ValueSource<String, ValueSourceParameters.None> {
 
+        /**
+         * Creates a new value source.
+         */
         @Inject
-        abstract ExecOperations getExecOperations();
+        public OriginRemoteUrlValueSource() {
+        }
+
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         *     Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
+        @Inject
+        public abstract ExecOperations getExecOperations();
 
         public String obtain() {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -128,52 +193,94 @@ public abstract class GitExtension {
                 it.setStandardOutput(output);
             });
 
-            return output.toString(Charset.defaultCharset());
+            return output.toString(Charset.defaultCharset()).trim();
         }
     }
 
-    public record Developer(int count, String name, String email) {}
-
-    public abstract static class DevelopersValueSource implements ValueSource<List<Developer>, ValueSourceParameters.None> {
-
-            @Inject
-            abstract ExecOperations getExecOperations();
-
-            public List<Developer> obtain() {
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                getExecOperations().exec(it -> {
-                    it.setCommandLine("git", "shortlog", "-sne");
-                    it.setStandardOutput(output);
-                });
-
-                final String outputString = output.toString(Charset.defaultCharset());
-                //The output is formatted like:
-                // 100 Author Name <email>
-                //   2 Author Name <email>
-                //We need to parse that into a list of developers.
-                return outputString.lines().map(line -> {
-                    //First extract the email:
-                    final int emailStart = line.indexOf('<');
-                    final int emailEnd = line.lastIndexOf('>');
-                    final String email = line.substring(emailStart + 1, emailEnd).trim();
-
-                    //Then extract the name, it starts at the first none whitespace and numeric character and ends at the first '<' character.:
-                    final int nameStart = line.length() - line.replaceFirst("( |\\d)+", "").length();
-                    final int nameEnd = line.indexOf('<') - 1;
-                    final String name = line.substring(nameStart, nameEnd).trim();
-
-                    //Finally extract the count:
-                    final int count = Integer.parseInt(line.substring(0, nameStart).trim());
-
-                    return new Developer(count, name, email);
-                }).toList();
-            }
+    /**
+     * A developer of the project.
+     *
+     * @param count The commit count of that developer.
+     * @param name  The name of the developer.
+     * @param email The email of the developer.
+     */
+    public record Developer(int count, String name, String email) {
     }
 
+    /**
+     * Lazy value source for the developers of the project.
+     */
+    public abstract static class DevelopersValueSource implements ValueSource<List<Developer>, ValueSourceParameters.None> {
+
+        /**
+         * Creates a new value source.
+         */
+        @Inject
+        public DevelopersValueSource() {
+        }
+
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         * Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
+        @Inject
+        public abstract ExecOperations getExecOperations();
+
+        public List<Developer> obtain() {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            getExecOperations().exec(it -> {
+                it.setCommandLine("git", "shortlog", "-sne");
+                it.setStandardOutput(output);
+            });
+
+            final String outputString = output.toString(Charset.defaultCharset()).trim();
+            //The output is formatted like:
+            // 100 Author Name <email>
+            //   2 Author Name <email>
+            //We need to parse that into a list of developers.
+            return outputString.lines().map(line -> {
+                //First extract the email:
+                final int emailStart = line.indexOf('<');
+                final int emailEnd = line.lastIndexOf('>');
+                final String email = line.substring(emailStart + 1, emailEnd).trim();
+
+                //Then extract the name, it starts at the first none whitespace and numeric character and ends at the first '<' character.:
+                final int nameStart = line.length() - line.replaceFirst("( |\\d)+", "").length();
+                final int nameEnd = line.indexOf('<') - 1;
+                final String name = line.substring(nameStart, nameEnd).trim();
+
+                //Finally extract the count:
+                final int count = Integer.parseInt(line.substring(0, nameStart).trim());
+
+                return new Developer(count, name, email);
+            }).toList();
+        }
+    }
+
+    /**
+     * Lazy value source for the year of the first commit.
+     */
     public abstract static class FirstCommitYearValueSource implements ValueSource<Integer, ValueSourceParameters.None> {
 
+        /**
+         * Creates a new value source.
+         */
         @Inject
-        abstract ExecOperations getExecOperations();
+        public FirstCommitYearValueSource() {
+        }
+
+        /**
+         * The exec operations which are used to invoke git.
+         * <p>
+         *     Injected by the Gradle runtime.
+         *
+         * @return The exec operations.
+         */
+        @Inject
+        public abstract ExecOperations getExecOperations();
 
         public Integer obtain() {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -182,7 +289,7 @@ public abstract class GitExtension {
                 it.setStandardOutput(output);
             });
 
-            return Integer.parseInt(output.toString(Charset.defaultCharset()));
+            return Integer.parseInt(output.toString(Charset.defaultCharset()).trim());
         }
     }
 

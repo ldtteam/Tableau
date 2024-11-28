@@ -30,10 +30,12 @@ public abstract class ModuleFeatures {
         return project.getGradle().getExtensions().getByType(ModuleFeatures.class);
     }
 
+    /**
+     * Creates a new features model
+     */
     @Inject
     public ModuleFeatures() {
         getUsesCrowdin().convention(false);
-        getUsesSonarQube().convention(false);
         getUsesShadowing().convention(false);
         getUsesJarJar().convention(false);
         getUsesCurse().convention(false);
@@ -48,13 +50,6 @@ public abstract class ModuleFeatures {
      * @return The property for whether the project uses crowdin.
      */
     public abstract Property<Boolean> getUsesCrowdin();
-
-    /**
-     * Gets the property for whether the project uses sonarqube.
-     *
-     * @return The property for whether the project uses sonarqube.
-     */
-    public abstract Property<Boolean> getUsesSonarQube();
 
     /**
      * Gets the property for whether the project uses shadowing.

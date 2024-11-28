@@ -15,11 +15,24 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * The project plugin for the Java module.
+ * <p>
+ *     Configures the jar tasks and the relevant publishing tasks.
+ */
 public class JavaProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public JavaProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
@@ -37,7 +50,6 @@ public class JavaProjectPlugin implements Plugin<Project> {
      *     <ul>
      *         <li>Adds the output of the universal source sets to the jar task.</li>
      *     </ul>
-     * </p>
      *
      * @param project the project to configure
      */
@@ -129,7 +141,6 @@ public class JavaProjectPlugin implements Plugin<Project> {
                 });
 
                 //TODO: Wire up test tasks once we need testing for individual source sets.
-
                 var sourceSetBuildTaskName = sourceSet.getTaskName("build", null);
                 var sourceSetBuildTask = project.getTasks().maybeCreate(sourceSetBuildTaskName);
                 project.getTasks().named(sourceSetBuildTaskName, task -> {

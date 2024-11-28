@@ -14,6 +14,7 @@ import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.file.Directory;
+import org.gradle.api.problems.Problems;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.TaskProvider;
@@ -21,19 +22,38 @@ import org.jetbrains.annotations.NotNull;
 import org.zaproxy.gradle.crowdin.CrowdinPlugin;
 import org.zaproxy.gradle.crowdin.tasks.BuildProjectTranslation;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+/**
+ * Project plugin for handling crowdin translation management.
+ */
+@SuppressWarnings("UnstableApiUsage")
 public class CrowdinProjectPlugin implements Plugin<Project> {
+
+    private final Problems problems;
+
+    /**
+     * Creates a new plugin instance.
+     *
+     * @param problems The {@link Problems} handler to use.
+     */
+    @Inject
+    public CrowdinProjectPlugin(Problems problems) {
+        this.problems = problems;
+    }
 
     @Override
     public void apply(@NotNull Project target) {
+        //We need these plugins as base, note the crowdin plugin is not our module plugin but the external one.
         target.getPlugins().apply(CrowdinPlugin.class);
         target.getPlugins().apply(ScriptingPlugin.class);
         target.getPlugins().apply(CommonPlugin.class);
         target.getPlugins().apply(GitPlugin.class);
 
+        //Register the DSL extension.
         TableauScriptingExtension.register(target, CrowdinExtension.EXTENSION_NAME, CrowdinExtension.class);
 
         target.afterEvaluate(ignored -> {
@@ -41,18 +61,28 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
             final org.zaproxy.gradle.crowdin.CrowdinExtension crowdin = target.getExtensions().getByType(org.zaproxy.gradle.crowdin.CrowdinExtension.class);
 
             if (crowdinExtension.getSourceFiles().isEmpty()) {
-                throw new InvalidUserDataException("No source files specified for Crowdin.");
+                throw problems.forNamespace("tableau").throwing(spec -> {
+                    spec.id("crowdin-no-source-files", "Missing source files for Crowdin")
+                            .details("No source files specified for Crowdin, please specify at least one source file to manage")
+                            .solution("Add at least one source file to the crowdin block of the Tableau DSL");
+                });
             }
 
             boolean mergesTranslations = false;
             if (crowdinExtension.getSourceFiles().getFiles().size() != 1) {
                 if (crowdinExtension.getTargetFiles().isEmpty()) {
-                    throw new InvalidUserDataException("No target files specified for Crowdin merging, yet multiple inputs are specified.");
+                    throw problems.forNamespace("tableau").throwing(spec -> {
+                        spec.id("crowdin-no-target-files", "Missing target files for Crowdin")
+                                .details("No target files specified for Crowdin, if you specify more then one source file, they need to be merged into at least one target file.")
+                                .solution("Add at least one target file to the crowdin block of the Tableau DSL");
+                    });
                 }
 
                 final TaskProvider<MergeTranslations> mergeTranslations = target.getTasks().register("mergeTranslations", MergeTranslations.class, task -> {
                     task.getSourceFiles().from(crowdinExtension.getSourceFiles());
                     task.getTargetFiles().from(crowdinExtension.getTargetFiles());
+                    task.setGroup("Crowdin");
+                    task.setDescription("Merges the translations from the source files into the target files.");
                 });
                 mergesTranslations = true;
 
@@ -110,6 +140,7 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
 
                 final TaskProvider<Delete> deleteTranslationFilesInBuildDir = target.getTasks().register("deleteTranslationFilesInBuildDir", Delete.class, task -> {
                     task.setGroup("Crowdin");
+                    task.setDescription("Deletes the translation files from the build directory.");
                     task.dependsOn(target.getTasks().named(CrowdinPlugin.COPY_PROJECT_TRANSLATIONS_TASK_NAME));
                     task.delete(target.getLayout().getBuildDirectory().dir("temp").map(dir -> dir.dir("translations")));
                     task.setFollowSymlinks(true);
@@ -117,6 +148,7 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
 
                 final TaskProvider<Copy> normalizeTranslationFilesInBuildDir = target.getTasks().register("normalizeTranslationFilesInBuildDir", Copy.class, task -> {
                     task.setGroup("Crowdin");
+                    task.setDescription("Normalizes the translation files in the build directory.");
                     task.dependsOn(deleteTranslationFilesInBuildDir);
                     task.from(crowdinExtension.getDownloadLocation());
                     task.into(target.getLayout().getBuildDirectory().dir("temp").map(dir -> dir.dir("translations")));
@@ -125,6 +157,7 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
 
                 final TaskProvider<Delete> deleteTranslationFilesInRuntimeDir = target.getTasks().register("deleteTranslationFilesInRuntimeDir", Delete.class, task -> {
                     task.setGroup("Crowdin");
+                    task.setDescription("Deletes the translation files from the runtime directory.");
                     task.dependsOn(normalizeTranslationFilesInBuildDir);
                     task.delete(crowdinExtension.getDownloadLocation());
                     task.setFollowSymlinks(true);
@@ -132,6 +165,7 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
 
                 final TaskProvider<Copy> normalizeTranslationFilesInRuntimeDir = target.getTasks().register("normalizeTranslationFilesInRuntimeDir", Copy.class, task -> {
                     task.setGroup("Crowdin");
+                    task.setDescription("Normalizes the translation files in the runtime directory.");
                     task.dependsOn(deleteTranslationFilesInRuntimeDir);
                     task.from(target.getLayout().getBuildDirectory().dir("temp").map(dir -> dir.dir("translations")));
                     task.into(crowdinExtension.getDownloadLocation());

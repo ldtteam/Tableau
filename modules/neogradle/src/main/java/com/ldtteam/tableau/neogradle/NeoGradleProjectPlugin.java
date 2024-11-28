@@ -36,12 +36,23 @@ import org.gradle.api.tasks.*;
 import org.gradle.language.jvm.tasks.ProcessResources;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
 
+/**
+ * The neogradle project plugin, which applies the user dev plugin and configures the project for neogradle.
+ */
 public class NeoGradleProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public NeoGradleProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
@@ -60,6 +71,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
     /**
      * Configures the source sets for the given project.
+     *
+     * @param target The project to configure the source sets for.
      */
     private void configureSourceSets(@NotNull Project target) {
         final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
@@ -81,7 +94,13 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         });
     }
 
+    /**
+     * Configures the library configurations for the given project.
+     *
+     * @param target The project to configure the library configurations for.
+     */
     private void configureLibraryConfigurations(@NotNull final Project target) {
+        //Register a rule that checks whether a library configuration should be created for a source set.
         target.getConfigurations().addRule(new Rule() {
             @Override
             public @NotNull String getDescription() {
@@ -145,6 +164,11 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         });
     }
 
+    /**
+     * Configures the runs for the given project.
+     *
+     * @param target The project to configure the runs for.
+     */
     @SuppressWarnings("UnstableApiUsage")
     private void configureRuns(@NotNull Project target) {
         final RunManager runManager = target.getExtensions().getByType(RunManager.class);
@@ -256,7 +280,6 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
      * If the source set is the main source set, the configuration is named "library".
      * If the source set is not the main source set, the configuration is named "%sLibrary".formatted(sourceSet.getName()).
      * If the source set is missing, then an exception is thrown.
-     * </p>
      *
      * @param target    The project to get the configuration from.
      * @param sourceSet The source set to get the configuration for.
@@ -272,6 +295,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
     /**
      * Configures the resource processing for the given project.
+     *
+     * @param project The project to configure the resource processing for.
      */
     private void configureResourceProcessing(final Project project) {
         final ResourceProcessingExtension resourceProcessing = ResourceProcessingExtension.get(project);
@@ -280,6 +305,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
     /**
      * Configures the access transformers for the given project.
+     *
+     * @param project The project to configure the access transformers for.
      */
     private void configureAccessTransformers(final Project project) {
         final NeoGradleExtension extension = NeoGradleExtension.get(project);
@@ -294,6 +321,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
     /**
      * Configures the interface injections for the given project.
+     *
+     * @param project The project to configure the interface injections for.
      */
     private void configureInterfaceInjections(final Project project) {
         final NeoGradleExtension extension = NeoGradleExtension.get(project);

@@ -11,6 +11,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.BasePluginExtension;
+import org.gradle.api.problems.Problems;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.Jar;
@@ -18,41 +19,76 @@ import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.external.javadoc.StandardJavadocDocletOptions;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 /**
  * The common project plugin.
  * <p>
  *     This plugin is applied to all projects and configures the project with the common settings.
- * </p>
  */
+@SuppressWarnings("UnstableApiUsage")
 public class CommonProjectPlugin implements Plugin<Project> {
+
+
+    private final Problems problems;
+
+    /**
+     * Creates a new plugin instance.
+     *
+     * @param problems The problems gradle subsystem to report problems to if found.
+     */
+    @Inject
+    public CommonProjectPlugin(Problems problems) {
+        this.problems = problems;
+    }
 
     @Override
     public void apply(@NotNull Project target) {
+        //Register all base plugins.
         target.getPlugins().apply("base");
         target.getPlugins().apply("jacoco");
         target.getPlugins().apply("idea");
         target.getPlugins().apply("eclipse");
 
+        //The DSL Extension.
         TableauScriptingExtension.register(target, ModExtension.EXTENSION_NAME, ModExtension.class, target);
 
+        //Configure processing.
         configureVersioning(target);
         configureRepositories(target);
         configureBase(target);
 
+        //Set global duplication strategy
         target.getTasks().withType(Copy.class).configureEach(task -> task.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
 
+        //Deal with API javadoc management
         target.getTasks()
                 .withType(Javadoc.class)
                 .matching(task -> task.getName().contains("api"))
                 .configureEach(task -> ((StandardJavadocDocletOptions) task.getOptions()).addStringOption("Xdoclint:none", "-quiet"));
 
+        //Set jar duplication strategies
         target.getTasks().withType(Jar.class).configureEach(jar -> jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
 
+        //Validate that the user configured a mod id, error out if not set.
         target.afterEvaluate(ignored -> {
             if (!ModExtension.get(target).getModId().isPresent()) {
-                throw new IllegalStateException("Mod ID is not set. Please set the mod ID in the build.gradle file.");
+                throw problems.forNamespace("tableau").throwing(spec -> {
+                    //TODO: Configure documentation link.
+                    spec.id("missing-mod-id", "Mod id is not configured.")
+                            .details("Without a specified mod id a lot of systems can not be configured.")
+                            .solution("Configure the mod id, in tableau's mod block.");
+                });
+            }
+
+            if (!ModExtension.get(target).getGroup().isPresent()) {
+                throw problems.forNamespace("tableau").throwing(spec -> {
+                    //TODO: Configure documentation link.
+                    spec.id("missing-mod-group", "Mod group is not configured.")
+                            .details("Without a specified mod group a lot of systems can not be configured.")
+                            .solution("Configure the mod group, in tableau's mod block.");
+                });
             }
         });
     }
@@ -81,7 +117,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
      *     This will set the version of the project to the version of the mod.
      *     If the minecraft based versioning is enabled, the version will be set to the minecraft based version.
      *     If the minecraft based versioning is disabled, the version will be set to the version of the mod.
-     * </p>
      *
      * @param target The target project.
      */
@@ -119,7 +154,10 @@ public class CommonProjectPlugin implements Plugin<Project> {
         }).orElse(minecraftBasedVersion));
 
         //Set the version of the project.
-        target.setVersion(projectVersion.toString());
+        target.setVersion(projectVersion);
+
+        //Set the group of the project.
+        target.setGroup(new ProjectGroup(ModExtension.get(target).getGroup()));
     }
 
     /**
@@ -139,6 +177,16 @@ public class CommonProjectPlugin implements Plugin<Project> {
         @Override
         public String toString() {
             return versionProvider().get();
+        }
+    }
+
+    /**
+     * A record to store the project group, returning only the project group when {@link Object#toString()} is called.
+     */
+    private record ProjectGroup(Provider<String> groupProvider) {
+        @Override
+        public String toString() {
+            return groupProvider().get();
         }
     }
 }

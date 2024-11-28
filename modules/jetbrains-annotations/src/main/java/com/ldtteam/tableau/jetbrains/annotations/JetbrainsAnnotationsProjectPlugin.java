@@ -9,7 +9,19 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * The project plugin for the Jetbrains Annotations module.
+ */
 public class JetbrainsAnnotationsProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public JetbrainsAnnotationsProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {

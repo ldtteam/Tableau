@@ -30,6 +30,11 @@ public abstract class ModExtension {
 
     private final Versioning versioning;
 
+    /**
+     * Creates a new mod extension model.
+     *
+     * @param project The project for the model.
+     */
     @Inject
     public ModExtension(final Project project) {
         versioning = project.getObjects().newInstance(Versioning.class);
@@ -38,6 +43,8 @@ public abstract class ModExtension {
     }
 
     /**
+     * The versioning model for this mod.
+     *
      * @return The versioning configuration.
      */
     public Versioning getVersioning() {
@@ -54,6 +61,30 @@ public abstract class ModExtension {
     }
 
     /**
+     * The current mod id for the mod.
+     * <p>
+     *     Not configuring the mod id, will likely result in an error during the build.
+     * </p>
+     *
+     * @return The mod id.
+     */
+    public abstract Property<String> getModId();
+
+    /**
+     * The mod group.
+     * <p>
+     *     Generally the mod group is the name of the modding team or the name of the modding group, in reverse DNS order.
+     *     So, for example: com.ldtteam, or com.github.example-team
+     * <p>
+     *     Not configuring the mod group, will likely result in an error during the build.
+     *
+     * @return The mod group.
+     */
+    public abstract Property<String> getGroup();
+
+    /**
+     * The current main minecraft version against which the mod is build.
+     *
      * @return The minecraft version.
      */
     public abstract Property<String> getMinecraftVersion();
@@ -79,17 +110,23 @@ public abstract class ModExtension {
     public abstract Property<String> getModLogo();
 
     /**
+     * The display name of the team or contributor who publishes the mod.
+     *
      * @return The mod publisher.
      */
     public abstract Property<String> getPublisher();
 
     /**
-     * @return The website for the mod.
+     * The url of the website where documentation can be found for the project.
+     *
+     * @return The website url, the location where documentation/support can be found.
      */
     public abstract Property<URI> getDisplayUrl();
 
     /**
-     * @return The repository url, where the source can be found.
+     * The url of the website where the source code can be found for the project.
+     *
+     * @return The repository url, is the location where the source code can be found.
      */
     public abstract Property<URI> getRepositoryUrl();
 
@@ -104,10 +141,13 @@ public abstract class ModExtension {
     public abstract Property<String> getLicense();
 
     /**
-     * Mod versioning configuration.
+     * Mod versioning configuration model.
      */
     public abstract static class Versioning {
 
+        /**
+         * Creates a new versioning model.
+         */
         @Inject
         public Versioning() {
             getVersion().convention("0.0.0");
@@ -115,11 +155,23 @@ public abstract class ModExtension {
         }
 
         /**
+         * The semver or maven compatible version string.
+         * <p>
+         *     Mods should generally use maven versioning.
+         * <p>
+         *     The default value is 0.0.0
+         *
          * @return The mod version.
          */
         public abstract Property<String> getVersion();
 
         /**
+         * The version suffix.
+         * <p>
+         *     This should generally be something like -SNAPSHOT, -RELEASE or empty.
+         * <p>
+         *     Might also indicate the branch that was used as source to build this version of the mod.
+         *
          * @return The mod version suffix.
          */
         public abstract Property<String> getSuffix();

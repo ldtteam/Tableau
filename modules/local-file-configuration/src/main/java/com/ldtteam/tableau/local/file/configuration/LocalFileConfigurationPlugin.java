@@ -7,7 +7,21 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * The root plugin for the Local File Configuration module.
+ * <p>
+ *     Can be applied to any {@link org.gradle.api.plugins.PluginAware} but will only interact with {@link Project projects}
+ */
 public class LocalFileConfigurationPlugin implements Plugin<Object> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public LocalFileConfigurationPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Object target) {

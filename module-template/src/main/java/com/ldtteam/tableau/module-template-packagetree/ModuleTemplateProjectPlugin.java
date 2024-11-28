@@ -7,7 +7,19 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Core module project plugin for ModuleTemplate
+ */
 public class ModuleTemplateProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new instance of the plugin.
+     */
+    @Inject
+    public ModuleTemplateProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {

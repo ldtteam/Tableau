@@ -3,29 +3,87 @@
  */
 package com.ldtteam.tableau.bootstrap;
 
-import org.gradle.api.Project;
+import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
-import org.gradle.plugin.use.PluginDependencySpec;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Map;
+
+/**
+ * Defines the core settings plugin for bootstrapping Tableau.
+ * <p>
+ *     This plugin is published to the Gradle Plugin repository.
+ * <p>
+ *     Its main job is to configure the plugin repositories in such a way that it
+ *     then can load the relevant tableau modules from our maven.
+ * <p>
+ *     It will pull the version to load from its own published manifest.
+ */
 public class BootstrapSettingsPlugin implements Plugin<Settings> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public BootstrapSettingsPlugin() {
+    }
 
     @Override
     public void apply(Settings target) {
+        //Get the version to use.
         final String version = this.getClass().getPackage().getImplementationVersion();
 
-        LoggerFactory.getLogger(BootstrapSettingsPlugin.class).warn("Setting up Bootstrap settings for {}", version);
-
+        //Configure the repositories section.
         target.getPluginManagement().getRepositories().mavenLocal();
         target.getPluginManagement().getRepositories().maven(repo -> {
             repo.setUrl("https://ldtteam.jfrog.io/artifactory/tableau/");
             repo.setName("Tableau");
         });
 
-        target.getPluginManagement().plugins(plugins -> {
-            plugins.id("com.ldtteam.tableau").version(version);
-        });
+        //Configure the dependencies section -> This needs to be in a temporary file, with a different buildscript block.
+        //When gradle then applies the file, it will detect the different classpath and create a new isolation scope,
+        //With a new classloader. This new classloader is now aware of the Tableau main plugin and will apply it.
+        try {
+            //Create the new temp file.
+            final File tempFile = File.createTempFile("tableau-bootstrap", ".gradle");
+
+            //We need to write out a gradle plugin file that then applies the plugin.
+            final String pluginFile = """
+                    buildscript {
+                        repositories {
+                            mavenLocal()
+                            maven {
+                                url = "https://ldtteam.jfrog.io/artifactory/tableau/"
+                                name = "Tableau"
+                            }
+                        }
+                    
+                        dependencies {
+                            classpath "com.ldtteam.tableau:Tableau:%s"
+                        }
+                    }
+                    
+                    apply plugin: com.ldtteam.tableau.TableauPlugin
+                    """.formatted(version);
+
+            //Write the file.
+            Files.writeString(tempFile.toPath(), pluginFile);
+
+            //Apply the plugin.
+            target.apply(Map.of("from", tempFile.getAbsolutePath()));
+
+            //Delete the temp file.
+            if (!tempFile.delete()) {
+                LoggerFactory.getLogger(BootstrapSettingsPlugin.class).warn("Failed to delete temp file: {}", tempFile.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            LoggerFactory.getLogger(BootstrapSettingsPlugin.class).error("Failed to create temp file for plugin application.", e);
+            throw new GradleException("Failed to create temp file for plugin application.", e);
+        }
     }
 }

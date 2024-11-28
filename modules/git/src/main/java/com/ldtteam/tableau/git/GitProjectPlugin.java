@@ -9,7 +9,19 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Module plugin for Git, configures to extract information from its git repository.
+ */
 public class GitProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public GitProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {

@@ -7,7 +7,22 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Core plugin for the sourceset management module.
+ * <p>
+ *     Can be applied to any {@link org.gradle.api.plugins.PluginAware} object
+ *     but will only operate on {@link Project} instances.
+ */
 public class SourcesetManagementPlugin implements Plugin<Object> {
+
+    /**
+     * Creates a new instance of the plugin.
+     */
+    @Inject
+    public SourcesetManagementPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Object target) {

@@ -7,7 +7,22 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Core shadowing logic plugin.
+ * <p>
+ *     Can be applied to any {@link org.gradle.api.plugins.PluginAware}, but will only operate
+ *     on a {@link Project}.
+ */
 public class ShadowingPlugin implements Plugin<Object> {
+
+    /**
+     * Creates a new shadowing plugin.
+     */
+    @Inject
+    public ShadowingPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Object target) {

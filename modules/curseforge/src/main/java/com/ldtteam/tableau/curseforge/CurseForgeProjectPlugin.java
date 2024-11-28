@@ -8,6 +8,7 @@ import com.ldtteam.tableau.curseforge.extensions.CurseForgeExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.jarjar.JarJarPlugin;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.shadowing.ShadowingPlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.darkhax.curseforgegradle.Constants;
@@ -23,15 +24,30 @@ import org.gradle.api.tasks.TaskProvider;
 import org.gradle.jvm.tasks.Jar;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.util.Locale;
 
+/**
+ * Defines the CurseForge module plugin for {@link Project projects}
+ */
 public class CurseForgeProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public CurseForgeProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
         target.getPlugins().apply(NeoGradlePlugin.class);
 
-        configureUploadTask(target);
+        TableauScriptingExtension.register(target, CurseForgeExtension.EXTENSION_NAME, CurseForgeExtension.class, target);
+
+        target.afterEvaluate(ignore -> {
+            configureUploadTask(target);
+        });
     }
 
     private TaskProvider<? extends Jar> getMainJar(Project project) {
@@ -56,8 +72,14 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
         final SourceSetExtension sourceSets = SourceSetExtension.get(project);
         final ModExtension mod = ModExtension.get(project);
 
+        if (!curse.getId().isPresent()) {
+            project.getLogger().debug("Skipping CurseForge upload task as no project id is set.");
+            return;
+        }
+
         final TaskProvider<TaskPublishCurseForge> curseforge = project.getTasks().register("curseforge", TaskPublishCurseForge.class, task -> {
             task.apiToken = project.getProviders().environmentVariable("CURSE_API_KEY");
+            task.debugMode = curse.getDebug().get();
 
             final UploadArtifact artifact = task.upload(curse.getId(), mainJar);
             task.dependsOn(mainJar);

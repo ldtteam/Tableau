@@ -1,0 +1,38 @@
+---
+sidebar_label: Introduction
+title: Introduction to Tableau
+slug: intro
+---
+
+Tableau is a Gradle plugin that allows declarative configuration of Minecraft Modding projects.
+It provides a common set of functionality for modding projects, simplifying the setup and configuration of your project by providing a set of modules that can be used to configure and manage the project's build process.
+
+Tableau is designed to work with different modding frameworks and provide a unified way to manage your projects.
+However, right now it only supports NeoGradle, but support for other modding frameworks and platforms will follow.
+
+The basic low-level concept of Tableau is a module.
+Each module in tableau provides some functionality, and might expose this functionality in a configurable way in the Tableau-DSL.
+
+### Features
+Currently, the following features are supported:
+- Handling of core mod properties
+- Interpolation of properties in resources
+- Custom pre- and post-processing of changelogs (can be used in combination with GitHub workflows)
+- Crowdin integration
+- Automatic CurseForge file uploads
+- Extraction of information from Git
+- Support for JarJar and ShadowJar
+- Support for configuring the Java SDK
+- Support for injecting Jetbrains annotations
+- Support for `.gradle` file handling in the `gradle` directory of a project
+- Support for configuring Maven Publishing
+    - Publishing to the LDTTeam Maven
+    - Publishing to GitHub Releases and Packages
+    - Publishing to a Local Directory
+    - Extraction of information for the POM from the Git repository
+    - Extraction of information for the POM from other Tableau modules
+- Support for NeoGradle project management
+    - Other Modding Frameworks to follow
+    - Other Modding Platforms to follow
+- Support for Parchment
+- Support for direct source set management (no need for `sourceSets` block, or `dependencies` block)

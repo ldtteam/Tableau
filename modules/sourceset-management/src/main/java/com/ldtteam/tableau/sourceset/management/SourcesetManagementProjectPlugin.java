@@ -15,9 +15,22 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.util.*;
 
+/**
+ * Project plugin for the sourceset management module.
+ * <p>
+ *     Configures the main source set to include sources and javadoc.
+ */
 public class SourcesetManagementProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new instance of the plugin.
+     */
+    @Inject
+    public SourcesetManagementProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {

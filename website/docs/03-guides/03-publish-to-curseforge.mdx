@@ -1,0 +1,247 @@
+---
+sidebar_label: Publishing to CurseForge
+title: Publishing your mod to CurseForge
+slug: publish-to-curseforge
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Publishing your mod to CurseForge is a great way to share your mod with the world. CurseForge is a popular platform for sharing mods, and it is used by many mod developers to share their mods with the community.
+Tableau has built-in support for publishing your mod to CurseForge, and this guide will show you how you can publish your mod to CurseForge using Tableau.
+
+## Prerequisites
+Before you can publish your mod to CurseForge, you need to have a CurseForge account. You can create an account on the [CurseForge website](https://www.curseforge.com/).
+You will also need to create a new project on CurseForge. You can do this by going to the [CurseForge website](https://authors.curseforge.com/#/projects/create/general) and clicking on the "Minecraft" button and following the instructions.
+
+### Finding your project id
+From this project you needs its project id.
+You can find this id on the project page, on the right under "About Project".
+This is numeric id. For example, the project id for [Aequivaleo](https://www.curseforge.com/minecraft/mc-mods/aequivaleo) is `404450`.
+
+### Getting your API key
+To publish your mod to CurseForge, you need to have an API key.
+To get this API key, go to the [CurseForge website](https://authors.curseforge.com), click on your profile in the top right, and then click on "My API Tokens".
+You can also use this direct link: [CurseForge API Tokens](https://legacy.curseforge.com/account/api-tokens).
+
+:::note
+When creating a token, make sure to give it a reasonable name!
+:::
+
+:::danger
+Keep your API key safe and do not share it with anyone!
+:::
+
+## Configuring Tableau
+To publish your mod to CurseForge, you need to configure Tableaus CurseForge module.
+To do this edit the `build.gradle` file of your project and add the following configuration to the `tableau` block:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    curse {
+        id = 123456 //Modify this to your project id
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    curse {
+        id.set(123456) //Modify this to your project id
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+This is enough configuration of the project to get started with publishing your mod to CurseForge.
+
+## Publishing your mod
+To publish your mod to CurseForge, set the following environment variable:
+
+- `CURSE_API_KEY` -> Your CurseForge API key
+
+This enables the CurseForge module to authenticate with the CurseForge API.
+
+Then run the following task: `curseforge`
+
+:::warning
+Right now Tableau does not support having multiple projects in one repository.
+If this is needed please create a ticket, we can easily support this scenario.
+:::
+
+:::danger
+We will never support providing the API key in the build.gradle file.
+This is a security risk and should never be done.
+:::
+
+## Refining the publication
+By default, Tableau will publish the mod to CurseForge with the following settings:
+- Release type: `Release`
+- Changelog: Read from a file called `changelog.md` in the root of the project
+- Version: Read from the `version` property of the project
+- Display name: Created from the project name, version and release type.
+
+There are many different ways to customize the publication of your mod to CurseForge.
+This section will show you how you can customize the publication of your mod to CurseForge.
+
+### Configuring the release type
+#### Using the DSL
+To configure the release type of your mod, you can use the `releaseType` property of the CurseForge module:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    curse {
+        releaseType = ReleaseType.BETA
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    curse {
+        releaseType.set(ReleaseType.BETA)
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+In this example, we set the release type of the mod to `Beta`.
+
+#### Using an environment variable
+You can also configure the release type of the mod using an environment variable.
+To do this, set the following environment variable:
+- `CURSE_RELEASE_TYPE` -> The release type of the mod
+
+### Support multiple minecraft versions
+To support multiple minecraft versions, you can use the `additionalMinecraftVersions` property of the CurseForge module:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    curse {
+        additionalMinecraftVersions = ["1.16.5", "1.17.1"]
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    curse {
+        additionalMinecraftVersions.set(listOf("1.16.5", "1.17.1"))
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+### Disabling fancy file names
+By default, Tableau will use fancy file names for the uploaded files.
+This means that the files in the CurseForge file list will have a fancy name, created from the project name, version and release type.
+If you want to disable this, you can use the `usesFancyFileNames` property of the CurseForge module:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    curse {
+        usesFancyFileNames = false
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    curse {
+        usesFancyFileNames.set(false)
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+This will disable the fancy file names for the uploaded files.
+And the files in the CurseForge file list will have the normal name, which is equal to the file name of the main jar.
+
+### Customizing the display name
+If you do not want to use the project name as part of the fancy file name, you can customize the display name of the mod.
+To do this, you can use the `artifactName` property of the CurseForge module:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    curse {
+        artifactName = "MyMod"
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    curse {
+        artifactName.set("MyMod")
+    }
+}
+```
+</TabItem>
+</Tabs>
+
+:::note
+The version and release type will still be added to the display name.
+:::
+
+### Managing project relationships
+If your mod has a relationship with another project you can configure these relationships.
+Available relationships are:
+- `embeddedLibrary` -> This project is a library that is embedded in your project. Users do not need to download this library separately.
+- `incompatible` -> This project is incompatible with your project. Users should not use these projects together.
+- `optionalDependency` -> This project is an optional dependency of your project. Users can use this project with your project, but it is not required.
+- `requiredDependency` -> This project is a required dependency of your project. Users need to download this project separately.
+- `tool` -> This project is a tool that is used by your project. Users can download this project separately.
+
+To configure these relationships, you can use the `relationships` property of the CurseForge module:
+
+<Tabs groupId="gradle-code">
+<TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    curse {
+        relationships {
+            embeddedLibrary("MyLibrary") // This project is a library that is embedded in your project
+            incompatible("IncompatibleMod") // This project is incompatible with your project
+            optionalDependency("OptionalMod") // This project is an optional dependency of your project
+            requiredDependency("RequiredMod") // This project is a required dependency of your project
+            tool("ToolMod") // This project is a tool that is used by your project
+        }
+    }
+}
+```
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    curse {
+        relationships {
+            embeddedLibrary("MyLibrary") // This project is a library that is embedded in your project
+            incompatible("IncompatibleMod") // This project is incompatible with your project
+            optionalDependency("OptionalMod") // This project is an optional dependency of your project
+            requiredDependency("RequiredMod") // This project is a required dependency of your project
+            tool("ToolMod") // This project is a tool that is used by your project
+        }
+    }
+}
+```
+</TabItem>
+</Tabs>

@@ -21,8 +21,14 @@ public abstract class JarJarExtension {
         return NeoGradleExtension.get(project).getExtensions().getByType(JarJarExtension.class);
     }
 
+    /**
+     * The name of the JarJar extension.
+     */
     public static final String EXTENSION_NAME = "jarjar";
 
+    /**
+     * Creates a new extension for the jar-jar model.
+     */
     @Inject
     public JarJarExtension() {
         getUsesNoneTransitiveJarJar().convention(true);

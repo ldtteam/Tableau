@@ -25,9 +25,24 @@
             <option value="$PROJECT_DIR$/modules/resource-processing" />
             <option value="$PROJECT_DIR$/modules/scripting" />
             <option value="$PROJECT_DIR$/modules/shadowing" />
-            <option value="$PROJECT_DIR$/modules/sonarqube" />
             <option value="$PROJECT_DIR$/modules/sourceset-management" />
             <option value="$PROJECT_DIR$/modules/utilities" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/examples/basic" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/examples/basic" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/examples/maven-publish" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/examples/maven-publish" />
           </set>
         </option>
       </GradleProjectSettings>

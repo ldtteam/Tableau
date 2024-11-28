@@ -3,6 +3,7 @@
  */
 package com.ldtteam.tableau.shadowing;
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin;
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin;
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
@@ -15,14 +16,27 @@ import org.gradle.api.Plugin;
 import org.gradle.api.tasks.bundling.Jar;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.util.List;
 
+/**
+ * Project plugin for the shadowing module.
+ * <p>
+ *     Configures the shadow plugin to include the correct dependencies and to shadow them.
+ */
 public class ShadowingProjectPlugin implements Plugin<Project> {
 
     /**
      * Name of the configuration used by the shadow plugin that contains the dependencies to be shadowed.
      */
     public static final String CONTAINED_CONFIGURATION_NAME = "contained";
+
+    /**
+     * Creates a new instance of the plugin.
+     */
+    @Inject
+    public ShadowingProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
@@ -49,7 +63,7 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
      * Configures the jar task to use the slim classifier.
      * <p>
      *     This ensures that the shadowed jar is not overwritten by the original jar.
-     * </p>
+     *
      * @param project the project to configure
      */
     private void configureJarTask(Project project) {
@@ -62,7 +76,6 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
      * Configures the shadowJar task.
      * <p>
      *     Ensures that the shadowed jar is created with the correct classifier and contains the correct dependencies.
-     * </p>
      *
      * @param project the project to configure
      */
@@ -71,7 +84,7 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
         final SourceSetExtension sourceSets = SourceSetExtension.get(project);
         final ShadowingExtension shadowing = ShadowingExtension.get(project);
 
-        project.getTasks().named("shadowJar", ShadowJar.class, shadowJar -> {
+        project.getTasks().named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar.class, shadowJar -> {
             shadowJar.getArchiveClassifier().set(neoGradle.getPrimaryJarClassifier());
 
             sourceSets.getUniversalJarSourceSets().get().forEach(sourceSet -> {

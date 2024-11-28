@@ -4,6 +4,8 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 
+import javax.inject.Inject;
+
 /**
  * The changelog extension, configures properties related to how the changelog is generated.
  */
@@ -25,12 +27,27 @@ public abstract class ChangelogExtension {
     public static final String EXTENSION_NAME = "changelog";
 
     /**
-     * The header to use for the changelog.
+     * Creates a new instance of the changelog extension.
+     */
+    @Inject
+    public ChangelogExtension() {
+    }
+
+    /**
+     * A property that holds the header of the changelog.
+     * <p>
+     *     Is optional and will prevent the output header task from running if not set.
+     *
+     * @return The header to use for the changelog.
      */
     public abstract Property<String> getHeader();
 
     /**
-     * The footer to use for the changelog.
+     * A property that holds the footer of the changelog.
+     * <p>
+     *     Is optional and will prevent the output footer task from running if not set.
+     *
+     * @return The footer to use for the changelog.
      */
     public abstract Property<String> getFooter();
 }

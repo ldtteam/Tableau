@@ -13,6 +13,12 @@ import java.util.Objects;
 public class ResourceUtils {
 
     /**
+     * Private constructor to hide the implicit public one.
+     */
+    private ResourceUtils() {
+    }
+
+    /**
      * Gets the JetBrains annotations version.
      *
      * @return The JetBrains annotations version.

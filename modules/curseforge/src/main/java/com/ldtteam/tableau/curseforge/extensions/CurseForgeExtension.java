@@ -34,6 +34,11 @@ public abstract class CurseForgeExtension {
 
     private final Project project;
 
+    /**
+     * Creates a new extension for the given project.
+     *
+     * @param project The project to create the extension for.
+     */
     @Inject
     public CurseForgeExtension(final Project project) {
         this.project = project;
@@ -51,9 +56,14 @@ public abstract class CurseForgeExtension {
         getAdditionalMinecraftVersions().add(neoGradle.getMinimalMinecraftVersion());
 
         getUsesFancyDisplayName().convention(true);
+
+        getDebug().convention(false);
     }
 
     /**
+     * The id of the project un CurseForge.
+     * <p>
+     *     Is a numeric.
      * @return The id of the project on CurseForge.
      */
     public abstract Property<Integer> getId();
@@ -62,11 +72,34 @@ public abstract class CurseForgeExtension {
      * The possible release types for a project on CurseForge.
      */
     public enum ReleaseType {
+        /**
+         * Indicates that this build is an ALPHA build.
+         * <p>
+         *     Does not show up in normal search results.
+         */
         ALPHA,
+
+        /**
+         * Indicates that this is a pre-release build.
+         * <p>
+         *     Shows up in normal search results
+         */
         BETA,
+
+        /**
+         * Indicates that this build is a full release build
+         * <p>
+         *     Shows up in normal search results
+         * <p>
+         *     Is the default value if not specified
+         */
         RELEASE;
 
-
+        /**
+         * Creates a lowercase string representation of the name of this release type.
+         *
+         * @return The name of the release type.
+         */
         @Override
         public String toString() {
             return name().toLowerCase(Locale.ROOT);
@@ -74,12 +107,16 @@ public abstract class CurseForgeExtension {
     }
 
     /**
-     * The release type of the project on CurseForge.
+     * The release type to use for this build.
+     *
+     * @return The release type of the project on CurseForge.
      */
     public abstract Property<ReleaseType> getReleaseType();
 
     /**
-     * The additional Minecraft versions to support, will automatically add the neogradle minimal minecraft version.
+     * The minecraft versions which this build additionally supports.
+     *
+     * @return The additional Minecraft versions to support, will automatically add the NeoGradle minimal minecraft version.
      */
     public abstract SetProperty<String> getAdditionalMinecraftVersions();
 
@@ -87,12 +124,14 @@ public abstract class CurseForgeExtension {
      * Whether to use the fancy display name for the projects files.
      * <p>
      *     This will make the files have a display name that includes the project version and the release type.
-     * </p>
+     * @return whether to use the fancy display name for project files.
      */
     public abstract Property<Boolean> getUsesFancyDisplayName();
 
     /**
-     * The name of the artifact to upload to CurseForge.
+     * The name of the artifact that this project produces.
+     *
+     * @return The name of the artifact to upload to CurseForge.
      */
     public abstract Property<String> getArtifactName();
 
@@ -108,6 +147,7 @@ public abstract class CurseForgeExtension {
      *         <li>requiredDependency</li>
      *         <li>tool</li>
      *     </ul>
+     * @return the relationships this project has with others
      */
     public abstract MapProperty<String, String> getRelationships();
 
@@ -121,12 +161,24 @@ public abstract class CurseForgeExtension {
     }
 
     /**
+     * Whether to enable debug mode for the CurseForge plugin.
+     *
+     * @return whether to enable debug mode for the CurseForge plugin.
+     */
+    public abstract Property<Boolean> getDebug();
+
+    /**
      * The DSL for configuring the relationships of the project on CurseForge.
      */
     public abstract static class Relationships {
 
         private final MapProperty<String, String> relationships;
 
+        /**
+         * Creates a new relationships model.
+         *
+         * @param relationships The backing data map.
+         */
         @Inject
         public Relationships(MapProperty<String, String> relationships) {
             this.relationships = relationships;
@@ -145,6 +197,7 @@ public abstract class CurseForgeExtension {
          *     <li>requiredDependency</li>
          *     <li>tool</li>
          * </ul>
+         * @return the relationships this project has with other published projects on CurseForge.
          */
         public MapProperty<String, String> getRelationships()
         {

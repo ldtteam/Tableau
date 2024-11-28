@@ -51,6 +51,11 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
 
     private final NamedDomainObjectContainer<SourceSetConfiguration> sourceSets;
 
+    /**
+     * Creates a new extension.
+     *
+     * @param project The project.
+     */
     @SuppressWarnings("UnstableApiUsage")
     @Inject
     public SourceSetExtension(final Project project) {
@@ -80,6 +85,20 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
             final Configuration api = project.getConfigurations()
                     .maybeCreate(sourceSet.getApiConfigurationName());
 
+            final Configuration tableauImplementation = project.getConfigurations()
+                    .maybeCreate(sourceSet.getImplementationConfigurationName() + "Tableau");
+            final Configuration tableauApi = project.getConfigurations()
+                    .maybeCreate(sourceSet.getApiConfigurationName() + "Tableau");
+
+            tableauImplementation.setCanBeResolved(true);
+            tableauApi.setCanBeResolved(true);
+
+            tableauImplementation.setCanBeConsumed(false);
+            tableauApi.setCanBeConsumed(false);
+
+            implementation.extendsFrom(tableauImplementation);
+            api.extendsFrom(tableauApi);
+
             java.registerFeature(sourceSet.getName(), feature -> {
                 feature.usingSourceSet(sourceSet);
                 feature.withSourcesJar();
@@ -87,7 +106,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
             });
 
             getUniversalJarSourceSets().addAll(
-                    configuration.getIsPartOfUniversalJar()
+                    configuration.getIsPartOfPrimaryJar()
                             .map(isPartOfUniversalJar -> isPartOfUniversalJar ? sourceSet : null)
                             .filter(Objects::nonNull)
                             .map(Collections::singletonList)
@@ -102,23 +121,25 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
                             .orElse(Collections.emptyList())
             );
 
-            implementation.fromDependencyCollector(configuration.getDependencies().getImplementation());
-            api.fromDependencyCollector(configuration.getDependencies().getApi());
+            tableauImplementation.fromDependencyCollector(configuration.getDependencies().getImplementation());
+            tableauApi.fromDependencyCollector(configuration.getDependencies().getApi());
         });
 
         final SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
         getUniversalJarSourceSets().add(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME));
-
-        create(SourceSet.MAIN_SOURCE_SET_NAME, sourceSet -> {
-            final ModExtension modExtension = ModExtension.get(project);
-
-            sourceSet.getResources().srcDir(modExtension.getModId().map("src/datagen/generated/%s"::formatted));
-        });
-
         getPublishedSourceSets().convention(List.of(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)));
+
+        project.afterEvaluate(p -> {
+            //Run this in an afterEval, because we need a group configured, which is not available at apply and construction time.
+            final SourceSetConfiguration main = maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
+
+            main.getResources().srcDir(ModExtension.get(project).getModId().map("src/datagen/generated/%s"::formatted));
+        });
     }
 
     /**
+     * The source sets which are configured for use with Tableau.
+     *
      * @return the source sets that are configured.
      */
     public NamedDomainObjectContainer<SourceSetConfiguration> getSourceSets() {
@@ -133,7 +154,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
     public void api(final Action<SourceSetConfiguration> action) {
          create(JavaPlugin.API_CONFIGURATION_NAME, configuration -> {
             action.execute(configuration);
-            configuration.getIsPartOfUniversalJar().set(true);
+            configuration.getIsPartOfPrimaryJar().set(true);
          });
     }
 
@@ -460,6 +481,13 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
 
         private final SourceSetDependencies dependencies;
 
+        /**
+         * Creates a new source set configuration.
+         *
+         * @param objectFactory The object factory.
+         * @param name          The name of the source set.
+         * @param sourceSet     The source set.
+         */
         @Inject
         public SourceSetConfiguration(ObjectFactory objectFactory, String name, SourceSet sourceSet) {
             this.name = name;
@@ -469,11 +497,13 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
 
             this.dependencies = objectFactory.newInstance(SourceSetDependencies.class);
 
-            getIsPartOfUniversalJar().convention(SourceSet.isMain(sourceSet));
+            getIsPartOfPrimaryJar().convention(SourceSet.isMain(sourceSet));
             getIsPublished().convention(SourceSet.isMain(sourceSet));
         }
 
         /**
+         * The gradle source set that this configuration is for.
+         *
          * @return the source set.
          */
         public SourceSet getSourceSet() {
@@ -481,6 +511,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         }
 
         /**
+         * The name of the source set.
+         *
          * @return the name of the source set.
          */
         @Override
@@ -493,7 +525,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
          *
          * @return The property.
          */
-        public abstract Property<Boolean> getIsPartOfUniversalJar();
+        public abstract Property<Boolean> getIsPartOfPrimaryJar();
 
         /**
          * Indicates whether the source set is published.
@@ -503,6 +535,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         public abstract Property<Boolean> getIsPublished();
 
         /**
+         * The dependencies for the source set.
+         *
          * @return the dependencies for the source set.
          */
         public SourceSetDependencies getDependencies() {
@@ -510,6 +544,17 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         }
 
         /**
+         * Configuration callback for the source sets dependencies
+         *
+         * @param action The configuration action.
+         */
+        public void dependencies(Action<SourceSetDependencies> action) {
+            action.execute(getDependencies());
+        }
+
+        /**
+         * The java source directory configuration.
+         *
          * @return the java source directory.
          */
         public SourceDirectorySet getJava() {
@@ -526,6 +571,8 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
         }
 
         /**
+         * The resources source directory configuration.
+         *
          * @return the resources source directory.
          */
         public SourceDirectorySet getResources() {
@@ -561,11 +608,22 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
     public abstract static class SourceSetDependencies implements Dependencies {
 
         /**
+         * Creates a new source set dependencies model.
+         */
+        @Inject
+        public SourceSetDependencies() {
+        }
+
+        /**
+         * The implementation dependencies.
+         *
          * @return the implementation dependencies.
          */
         public abstract DependencyCollector getImplementation();
 
         /**
+         * The api dependencies.
+         *
          * @return the api dependencies.
          */
         public abstract DependencyCollector getApi();

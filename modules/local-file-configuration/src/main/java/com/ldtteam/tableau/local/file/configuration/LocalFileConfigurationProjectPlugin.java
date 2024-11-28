@@ -7,9 +7,22 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.util.Map;
 
+/**
+ * The local file project plugin.
+ * <p>
+ *     Ensures that local *.gradle files are applied to the current project from different directories.
+ */
 public class LocalFileConfigurationProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public LocalFileConfigurationProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {
