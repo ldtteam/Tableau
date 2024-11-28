@@ -1,4 +1,4 @@
-package com.ldtteam.tableau.neogradle.extensions;
+package com.ldtteam.tableau.extensions;
 
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;

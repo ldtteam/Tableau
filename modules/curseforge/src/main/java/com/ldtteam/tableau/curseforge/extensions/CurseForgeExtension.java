@@ -1,6 +1,6 @@
 package com.ldtteam.tableau.curseforge.extensions;
 
-import com.ldtteam.tableau.neogradle.extensions.NeoGradleResourceProcessingExtension;
+import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import net.darkhax.curseforgegradle.Constants;
 import org.gradle.api.Action;
