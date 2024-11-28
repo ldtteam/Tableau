@@ -207,9 +207,10 @@ If your mod has a relationship with another project you can configure these rela
 Available relationships are:
 - `embeddedLibrary` -> This project is a library that is embedded in your project. Users do not need to download this library separately.
 - `incompatible` -> This project is incompatible with your project. Users should not use these projects together.
-- `optionalDependency` -> This project is an optional dependency of your project. Users can use this project with your project, but it is not required.
-- `requiredDependency` -> This project is a required dependency of your project. Users need to download this project separately.
 - `tool` -> This project is a tool that is used by your project. Users can download this project separately.
+
+There are two more types of relationships: `requiredDependency` and `optionalDependency`, however these are not manually configurable here.
+These are provided through the [mod dependencies](managing-dependencies) block.
 
 To configure these relationships, you can use the `relationships` property of the CurseForge module:
 
@@ -221,8 +222,6 @@ tableau {
         relationships {
             embeddedLibrary("MyLibrary") // This project is a library that is embedded in your project
             incompatible("IncompatibleMod") // This project is incompatible with your project
-            optionalDependency("OptionalMod") // This project is an optional dependency of your project
-            requiredDependency("RequiredMod") // This project is a required dependency of your project
             tool("ToolMod") // This project is a tool that is used by your project
         }
     }
@@ -236,8 +235,6 @@ tableau {
         relationships {
             embeddedLibrary("MyLibrary") // This project is a library that is embedded in your project
             incompatible("IncompatibleMod") // This project is incompatible with your project
-            optionalDependency("OptionalMod") // This project is an optional dependency of your project
-            requiredDependency("RequiredMod") // This project is a required dependency of your project
             tool("ToolMod") // This project is a tool that is used by your project
         }
     }

@@ -5,6 +5,6 @@ tableau {
         group = 'com.example' // Use your own group here.
         minecraftVersion = '1.21.3' // Or any other minecraft version.
         publisher = 'SomePublisher' // Use your own name here.
-        url = 'https://github.com/someorg/modid' // Use your own URL here.
+        repositoryUrl = uri('https://github.com/someorg/modid') // Use your own URL here.
     }
 }

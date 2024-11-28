@@ -1,4 +1,4 @@
-package com.ldtteam.tableau.extensions;
+package com.ldtteam.tableau.neogradle.extensions;
 
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;
@@ -124,6 +124,8 @@ public abstract class NeoGradleExtension implements ExtensionAware {
     public abstract Property<String> getNeoForgeVersion();
 
     /**
+     * Whether to automatically build the neoforge.mods.toml or not.
+     *
      * @return Whether to automatically generate a neoforge.mods.toml during build.
      */
     public abstract Property<Boolean> getAutoGenerateModsToml();

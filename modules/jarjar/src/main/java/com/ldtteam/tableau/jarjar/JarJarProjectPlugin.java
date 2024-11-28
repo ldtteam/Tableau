@@ -3,7 +3,7 @@
  */
 package com.ldtteam.tableau.jarjar;
 
-import com.ldtteam.tableau.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.neogradle.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.jarjar.extensions.JarJarExtension;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;

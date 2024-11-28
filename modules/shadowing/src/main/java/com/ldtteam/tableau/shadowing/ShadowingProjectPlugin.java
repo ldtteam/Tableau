@@ -6,7 +6,7 @@ package com.ldtteam.tableau.shadowing;
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin;
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin;
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
-import com.ldtteam.tableau.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.neogradle.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.shadowing.extensions.ShadowingExtension;

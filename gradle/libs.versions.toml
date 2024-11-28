@@ -21,7 +21,7 @@ fancyModLoader = { module = "net.neoforged.fancymodloader:loader", version.ref =
 secureJarHandler = { module = "cpw.mods:securejarhandler", version.ref = "secureJarHandler" }
 
 [bundles]
-neogradle = ["neogradle-userdev"]
+neogradle = ["neogradle-userdev", "fancyModLoader"]
 crowdin = ["crowdin", "gradle-download"]
 sonarqube = ["sonarqube"]
 shadow = ["shadow"]

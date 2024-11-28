@@ -90,21 +90,22 @@ public abstract class ModExtension {
     public abstract Property<String> getMinecraftVersion();
 
     /**
-     * @return The mod id.
-     */
-    public abstract Property<String> getModId();
-
-    /**
+     * The mod display name.
+     *
      * @return The mod display name.
      */
     public abstract Property<String> getModName();
 
     /**
+     * The full mod description.
+     *
      * @return The mod description.
      */
     public abstract Property<String> getModDescription();
 
     /**
+     * The mod logo file.
+     *
      * @return The mod logo.
      */
     public abstract Property<String> getModLogo();
@@ -131,11 +132,15 @@ public abstract class ModExtension {
     public abstract Property<URI> getRepositoryUrl();
 
     /**
+     * The url of the website where the issue tracker can be found for the project.
+     *
      * @return The issue tracker url, where issues may be filed for the mod.
      */
     public abstract Property<URI> getIssueTrackerUrl();
 
     /**
+     * The license for the mod.
+     *
      * @return The license used for the mod.
      */
     public abstract Property<String> getLicense();

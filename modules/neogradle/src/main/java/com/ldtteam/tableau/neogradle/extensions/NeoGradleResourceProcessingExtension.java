@@ -1,4 +1,4 @@
-package com.ldtteam.tableau.extensions;
+package com.ldtteam.tableau.neogradle.extensions;
 
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;

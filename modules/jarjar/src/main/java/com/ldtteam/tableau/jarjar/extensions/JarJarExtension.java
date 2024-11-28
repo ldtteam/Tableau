@@ -1,6 +1,6 @@
 package com.ldtteam.tableau.jarjar.extensions;
 
-import com.ldtteam.tableau.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.neogradle.extensions.NeoGradleExtension;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 

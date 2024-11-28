@@ -7,12 +7,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.dependencies.extensions.DependenciesExtension;
-import com.ldtteam.tableau.extensions.NeoGradleExtension;
-import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
-import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
-import com.ldtteam.tableau.neogradle.model.CombinedDependency;
+import com.ldtteam.tableau.neogradle.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.neogradle.extensions.NeoGradleResourceProcessingExtension;
+import com.ldtteam.tableau.neogradle.extensions.NeoGradleSourceSetConfigurationExtension;
 import com.ldtteam.tableau.neogradle.tasks.GenerateModsTomlTask;
-import com.ldtteam.tableau.neogradle.model.ResolvedDependency;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
@@ -26,12 +24,6 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.Rule;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
-import org.gradle.api.artifacts.component.ModuleComponentSelector;
-import org.gradle.api.artifacts.result.DependencyResult;
-import org.gradle.api.artifacts.result.ResolvedArtifactResult;
-import org.gradle.api.internal.provider.BiProvider;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.*;
 import org.gradle.language.jvm.tasks.ProcessResources;
 import org.jetbrains.annotations.NotNull;
@@ -356,8 +348,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             task.getIssueTrackerUrl().set(mod.getIssueTrackerUrl());
             task.getLicense().set(mod.getLicense());
 
-            task.getRequiredDependencies().set(resolveDependencies(dependencies.getRequiredConfiguration()));
-            task.getOptionalDependencies().set(resolveDependencies(dependencies.getOptionalConfiguration()));
+            task.getRequiredDependencies().set(dependencies.getAllRequiredDependencies());
+            task.getOptionalDependencies().set(dependencies.getAllOptionalDependencies());
         });
 
         if (neogradle.getAutoGenerateModsToml().get()) {
@@ -367,48 +359,5 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                 });
             });
         }
-    }
-
-    /**
-     * Find all the resolved dependencies.
-     *
-     * @param configuration The configuration to look for dependencies in.
-     * @return The set provider.
-     */
-    private Provider<List<ResolvedDependency>> resolveDependencies(final Configuration configuration)
-    {
-        return new BiProvider<>(CombinedDependency.class,
-          configuration.getIncoming().getArtifacts().getResolvedArtifacts(),
-          configuration.getIncoming().getResolutionResult().getRootComponent(),
-          CombinedDependency::new).map(dependency -> dependency.artifacts()
-                                                       .stream()
-                                                       .map(resolvedArtifact -> new ResolvedDependency(dependency.component()
-                                                                                                         .getDependencies()
-                                                                                                         .stream()
-                                                                                                         .map(DependencyResult::getRequested)
-                                                                                                         .filter(f -> f instanceof ModuleComponentSelector)
-                                                                                                         .map(ModuleComponentSelector.class::cast)
-                                                                                                         .filter(f -> componentMatches(f, resolvedArtifact))
-                                                                                                         .map(m -> m.getVersionConstraint().getRequiredVersion())
-                                                                                                         .findFirst()
-                                                                                                         .orElse(null), resolvedArtifact.getFile()))
-                                                       .filter(f -> f.getVersionRange() != null)
-                                                       .toList());
-    }
-
-    /**
-     * Check whether the given component selector matches the provided resolved artifact.
-     *
-     * @param selector The input component selector.
-     * @param artifact The resolved artifact.
-     * @return True if the artifact identifier matches the component selector.
-     */
-    private static boolean componentMatches(final ModuleComponentSelector selector, final ResolvedArtifactResult artifact)
-    {
-        if (artifact.getId().getComponentIdentifier() instanceof ModuleComponentIdentifier artifactIdentifier)
-        {
-            return selector.getModuleIdentifier().equals(artifactIdentifier.getModuleIdentifier());
-        }
-        return false;
     }
 }

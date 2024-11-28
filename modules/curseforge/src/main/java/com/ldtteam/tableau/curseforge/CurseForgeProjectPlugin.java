@@ -5,7 +5,7 @@ package com.ldtteam.tableau.curseforge;
 
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.curseforge.extensions.CurseForgeExtension;
-import com.ldtteam.tableau.extensions.NeoGradleExtension;
+import com.ldtteam.tableau.dependencies.extensions.DependenciesExtension;
 import com.ldtteam.tableau.jarjar.JarJarPlugin;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
@@ -14,11 +14,9 @@ import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.darkhax.curseforgegradle.Constants;
 import net.darkhax.curseforgegradle.TaskPublishCurseForge;
 import net.darkhax.curseforgegradle.UploadArtifact;
-import org.gradle.api.GradleException;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
-import org.gradle.api.internal.project.IProjectFactory;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.jvm.tasks.Jar;
@@ -70,6 +68,7 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
         final TaskProvider<? extends Jar> mainJar = getMainJar(project);
         final CurseForgeExtension curse = CurseForgeExtension.get(project);
         final SourceSetExtension sourceSets = SourceSetExtension.get(project);
+        final DependenciesExtension dependencies = DependenciesExtension.get(project);
         final ModExtension mod = ModExtension.get(project);
 
         if (!curse.getId().isPresent()) {
@@ -117,6 +116,9 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
                     task.dependsOn(project.getTasks().named(sourceSet.getJarTaskName()));
                 }
             });
+
+            dependencies.getAllRequiredDependencies().get().forEach(dep -> artifact.addRelation(dep.modId(), Constants.RELATION_REQUIRED));
+            dependencies.getAllOptionalDependencies().get().forEach(dep -> artifact.addRelation(dep.modId(), Constants.RELATION_OPTIONAL));
 
             curse.getRelationships().get().forEach((slug, relationship) -> {
                 if (!Constants.VALID_RELATION_TYPES.contains(relationship)) {

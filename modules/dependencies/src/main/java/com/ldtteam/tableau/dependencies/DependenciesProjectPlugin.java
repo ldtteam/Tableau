@@ -5,12 +5,24 @@ package com.ldtteam.tableau.dependencies;
 
 import com.ldtteam.tableau.dependencies.extensions.DependenciesExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
-import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * Defines the Dependencies module plugin for {@link Project projects}
+ */
 public class DependenciesProjectPlugin implements Plugin<Project> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public DependenciesProjectPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Project target) {

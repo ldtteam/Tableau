@@ -3,11 +3,25 @@
  */
 package com.ldtteam.tableau.dependencies;
 
-import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+/**
+ * The root plugin for the Dependencies module.
+ * <p>
+ * Can be applied to any {@link org.gradle.api.plugins.PluginAware} but will only interact with {@link Project projects}
+ */
 public class DependenciesPlugin implements Plugin<Object> {
+
+    /**
+     * Creates a new plugin instance.
+     */
+    @Inject
+    public DependenciesPlugin() {
+    }
 
     @Override
     public void apply(@NotNull Object target) {

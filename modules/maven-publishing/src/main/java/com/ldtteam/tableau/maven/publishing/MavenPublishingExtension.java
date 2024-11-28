@@ -15,10 +15,7 @@ import org.gradle.internal.instrumentation.api.annotations.ToBeReplacedByLazyPro
 
 import javax.inject.Inject;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Extension that configures the Maven publishing plugin.

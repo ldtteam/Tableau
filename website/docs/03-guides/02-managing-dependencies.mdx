@@ -1,0 +1,117 @@
+---
+sidebar_label: Managing dependencies
+title: Managing dependencies
+slug: managing-dependencies
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Tableau has automatic dependency management that works just like regular Gradle dependency management.
+You can define a mod dependencies block that Gradle will use to automatically resolve mod dependencies,
+but these dependencies will also be used for other use-cases from other modules.
+
+Whilst this dependencies block is a regular dependency collector, it's meant specifically for putting mod dependencies here.
+Nothing prevents you from putting other dependencies here, like regular `implementation` dependencies, however we recommend
+you put these in the default `dependencies` block, as you normally would.
+
+## Dependency management
+
+In order to start defining the dependencies you have to define the dependencies block:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            modDependencies {
+                // Fill in your mod dependencies
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            modDependencies {
+                // Fill in your mod dependencies
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+The dependencies block supports two types of dependencies: `required` and `optional` dependencies.
+Both of these are defined the same way as any other dependency in Gradle, meaning you can do:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            modDependencies {
+                required 'com.ldtteam:structurize:[1.0.755-1.21.1-snapshot,)'
+                // Or
+                optional 'com.ldtteam:structurize:[1.0.755-1.21.1-snapshot,)'
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            modDependencies {
+                required("com.ldtteam:structurize:[1.0.755-1.21.1-snapshot,)")
+                // Or
+                optional("com.ldtteam:structurize:[1.0.755-1.21.1-snapshot,)")
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+## Runtime dependencies
+
+The above way of defining dependencies doesn't always work, some mods split their code in an API mod, and the mod itself.
+Examples of this are mods like [JEI](https://github.com/mezz/JustEnoughItems/wiki) or [JourneyMap](https://bitbucket.org/TeamJM/journeymap-api/src/master/docs/howto.md).
+
+If you attempt to define these as a required or optional mod you will get the API package as a dependency,
+though other modules like the `neoforge.mods.toml` will incorrectly register these API packages as dependencies, instead of the actual mod.
+
+For these scenarios you can add runtime dependencies into the mod dependencies block.
+These use a slightly different API as these are not compile dependencies,
+these dependencies are only meant to be registered in the `neoforge.mods.toml` and/or Curseforge.
+You then provide the API package as a separate `compileOnly` dependency.
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        dependencies {
+            compileOnly 'mezz.jei:jei-1.21.1-neoforge-api:[19.19.6.235,)'
+        }
+
+        tableau {
+            modDependencies {
+                requiredRuntime 'jei', '[19.19.6.235,)'
+                // Or
+                optionalRuntime 'jei', '[19.19.6.235,)'
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        dependencies {
+            compileOnly("mezz.jei:jei-1.21.1-neoforge-api:[19.19.6.235,)")
+        }
+
+        tableau {
+            modDependencies {
+                requiredRuntime("jei", "[19.19.6.235,)")
+                // Or
+                optionalRuntime("jei", "[19.19.6.235,)")
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+This way you can still use all Tableau its features that rely on mod dependencies without having to resort to manually configuring them.

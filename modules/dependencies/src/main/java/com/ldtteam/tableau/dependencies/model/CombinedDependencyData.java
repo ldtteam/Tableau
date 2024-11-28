@@ -1,4 +1,4 @@
-package com.ldtteam.tableau.neogradle.model;
+package com.ldtteam.tableau.dependencies.model;
 
 import org.gradle.api.artifacts.result.ResolvedArtifactResult;
 import org.gradle.api.artifacts.result.ResolvedComponentResult;
@@ -11,6 +11,6 @@ import java.util.Set;
  * @param artifacts The set of the resolved artifacts.
  * @param component The resolved component result.
  */
-public record CombinedDependency(Set<ResolvedArtifactResult> artifacts, ResolvedComponentResult component)
+public record CombinedDependencyData(Set<ResolvedArtifactResult> artifacts, ResolvedComponentResult component)
 {
 }

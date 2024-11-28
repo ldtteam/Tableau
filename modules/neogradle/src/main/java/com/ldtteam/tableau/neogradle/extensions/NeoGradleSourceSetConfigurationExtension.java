@@ -1,4 +1,4 @@
-package com.ldtteam.tableau.extensions;
+package com.ldtteam.tableau.neogradle.extensions;
 
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import org.gradle.api.Project;
