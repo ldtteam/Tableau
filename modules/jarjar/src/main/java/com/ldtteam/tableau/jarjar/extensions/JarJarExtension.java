@@ -24,7 +24,7 @@ public abstract class JarJarExtension {
     /**
      * The name of the JarJar extension.
      */
-    public static final String EXTENSION_NAME = "jarjar";
+    public static final String EXTENSION_NAME = "jarJar";
 
     /**
      * Creates a new extension for the jar-jar model.
@@ -32,6 +32,7 @@ public abstract class JarJarExtension {
     @Inject
     public JarJarExtension() {
         getUsesNoneTransitiveJarJar().convention(true);
+        getExtendImplementation().convention(true);
     }
 
     /**
@@ -40,4 +41,11 @@ public abstract class JarJarExtension {
      * @return The property for whether the project uses none transitive jarjar.
      */
     public abstract Property<Boolean> getUsesNoneTransitiveJarJar();
+
+    /**
+     * Gets the property for whether the project should have its implementation configuration extended.
+     *
+     * @return The property for whether the project should have its implementation configuration extended.
+     */
+    public abstract Property<Boolean> getExtendImplementation();
 }

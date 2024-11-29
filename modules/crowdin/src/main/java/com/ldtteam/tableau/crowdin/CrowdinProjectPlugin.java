@@ -24,6 +24,8 @@ import org.zaproxy.gradle.crowdin.tasks.BuildProjectTranslation;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -58,6 +60,12 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
 
         target.afterEvaluate(ignored -> {
             final CrowdinExtension crowdinExtension = CrowdinExtension.get(target);
+
+            if (!crowdinExtension.getProjectId().isPresent()) {
+                target.getLogger().debug("Crowdin project id not set, skipping Crowdin configuration");
+                return;
+            }
+
             final org.zaproxy.gradle.crowdin.CrowdinExtension crowdin = target.getExtensions().getByType(org.zaproxy.gradle.crowdin.CrowdinExtension.class);
 
             if (crowdinExtension.getSourceFiles().isEmpty()) {
@@ -97,13 +105,15 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
                 });
 
                 crowdin.configuration(configuration -> {
-                    configuration.getFile().set(target.getRootProject().file("gradle/crowdin.yml"));
-                    configuration.getTokens().put("%crowdin_download_path%", crowdinExtension.getDownloadLocation().map(Directory::getAsFile).map(File::getAbsolutePath));
-
-                    if (crowdinExtension.getSplitByBranch().get()) {
-                        final GitExtension gitExtension = GitExtension.get(target);
-                        configuration.getTokens().put("%branch_name%", gitExtension.getBranch());
+                    final File configFile;
+                    try {
+                        configFile = writeConfigurationFile(target);
+                    } catch (IOException e) {
+                        throw new InvalidUserDataException("Failed to write crowdin configuration file", e);
                     }
+
+                    configuration.getFile().set(configFile);
+                    configuration.getTokens().put("%crowdin_download_path%", crowdinExtension.getDownloadLocation().map(Directory::getAsFile).map(File::getAbsolutePath));
                 });
 
                 target.getTasks().named(CrowdinPlugin.BUILD_PROJECT_TRANSLATION_TASK_NAME, BuildProjectTranslation.class, task -> {
@@ -183,5 +193,44 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
                 });
             }
         });
+    }
+
+    private File writeConfigurationFile(Project project) throws IOException {
+        final File file = project.getLayout().getBuildDirectory().dir("crowdin").map(dir -> dir.file("crowdin.yml")).get().getAsFile();
+        final int projectId = CrowdinExtension.get(project).getProjectId().get();
+
+        if (file.exists()) {
+            if (Files.readString(file.toPath()).contains("  - id: %s".formatted(projectId))) {
+                return file;
+            }
+
+            if (!file.delete()) {
+                throw new InvalidUserDataException("Failed to delete existing crowdin configuration file");
+            }
+        }
+
+        if (!file.exists()) {
+            if (!file.getParentFile().mkdirs()) {
+                throw new InvalidUserDataException("Failed to create crowdin configuration file parent directories");
+            }
+        }
+
+        //noinspection MalformedFormatString
+        Files.writeString(file.toPath(), """
+                projects:
+                  - id: %s
+                    sources:
+                      - dir: "%crowdin_download_path%"
+                        crowdinPath:
+                          dir: "/lang"
+                          filename: "en_us.json"
+                        exportPattern:
+                          dir: "/lang"
+                          filename: "%locale_with_underscore%.json"
+                        includes:
+                          - pattern: "en_us.json"
+                """.formatted(projectId));
+
+        return file;
     }
 }

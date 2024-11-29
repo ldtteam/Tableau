@@ -43,8 +43,18 @@ public abstract class CrowdinExtension {
         getTargetFiles().convention(mod.getModId().map(id -> project.file("src/main/resources/assets/" + id + "/lang/en_us.json")));
 
         getDownloadLocation().convention(mod.getModId().map(id -> project.getLayout().getProjectDirectory().dir("src/main/resources/assets/" + id + "/lang")));
-        getSplitByBranch().convention(false);
+
+        getExportApprovedOnly().convention(false);
+        getSkipUntranslatedFiles().convention(false);
+        getSkipUntranslatedStrings().convention(false);
     }
+
+    /**
+     * The Crowdin project id.
+     *
+     * @return The project id.
+     */
+    public abstract Property<Integer> getProjectId();
 
     /**
      * The source files that should be merged before uploading.
@@ -66,13 +76,6 @@ public abstract class CrowdinExtension {
      * @return The download location.
      */
     public abstract DirectoryProperty getDownloadLocation();
-
-    /**
-     * Whether to split the translations by branch.
-     *
-     * @return Whether to split the translations by branch.
-     */
-    public abstract Property<Boolean> getSplitByBranch();
 
     /**
      * A regex pattern that needs to match the branch name for the build crowdin build to be triggered.

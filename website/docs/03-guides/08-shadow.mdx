@@ -1,0 +1,157 @@
+---
+sidebar_label: Shadowing Dependencies
+title: Shadowing dependencies into mod JAR
+slug: shadowing
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+When you build a mod, you can shadow dependencies into the JAR file.
+This is useful when you want to distribute your mod as a single JAR file, without including the inner jars, or if you want exclusive control of the dependencies.
+
+:::warning
+Shadowing dependencies is only supported in the main primary jar, we are working on a more complete publication system that supports an arbitrary combination of jars.
+:::
+
+:::note
+This is an optional features and will need to be enabled
+:::
+
+:::tip
+The shadow module is mutually exclusive with the jarjar module. You can only use one of them at a time.
+:::
+
+## Enabling Shadowing
+As this feature is optional, and a different distribution method can be used (like jar-in-jar), you will need to enable it in your `settings` file:
+
+<Tabs>
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title=settings.gradle
+        features {
+            usesShadowing = true
+        }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title=settings.gradle.kts
+        features {
+            usesShadowing.set(true)
+        }
+    ```
+    </TabItem>
+</Tabs>
+
+## Including dependencies
+To shadow dependencies you have to add them to the `contained` configuration of your `main` source set in your build.gradle:
+
+<Tabs>
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title=build.gradle
+    tableau {
+        sourceSets {
+            main {
+                contained "com.google.guava:guava:30.1-jre"
+            }
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title=build.gradle.kts
+    tableau {
+        sourceSets {
+            main {
+                contained("com.google.guava:guava:30.1-jre")
+            }
+        }
+    }
+    ```
+    </TabItem>
+</Tabs>
+
+This will shadow the Guava library in your mod JAR file as a JAR-in-JAR dependency.
+
+:::note
+We highly recommend remapping the packages of the dependencies you shadow to avoid conflicts with other mods.
+:::
+
+### Remapping packages
+To remap the packages of the dependencies you shadow, you can add the source and target packages to the `renamedNamespaces` property:
+
+<Tabs>
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title=build.gradle
+    tableau {
+        shadowing {
+            renamedNamespaces = [
+            "com.google.common": "com.example.guava"
+            ]
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title=build.gradle.kts
+    tableau {
+        shadowing {
+            renamedNamespaces.set(mapOf(
+                "com.google.common" to "com.example.guava"
+            ))
+        }
+    }
+    ```
+    </TabItem>
+</Tabs>
+
+This will remap the `com.google.common` package to `com.example.guava` in the shadowed dependencies as well as your own mod.
+
+### Include transitive dependencies
+By default, only the direct dependencies are shadowed in the mod JAR file. If you want to shadow transitive dependencies, you can set the `usesNoneTransitiveShadow` parameter to false:
+<Tabs>
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title=build.gradle
+    tableau {
+        jarJar {
+            usesNoneTransitiveShadow = false
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title=build.gradle.kts
+    tableau {
+        jarJar {
+            usesNoneTransitiveShadow.set(false)
+        }
+    }
+    ```
+    </TabItem>
+</Tabs>
+
+This will shadow all transitive dependencies of the direct dependencies into the mod JAR file.
+
+### Implementation extension
+By default, all dependencies added to the contained configuration are treated as `implementation` dependencies.
+If you want to disable this behavior, you can set the `extendImplementation` parameter to false:
+
+<Tabs>
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title=build.gradle
+    tableau {
+        shadowing {
+            extendImplementation = false
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title=build.gradle.kts
+    tableau {
+        shadowing {
+            extendImplementation.set(false)
+        }
+    }
+    ```
+    </TabItem>
+</Tabs>

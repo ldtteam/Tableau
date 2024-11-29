@@ -41,7 +41,6 @@ public abstract class ModuleFeatures {
         getUsesCurse().convention(false);
         getUsesParchment().convention(false);
         getUsesGit().convention(false);
-        getUsesTesting().convention(false);
     }
 
     /**
@@ -85,11 +84,4 @@ public abstract class ModuleFeatures {
      * @return The property for whether the project uses git.
      */
     public abstract Property<Boolean> getUsesGit();
-
-    /**
-     * Gets the property for whether the project uses testing.
-     *
-     * @return The property for whether the project uses testing.
-     */
-    public abstract Property<Boolean> getUsesTesting();
 }

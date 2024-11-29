@@ -8,9 +8,12 @@ import com.ldtteam.tableau.jarjar.extensions.JarJarExtension;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.neoforged.gradle.common.tasks.JarJar;
-import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.dsl.DependencyCollector;
+import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,8 +22,8 @@ import javax.inject.Inject;
 /**
  * Project plugin for JarJar.
  * <p>
- *     Configures the contained configuration, the jar task and the jarjar task.
- *     Sets the jar task to have the slim classifier and the jarjar task to use the contained configuration.
+ * Configures the contained configuration, the jar task and the jarjar task.
+ * Sets the jar task to have the slim classifier and the jarjar task to use the contained configuration.
  */
 public class JarJarProjectPlugin implements Plugin<Project> {
 
@@ -52,18 +55,40 @@ public class JarJarProjectPlugin implements Plugin<Project> {
      *
      * @param project the project to configure
      */
+    @SuppressWarnings("UnstableApiUsage")
     private void configureContainedConfiguration(Project project) {
         final Configuration configuration = project.getConfigurations().maybeCreate(CONTAINED_CONFIGURATION_NAME);
-        project.afterEvaluate(evaluatedProject -> {
-            final JarJarExtension jarJar = JarJarExtension.get(evaluatedProject);
+
+        final Configuration implementation = project.getConfigurations().getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME);
+
+        final JarJarExtension jarJar = JarJarExtension.get(project);
+        project.afterEvaluate(ignored -> {
             configuration.setTransitive(!jarJar.getUsesNoneTransitiveJarJar().get());
+
+            if (jarJar.getExtendImplementation().get()) {
+                implementation.extendsFrom(configuration);
+            }
         });
+
+        //For now register the extension only on the main source set.
+        final SourceSetExtension sourceSets = SourceSetExtension.get(project);
+
+        //Needs to go through matching to ensure that the source set is lazily looked up.
+        sourceSets.matching(sourceSet -> SourceSet.isMain(sourceSet.getSourceSet()))
+                .configureEach(sourceSet -> {
+                    final SourceSetExtension.SourceSetConfiguration main = sourceSets.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
+                    final DependencyCollector dependencies = project.getObjects().dependencyCollector();
+                    main.getDependencies().getExtensions().add(CONTAINED_CONFIGURATION_NAME, dependencies);
+
+                    configuration.fromDependencyCollector(dependencies);
+                });
     }
 
     /**
      * Configures the jar task to use the slim classifier.
      * <p>
-     *     This ensures that the jar-in-jar'ed jar is not overwritten by the original jar.
+     * This ensures that the jar-in-jar'ed jar is not overwritten by the original jar.
+     *
      * @param project the project to configure
      */
     private void configureJarTask(Project project) {
@@ -75,7 +100,7 @@ public class JarJarProjectPlugin implements Plugin<Project> {
     /**
      * Configures the jarjar task.
      * <p>
-     *     Ensures that the primary sourcesets are included and the contained configuration is used.
+     * Ensures that the primary sourcesets are included and the contained configuration is used.
      *
      * @param project the project to configure
      */
@@ -83,7 +108,7 @@ public class JarJarProjectPlugin implements Plugin<Project> {
         final SourceSetExtension sourceSets = SourceSetExtension.get(project);
         final NeoGradleExtension neoGradle = NeoGradleExtension.get(project);
 
-        project.getTasks().named("jarjar", JarJar.class, jar -> {
+        project.getTasks().named("jarJar", JarJar.class, jar -> {
             jar.getArchiveClassifier().set(neoGradle.getPrimaryJarClassifier());
 
             sourceSets.getUniversalJarSourceSets().get().forEach(sourceSet -> {

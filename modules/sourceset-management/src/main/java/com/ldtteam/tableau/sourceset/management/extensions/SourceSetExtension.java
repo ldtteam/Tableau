@@ -605,7 +605,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
      * Contains the dependencies for a source set.
      */
     @SuppressWarnings("UnstableApiUsage")
-    public abstract static class SourceSetDependencies implements Dependencies {
+    public abstract static class SourceSetDependencies implements Dependencies, ExtensionAware {
 
         /**
          * Creates a new source set dependencies model.

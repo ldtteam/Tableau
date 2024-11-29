@@ -1,0 +1,81 @@
+---
+sidebar_label: Jar-in-Jar
+title: Including dependencies in the mod JAR
+slug: jarjar
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+When you build a mod, you can include dependencies in the mod JAR file. This is useful when you want to distribute your mod as a single JAR file.
+This example will show how to include a version of guava, but you can pick any dependency you want.
+
+:::warning
+Including dependencies is only supported in the main primary jar, we are working on a more complete publication system that supports an arbitrary combination of jars.
+:::
+
+### Setting up Jar-in-Jar
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="settings.gradle"
+        features {
+            usesJarJar = true
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="settings.gradle.kts"
+        features {
+            usesJarJar.set(true)
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+### Including dependencies
+<Tabs>
+    <TabItem value="groovy" label="Groovy">
+    ```groovy title=build.gradle
+    tableau {
+        mod {
+            // Mod information
+            modid = 'modid' // Use your own modid here.
+            group = 'com.example' // Use your own group here.
+            minecraftVersion = '1.21.3' // Or any other minecraft version.
+            publisher = 'SomePublisher' // Use your own name here.
+            url = 'https://github.com/someorg/modid' // Use your own URL here.
+        }
+
+        sourceSets {
+            main {
+                contained "com.google.guava:guava:30.1-jre"
+            }
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+    ```kotlin title=build.gradle.kts
+    tableau {
+        mod {
+            // Mod information
+            modid.set("modid") // Use your own modid here.
+            group.set("com.example") // Use your own group here.
+            minecraftVersion.set("1.21.3") // Or any other minecraft version.
+            publisher.set("SomePublisher") // Use your own name here.
+            url.set("https://github.com/someorg/modid") // Use your own URL here.
+        }
+
+        sourceSets {
+            main {
+                contained("com.google.guava:guava:30.1-jre")
+            }
+        }
+    }
+    ```
+    </TabItem>
+</Tabs>
+
+:::note
+You can find a full example of this project configuration in the [JarJar Example](https://github.com/ldtteam/Tableau/tree/main/examples/jarjar) on GitHub.
+:::

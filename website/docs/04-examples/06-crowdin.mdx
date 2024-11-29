@@ -1,0 +1,64 @@
+---
+sidebar_label: Crowdin
+title: Translate with Crowdin
+slug: crowdin
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Crowdin is a localization management platform that helps you translate your content into multiple languages. It provides a user-friendly interface for translators and project managers to work together on translations.
+This example configures a Tableau project to use crowding for translations:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+```groovy title="build.gradle"
+tableau {
+    mod {
+        // Mod information
+        modid = 'modid' // Use your own modid here.
+        group = 'com.example' // Use your own group here.
+        minecraftVersion = '1.21.3' // Or any other minecraft version.
+        publisher = 'SomePublisher' // Use your own name here.
+        url = 'https://github.com/someorg/modid' // Use your own URL here.
+    }
+
+    crowdin {
+        projectId = 123455
+        onlyUploadOnBranchMatching = "main"
+        onlyBuildOnBranchMatching = "main"
+        exportApprovedOnly = true
+        skipUntranslatedFiles = true
+        skipUntranslatedEntries = true
+    }
+}
+```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+```kotlin title="build.gradle.kts"
+tableau {
+    mod {
+        // Mod information
+        modid.set("modid") // Use your own modid here.
+        group.set("com.example") // Use your own group here.
+        minecraftVersion.set("1.21.3") // Or any other minecraft version.
+        publisher.set("SomePublisher") // Use your own name here.
+        url.set("https://github.com/someorg/modid") // Use your own URL here.
+    }
+
+    crowdin {
+        projectId.set(123455)
+        onlyUploadOnBranchMatching.set("main")
+        onlyBuildOnBranchMatching.set("main")
+        exportApprovedOnly.set(true)
+        skipUntranslatedFiles.set(true)
+        skipUntranslatedEntries.set(true)
+    }
+}
+```
+    </TabItem>
+</Tabs>
+
+:::note
+You can find a full example of this project configuration in the [Crowdin Example](https://github.com/ldtteam/Tableau/tree/main/examples/crowdin) on GitHub.
+:::

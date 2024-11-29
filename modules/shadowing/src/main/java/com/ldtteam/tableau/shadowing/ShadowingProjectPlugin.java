@@ -13,6 +13,10 @@ import com.ldtteam.tableau.shadowing.extensions.ShadowingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.dsl.DependencyCollector;
+import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,8 +59,34 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
      *
      * @param project the project to configure
      */
+    @SuppressWarnings("UnstableApiUsage")
     private void configureContainedConfiguration(Project project) {
-        project.getConfigurations().maybeCreate(CONTAINED_CONFIGURATION_NAME).setTransitive(false);
+        final Configuration configuration = project.getConfigurations().maybeCreate(CONTAINED_CONFIGURATION_NAME).setTransitive(false);
+
+
+        final Configuration implementation = project.getConfigurations().getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME);
+
+        final ShadowingExtension shadow = ShadowingExtension.get(project);
+        project.afterEvaluate(ignored -> {
+            configuration.setTransitive(!shadow.getUsesNoneTransitiveShadow().get());
+
+            if (shadow.getExtendImplementation().get()) {
+                implementation.extendsFrom(configuration);
+            }
+        });
+
+        //For now register the extension only on the main source set.
+        final SourceSetExtension sourceSets = SourceSetExtension.get(project);
+
+        //Needs to go through matching to ensure that the source set is lazily looked up.
+        sourceSets.matching(sourceSet -> SourceSet.isMain(sourceSet.getSourceSet()))
+                .configureEach(sourceSet -> {
+                    final SourceSetExtension.SourceSetConfiguration main = sourceSets.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
+                    final DependencyCollector dependencies = project.getObjects().dependencyCollector();
+                    main.getDependencies().getExtensions().add(CONTAINED_CONFIGURATION_NAME, dependencies);
+
+                    configuration.fromDependencyCollector(dependencies);
+                });
     }
 
     /**
