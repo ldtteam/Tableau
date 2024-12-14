@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+    "image":"mcr.microsoft.com/devcontainers/java",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-debug",
+                "dbaeumer.vscode-eslint",
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-gradle",
+                "VisualStudioExptTeam.vscodeintellicode",
+                "VisualStudioExptTeam.intellicode-api-usage-examples",
+                "redhat.java",
+                "vscjava.vscode-maven",
+                "vscjava.vscode-java-dependency",
+                "vscjava.vscode-java-test"
+            ]
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {},
+        "ghcr.io/nikobockerman/devcontainer-features/yarn-persistent-cache:1": {}
+    }
+}
