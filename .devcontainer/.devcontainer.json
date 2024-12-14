@@ -1,6 +1,23 @@
 {
-    "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
-    "image":"mcr.microsoft.com/devcontainers/java",
+    "name": "Tableau",
+    
+	"image": "mcr.microsoft.com/devcontainers/java:1-21",
+
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "none",
+			"installMaven": "true",
+			"mavenVersion": "3.8.6",
+			"installGradle": "true",
+            "gradleVersion": "8.10"
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "22"
+        },
+        "ghcr.io/nikobockerman/devcontainer-features/yarn-persistent-cache:1": {
+        }
+	},
+
     "customizations": {
         "vscode": {
             "extensions": [
@@ -13,12 +30,9 @@
                 "redhat.java",
                 "vscjava.vscode-maven",
                 "vscjava.vscode-java-dependency",
-                "vscjava.vscode-java-test"
+                "vscjava.vscode-java-test",
+                "ms-azuretools.vscode-docker"
             ]
         }
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/node:1": {},
-        "ghcr.io/nikobockerman/devcontainer-features/yarn-persistent-cache:1": {}
     }
 }
