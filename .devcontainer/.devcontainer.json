@@ -1,7 +1,9 @@
 {
     "name": "Tableau",
     
-	"image": "mcr.microsoft.com/devcontainers/java:1-21",
+	"build": {
+	  "dockerfile": "Dockerfile"
+	},
 
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {
