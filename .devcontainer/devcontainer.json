@@ -1,11 +1,11 @@
 {
   "name": "Discord-PIM",
 
-  "image": "mcr.microsoft.com/devcontainers/java:21",
+  "image": "mcr.microsoft.com/devcontainers/base:debian",
     
   "features": {
 		"ghcr.io/devcontainers/features/java:1": {
-			"version": "none",
+			"version": "21",
 			"installMaven": "true",
 			"mavenVersion": "3.8.6",
 			"installGradle": "true",
