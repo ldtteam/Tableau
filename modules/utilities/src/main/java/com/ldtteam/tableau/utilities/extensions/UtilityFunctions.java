@@ -2,10 +2,7 @@ package com.ldtteam.tableau.utilities.extensions;
 
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
-import org.gradle.api.initialization.Settings;
 import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.provider.ProviderFactory;
-
 import javax.inject.Inject;
 
 /**

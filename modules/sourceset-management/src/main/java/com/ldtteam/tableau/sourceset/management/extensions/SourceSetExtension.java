@@ -1,9 +1,15 @@
 package com.ldtteam.tableau.sourceset.management.extensions;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
-import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
-import groovy.lang.Closure;
-import org.gradle.api.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+import javax.inject.Inject;
+
+import org.gradle.api.Action;
+import org.gradle.api.Named;
+import org.gradle.api.NamedDomainObjectFactory;
+import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.dsl.Dependencies;
 import org.gradle.api.artifacts.dsl.DependencyCollector;
@@ -14,25 +20,18 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.provider.Provider;
-import org.gradle.api.specs.Spec;
-import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
+import com.ldtteam.tableau.utilities.utils.DelegatingNamedDomainObjectContainer;
 
 /**
  * Contains the base dsl for source set management.
  */
-public abstract class SourceSetExtension implements NamedDomainObjectContainer<SourceSetExtension.SourceSetConfiguration> {
+public abstract class SourceSetExtension extends DelegatingNamedDomainObjectContainer<SourceSetExtension.SourceSetConfiguration> {
 
     /**
      * Gets the extension from the project.
@@ -49,8 +48,6 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
      */
     public static final String EXTENSION_NAME = "sourceSets";
 
-    private final NamedDomainObjectContainer<SourceSetConfiguration> sourceSets;
-
     /**
      * Creates a new extension.
      *
@@ -59,7 +56,7 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
     @SuppressWarnings("UnstableApiUsage")
     @Inject
     public SourceSetExtension(final Project project) {
-        this.sourceSets = project.container(SourceSetConfiguration.class, new NamedDomainObjectFactory<>() {
+        super(project.container(SourceSetConfiguration.class, new NamedDomainObjectFactory<>() {
             @Override
             public @NotNull SourceSetConfiguration create(@NotNull String name) {
                 final SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
@@ -73,9 +70,9 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
                         sourceSet
                 );
             }
-        });
+        }));
 
-        this.sourceSets.whenObjectAdded(configuration -> {
+        whenObjectAdded(configuration -> {
             final SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
             final SourceSet sourceSet = sourceSets.getByName(configuration.getName());
             final JavaPluginExtension java = project.getExtensions().getByType(JavaPluginExtension.class);
@@ -138,15 +135,6 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
     }
 
     /**
-     * The source sets which are configured for use with Tableau.
-     *
-     * @return the source sets that are configured.
-     */
-    public NamedDomainObjectContainer<SourceSetConfiguration> getSourceSets() {
-        return sourceSets;
-    }
-
-    /**
      * Adds and configures a sourceset for an API.
      *
      * @param action The configuration action.
@@ -171,303 +159,6 @@ public abstract class SourceSetExtension implements NamedDomainObjectContainer<S
      * @return The source sets.
      */
     public abstract ListProperty<SourceSet> getPublishedSourceSets();
-
-    @Override
-    public @NotNull SourceSetConfiguration create(@NotNull String name) throws InvalidUserDataException {
-        return sourceSets.create(name);
-    }
-
-    @Override
-    public @NotNull SourceSetConfiguration maybeCreate(@NotNull String name) {
-        return sourceSets.maybeCreate(name);
-    }
-
-    @Override
-    public @NotNull SourceSetConfiguration create(@NotNull String name, @NotNull Closure configureClosure) throws InvalidUserDataException {
-        return sourceSets.create(name, configureClosure);
-    }
-
-    @Override
-    public @NotNull SourceSetConfiguration create(@NotNull String name, @NotNull Action<? super SourceSetConfiguration> configureAction) throws InvalidUserDataException {
-        return sourceSets.create(name, configureAction);
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectContainer<SourceSetConfiguration> configure(@NotNull Closure configureClosure) {
-        return sourceSets.configure(configureClosure);
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectProvider<SourceSetConfiguration> register(@NotNull String name, @NotNull Action<? super SourceSetConfiguration> configurationAction) throws InvalidUserDataException {
-        return sourceSets.register(name, configurationAction);
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectProvider<SourceSetConfiguration> register(@NotNull String name) throws InvalidUserDataException {
-        return sourceSets.register(name);
-    }
-
-    @Override
-    public <S extends SourceSetConfiguration> @NotNull NamedDomainObjectSet<S> withType(@NotNull Class<S> type) {
-        return sourceSets.withType(type);
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectSet<SourceSetConfiguration> named(@NotNull Spec<String> nameFilter) {
-        return sourceSets.named(nameFilter);
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectSet<SourceSetConfiguration> matching(@NotNull Spec<? super SourceSetConfiguration> spec) {
-        return sourceSets.matching(spec);
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectSet<SourceSetConfiguration> matching(@NotNull Closure spec) {
-        return sourceSets.matching(spec);
-    }
-
-    @Override
-    public @NotNull Set<SourceSetConfiguration> findAll(@NotNull Closure spec) {
-        return sourceSets.findAll(spec);
-    }
-
-    @Override
-    public boolean add(@NotNull SourceSetConfiguration e) {
-        return sourceSets.add(e);
-    }
-
-    @Override
-    public boolean addAll(@NotNull Collection<? extends SourceSetConfiguration> c) {
-        return sourceSets.addAll(c);
-    }
-
-    @Override
-    public @NotNull Namer<SourceSetConfiguration> getNamer() {
-        return sourceSets.getNamer();
-    }
-
-    @Override
-    public @NotNull SortedMap<String, SourceSetConfiguration> getAsMap() {
-        return sourceSets.getAsMap();
-    }
-
-    @Override
-    public @NotNull SortedSet<String> getNames() {
-        return sourceSets.getNames();
-    }
-
-    @Nullable
-    @Override
-    public SourceSetConfiguration findByName(@NotNull String name) {
-        return sourceSets.findByName(name);
-    }
-
-    @Override
-    public @NotNull SourceSetConfiguration getByName(@NotNull String name) throws UnknownDomainObjectException {
-        return sourceSets.getByName(name);
-    }
-
-    @Override
-    public @NotNull SourceSetConfiguration getByName(@NotNull String name, @NotNull Closure configureClosure) throws UnknownDomainObjectException {
-        return sourceSets.getByName(name, configureClosure);
-    }
-
-    @Override
-    public @NotNull SourceSetConfiguration getByName(@NotNull String name, @NotNull Action<? super SourceSetConfiguration> configureAction) throws UnknownDomainObjectException {
-        return sourceSets.getByName(name, configureAction);
-    }
-
-    @Override
-    public @NotNull SourceSetConfiguration getAt(@NotNull String name) throws UnknownDomainObjectException {
-        return sourceSets.getAt(name);
-    }
-
-    @Override
-    public @NotNull Rule addRule(@NotNull Rule rule) {
-        return sourceSets.addRule(rule);
-    }
-
-    @Override
-    public @NotNull Rule addRule(@NotNull String description, @NotNull Closure ruleAction) {
-        return sourceSets.addRule(description, ruleAction);
-    }
-
-    @Override
-    public @NotNull Rule addRule(@NotNull String description, @NotNull Action<String> ruleAction) {
-        return sourceSets.addRule(description, ruleAction);
-    }
-
-    @Override
-    public @NotNull List<Rule> getRules() {
-        return sourceSets.getRules();
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectProvider<SourceSetConfiguration> named(@NotNull String name) throws UnknownDomainObjectException {
-        return sourceSets.named(name);
-    }
-
-    @Override
-    public @NotNull NamedDomainObjectProvider<SourceSetConfiguration> named(@NotNull String name, @NotNull Action<? super SourceSetConfiguration> configurationAction) throws UnknownDomainObjectException {
-        return sourceSets.named(name, configurationAction);
-    }
-
-    @Override
-    public <S extends SourceSetConfiguration> @NotNull NamedDomainObjectProvider<S> named(@NotNull String name, @NotNull Class<S> type) throws UnknownDomainObjectException {
-        return sourceSets.named(name, type);
-    }
-
-    @Override
-    public <S extends SourceSetConfiguration> @NotNull NamedDomainObjectProvider<S> named(@NotNull String name, @NotNull Class<S> type, @NotNull Action<? super S> configurationAction) throws UnknownDomainObjectException {
-        return sourceSets.named(name, type, configurationAction);
-    }
-
-    @Internal
-    @Override
-    public @NotNull NamedDomainObjectCollectionSchema getCollectionSchema() {
-        return sourceSets.getCollectionSchema();
-    }
-
-    @Override
-    public void addLater(@NotNull Provider<? extends SourceSetConfiguration> provider) {
-        sourceSets.addLater(provider);
-    }
-
-    @Override
-    public void addAllLater(@NotNull Provider<? extends Iterable<SourceSetConfiguration>> provider) {
-        sourceSets.addAllLater(provider);
-    }
-
-    @Override
-    public <S extends SourceSetConfiguration> @NotNull DomainObjectCollection<S> withType(@NotNull Class<S> type, @NotNull Action<? super S> configureAction) {
-        return sourceSets.withType(type, configureAction);
-    }
-
-    @Override
-    public <S extends SourceSetConfiguration> @NotNull DomainObjectCollection<S> withType(@NotNull Class<S> type, @NotNull Closure configureClosure) {
-        return sourceSets.withType(type, configureClosure);
-    }
-
-    @Override
-    public @NotNull Action<? super SourceSetConfiguration> whenObjectAdded(@NotNull Action<? super SourceSetConfiguration> action) {
-        return sourceSets.whenObjectAdded(action);
-    }
-
-    @Override
-    public void whenObjectAdded(@NotNull Closure action) {
-        sourceSets.whenObjectAdded(action);
-    }
-
-    @Override
-    public @NotNull Action<? super SourceSetConfiguration> whenObjectRemoved(@NotNull Action<? super SourceSetConfiguration> action) {
-        return sourceSets.whenObjectRemoved(action);
-    }
-
-    @Override
-    public void whenObjectRemoved(@NotNull Closure action) {
-        sourceSets.whenObjectRemoved(action);
-    }
-
-    @Override
-    public void all(@NotNull Action<? super SourceSetConfiguration> action) {
-        sourceSets.all(action);
-    }
-
-    @Override
-    public void all(@NotNull Closure action) {
-        sourceSets.all(action);
-    }
-
-    @Override
-    public void configureEach(@NotNull Action<? super SourceSetConfiguration> action) {
-        sourceSets.configureEach(action);
-    }
-
-    @Override
-    public int size() {
-        return sourceSets.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return sourceSets.isEmpty();
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        return sourceSets.contains(o);
-    }
-
-    @Override
-    public @NotNull Iterator<SourceSetConfiguration> iterator() {
-        return sourceSets.iterator();
-    }
-
-    @Override
-    public @NotNull Object @NotNull [] toArray() {
-        return sourceSets.toArray();
-    }
-
-    @Override
-    public @NotNull <T> T @NotNull [] toArray(@NotNull T @NotNull [] a) {
-        return sourceSets.toArray(a);
-    }
-
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return sourceSets.toArray(generator);
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return sourceSets.remove(o);
-    }
-
-    @Override
-    public boolean containsAll(@NotNull Collection<?> c) {
-        return sourceSets.containsAll(c);
-    }
-
-    @Override
-    public boolean removeAll(@NotNull Collection<?> c) {
-        return sourceSets.removeAll(c);
-    }
-
-    @Override
-    public boolean removeIf(Predicate<? super SourceSetConfiguration> filter) {
-        return sourceSets.removeIf(filter);
-    }
-
-    @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
-        return sourceSets.retainAll(c);
-    }
-
-    @Override
-    public void clear() {
-        sourceSets.clear();
-    }
-
-    @Override
-    public Spliterator<SourceSetConfiguration> spliterator() {
-        return sourceSets.spliterator();
-    }
-
-    @Override
-    public Stream<SourceSetConfiguration> stream() {
-        return sourceSets.stream();
-    }
-
-    @Override
-    public Stream<SourceSetConfiguration> parallelStream() {
-        return sourceSets.parallelStream();
-    }
-
-    @Override
-    public void forEach(Consumer<? super SourceSetConfiguration> action) {
-        sourceSets.forEach(action);
-    }
 
     /**
      * Contains the configuration for a source set.

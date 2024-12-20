@@ -48,7 +48,7 @@ public abstract class JetbrainsAnnotationsExtension implements Dependencies {
     @Inject
     public JetbrainsAnnotationsExtension(final Project project) {
         final SourceSetExtension sourceSetExtension = SourceSetExtension.get(project);
-        sourceSetExtension.getSourceSets().configureEach(sourceSetConfiguration -> {
+        sourceSetExtension.configureEach(sourceSetConfiguration -> {
             //Register a control extension on each source set to allow for the configuration of the jetbrains annotations per annotation.
             sourceSetConfiguration.getExtensions().create(JetbrainsAnnotationsSourceSetExtension.EXTENSION_NAME, JetbrainsAnnotationsSourceSetExtension.class);
         });
@@ -58,7 +58,7 @@ public abstract class JetbrainsAnnotationsExtension implements Dependencies {
         final Dependency defaultJetbrainsAnnotationsDependency = project.getDependencies().create("org.jetbrains:annotations:%s".formatted(ResourceUtils.getJetbrainsAnnotationsVersion()));
 
         //Configure all source sets to inject the jetbrains annotations if the extension is enabled.
-        sourceSetExtension.getSourceSets().configureEach(sourceSetConfiguration -> {
+        sourceSetExtension.configureEach(sourceSetConfiguration -> {
             //Get the source sets extension to check whether it is enabled or not.
             final JetbrainsAnnotationsSourceSetExtension jaSourceSetExtension = JetbrainsAnnotationsSourceSetExtension.get(sourceSetConfiguration);
             final SourceSet sourceSet = project.getExtensions().getByType(SourceSetContainer.class).getByName(sourceSetConfiguration.getName());

@@ -3,6 +3,21 @@
  */
 package com.ldtteam.tableau.neogradle;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
+
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
+import org.gradle.api.Rule;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
+import org.jetbrains.annotations.NotNull;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.ldtteam.tableau.common.extensions.ModExtension;
@@ -12,26 +27,12 @@ import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
-import net.neoforged.gradle.common.extensions.MinecraftExtension;
-import net.neoforged.gradle.common.util.ProjectUtils;
+
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers;
 import net.neoforged.gradle.dsl.common.extensions.InterfaceInjections;
 import net.neoforged.gradle.dsl.common.extensions.Minecraft;
 import net.neoforged.gradle.dsl.common.runs.run.RunManager;
 import net.neoforged.gradle.userdev.UserDevPlugin;
-import org.gradle.api.Project;
-import org.gradle.api.Plugin;
-import org.gradle.api.Rule;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.SourceSetContainer;
-import org.jetbrains.annotations.NotNull;
-
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Stream;
 
 /**
  * The neogradle project plugin, which applies the user dev plugin and configures the project for neogradle.
@@ -66,7 +67,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
      */
     private void configureSourceSets(@NotNull Project target) {
         final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
-        sourceSetExtension.getSourceSets().configureEach(sourceSetConfig -> {
+        sourceSetExtension.configureEach(sourceSetConfig -> {
             final NeoGradleSourceSetConfigurationExtension extension = target.getObjects()
                     .newInstance(NeoGradleSourceSetConfigurationExtension.class, target, sourceSetConfig);
 
@@ -109,7 +110,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
                 //Check if the source set is marked to be included in the libraries.
                 if (domainObjectName.equals("library")) {
-                    final SourceSetExtension.SourceSetConfiguration mainSourceSetConfig = sourceSetExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+                    final SourceSetExtension.SourceSetConfiguration mainSourceSetConfig = sourceSetExtension.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
                     final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(mainSourceSetConfig);
                     final SourceSet mainSourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(SourceSet.MAIN_SOURCE_SET_NAME);
 
@@ -128,7 +129,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
                 final String sourceSetName = domainObjectName.substring(0, domainObjectName.length() - "Library".length());
 
-                if (sourceSetExtension.getSourceSets().findByName(sourceSetName) == null) {
+                if (sourceSetExtension.findByName(sourceSetName) == null) {
                     //The source set configuration does not exist. Ignore.
                     return;
                 }
@@ -136,7 +137,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                 //We know that a source set configuration exists for the given source set name.
                 //So we also know a neogradle extension exists for the source set configuration.
                 //And we know that the source set itself will exist.
-                final SourceSetExtension.SourceSetConfiguration sourceSetConfig = sourceSetExtension.getSourceSets().getByName(sourceSetName);
+                final SourceSetExtension.SourceSetConfiguration sourceSetConfig = sourceSetExtension.getByName(sourceSetName);
                 final NeoGradleSourceSetConfigurationExtension extension = NeoGradleSourceSetConfigurationExtension.get(sourceSetConfig);
                 final SourceSet sourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(sourceSetName);
 
@@ -241,7 +242,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             //Add the mod sources to the run.
             run.getModSources().addAllLater(
                     modExtension.getModId().map(modId -> {
-                        final List<SourceSet> sourceSets = sourceSetExtension.getSourceSets()
+                        final List<SourceSet> sourceSets = sourceSetExtension
                                 .stream()
                                 .filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())
                                 .map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
@@ -255,7 +256,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             );
 
             //After evaluation, add the library configurations to the run.
-            sourceSetExtension.getSourceSets()
+            sourceSetExtension
                     .stream()
                     .filter(config -> NeoGradleSourceSetConfigurationExtension.get(config).getIncludeInLibraries().get())
                     .map(config -> sourceSetContainer.getByName(config.getName()))

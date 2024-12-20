@@ -6,6 +6,7 @@ sonarqube = "5.+"
 shadow = "8.+"
 jetbrainsAnnotations = "+"
 curseForgeGradle = "1.+"
+nightconfig = "3.6.+"
 
 [libraries]
 neogradle-userdev = { module = "net.neoforged.gradle:userdev", version.ref = "neogradle" }
@@ -15,6 +16,7 @@ sonarqube = { module = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin",
 shadow = { module = "com.gradleup.shadow:shadow-gradle-plugin", version.ref = "shadow" }
 jetbrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
 curseForgeGradle = { module = "net.darkhax.curseforgegradle:CurseForgeGradle", version.ref = "curseForgeGradle" }
+nightconfig = { module = "com.electronwill.night-config:toml", version.ref = "nightconfig" }
 
 [bundles]
 neogradle = ["neogradle-userdev"]
@@ -23,3 +25,4 @@ sonarqube = ["sonarqube"]
 shadow = ["shadow"]
 jetbrainsAnnotations = ["jetbrainsAnnotations"]
 curseForgeGradle = ["curseForgeGradle"]
+nightconfig = ["nightconfig"]

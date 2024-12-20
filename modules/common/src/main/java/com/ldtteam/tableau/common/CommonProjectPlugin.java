@@ -20,7 +20,6 @@ import org.gradle.external.javadoc.StandardJavadocDocletOptions;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
-import java.util.Map;
 
 /**
  * The common project plugin.
