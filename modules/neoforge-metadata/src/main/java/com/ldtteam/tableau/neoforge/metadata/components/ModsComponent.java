@@ -13,6 +13,7 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
 import com.ldtteam.tableau.neoforge.metadata.api.IMetadataComponent;
 import com.ldtteam.tableau.neoforge.metadata.components.model.Mod;
+import com.ldtteam.tableau.neoforge.metadata.extensions.MetadataExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension.SourceSetConfiguration;
 import com.ldtteam.tableau.utilities.utils.DelegatingNamedDomainObjectContainer;
 
@@ -20,6 +21,11 @@ import com.ldtteam.tableau.utilities.utils.DelegatingNamedDomainObjectContainer;
  * Exposed API container for mods, converts the mods and their relevant 
  */
 public abstract class ModsComponent extends DelegatingNamedDomainObjectContainer<Mod> implements IMetadataComponent {
+
+    /**
+     * The name of the component.
+     */
+    public static final String NAME = "mods";   
 
     /**
      * Creates a new instance of the mods component.
@@ -36,6 +42,10 @@ public abstract class ModsComponent extends DelegatingNamedDomainObjectContainer
             //As soon as a mod is added to the sourceset, we include the jar as a source in all runs.
             final NeoGradleSourceSetConfigurationExtension neogradleSourceSet = NeoGradleSourceSetConfigurationExtension.get(sourceSet);
             neogradleSourceSet.getIsModSource().convention(true);
+
+            //When a mod gets added, we enable the metadata generation on the sourceset
+            final MetadataExtension metadata = MetadataExtension.get(sourceSet);
+            metadata.getIsEnabled().convention(true);
 
             //Create the mod object.
             return project.getObjects().newInstance(Mod.class, project, sourceSet, name);

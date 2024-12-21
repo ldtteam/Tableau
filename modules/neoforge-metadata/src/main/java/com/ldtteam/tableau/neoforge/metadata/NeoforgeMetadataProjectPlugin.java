@@ -7,6 +7,19 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import com.ldtteam.tableau.git.GitPlugin;
+import com.ldtteam.tableau.neoforge.metadata.components.AccessTransformersComponent;
+import com.ldtteam.tableau.neoforge.metadata.components.HeaderComponent;
+import com.ldtteam.tableau.neoforge.metadata.components.LicenseComponent;
+import com.ldtteam.tableau.neoforge.metadata.components.LoaderVersionComponent;
+import com.ldtteam.tableau.neoforge.metadata.components.ModsComponent;
+import com.ldtteam.tableau.neoforge.metadata.conventions.AccessTransformerTaskConventions;
+import com.ldtteam.tableau.neoforge.metadata.conventions.ModTaskConventions;
+import com.ldtteam.tableau.neoforge.metadata.extensions.MetadataExtension;
+import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
+import com.ldtteam.tableau.scripting.ScriptingPlugin;
+import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
+
 import javax.inject.Inject;
 
 /**
@@ -23,6 +36,31 @@ public class NeoforgeMetadataProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        //TODO: Implement this method
+        target.getPlugins().apply(ScriptingPlugin.class);
+        target.getPlugins().apply(GitPlugin.class);
+        target.getPlugins().apply(NeoGradlePlugin.class);
+
+        registerMetadata(target);
+
+        AccessTransformerTaskConventions.configure(target);
+        ModTaskConventions.configure(target);
     }
+
+    private void registerMetadata(final Project project) {
+        final SourceSetExtension sourceSetExtension = SourceSetExtension.get(project);
+
+        sourceSetExtension.configureEach(sourceSet -> {
+            final MetadataExtension metadata = sourceSet.getExtensions().create(MetadataExtension.EXTENSION_NAME, MetadataExtension.class, project, sourceSet);
+
+            //Register components
+            metadata.getExtensions().create(HeaderComponent.NAME, HeaderComponent.class);
+            metadata.getExtensions().create(LoaderVersionComponent.NAME, LoaderVersionComponent.class, project, sourceSet);
+            metadata.getExtensions().create(LicenseComponent.NAME, LicenseComponent.class, project, sourceSet);
+            metadata.getExtensions().create(ModsComponent.NAME, ModsComponent.class, project, sourceSet);
+            metadata.getExtensions().create(AccessTransformersComponent.NAME, AccessTransformersComponent.class, project, sourceSet);
+        });
+    }
+
+    
+
 }

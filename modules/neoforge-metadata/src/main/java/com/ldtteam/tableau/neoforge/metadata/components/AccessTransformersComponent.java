@@ -3,11 +3,13 @@ package com.ldtteam.tableau.neoforge.metadata.components;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
+import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.TaskProvider;
@@ -26,6 +28,11 @@ import net.neoforged.gradle.dsl.common.extensions.Minecraft;
  */
 public class AccessTransformersComponent extends DelegatingConfigurableFileCollection implements IMetadataComponent {
 
+    /**
+     * The name of the component.
+     */
+    public static final String NAME = "accessTransformers";
+
     private final SourceSetConfiguration sourceSet;
 
     /**
@@ -42,24 +49,7 @@ public class AccessTransformersComponent extends DelegatingConfigurableFileColle
         
         this.sourceSet = sourceSet;
 
-        //Configure the copy and process resources tasks
-        final Provider<Directory> atDirectory = project.getLayout().getBuildDirectory()
-                .dir("metadata")
-                .map(metadata -> metadata.dir("accessTransformers"))
-                .map(logos -> logos.dir(sourceSet.getName()));
-        final TaskProvider<Copy> copyTransformers = project.getTasks()
-                .register(sourceSet.getSourceSet().getTaskName("copy", "%sTransformers".formatted(sourceSet.getName())), Copy.class, copy -> {
-                    copy.onlyIf(task -> !getFiles().isEmpty() && getFiles().stream().allMatch(File::exists));
-                    copy.from(this);
-                    copy.into(atDirectory);
-                });
-        project.getTasks().named(sourceSet.getSourceSet().getProcessResourcesTaskName(), ProcessResources.class,
-                processResources -> {
-                    processResources.from(project.fileTree(atDirectory));
-                    processResources.into("META-INF/Tableau/AccessTransformers/%s".formatted(sourceSet.getName()));
-                    processResources.dependsOn(copyTransformers);
-                });
-
+        /*
         //The convention of our data is that it takes the sourcesets module data and looks for the relevant at-file in the META-INF directory.
         this.convention(sourceSet.getSourceSet().getResources().getSourceDirectories().getElements()
                 .map(sourceDirectories -> {
@@ -67,11 +57,14 @@ public class AccessTransformersComponent extends DelegatingConfigurableFileColle
                     .filter(Directory.class::isInstance)
                     .map(Directory.class::cast)
                     .findFirst()
-                    .orElse(null); //Empty out the outer provider when there is no source directory configured.
+                    .orElseGet(() -> {
+                        project.getLogger().warn("No source directory configured for source set %s. Skipping ATs.".formatted(sourceSet.getName()));
+                        return project.getLayout().getProjectDirectory().dir(".tableau");
+                    }); //Empty out the outer provider when there is no source directory configured.
                 })
                 .map(firstResourceDirectory -> {
                     return firstResourceDirectory.dir("META-INF").file("accesstransformer.cfg");
-                }));
+                }));*/
         
         //Register the usage of the in us contained ATs.
         final AccessTransformers accessTransformers = project.getExtensions().getByType(Minecraft.class).getAccessTransformers();
@@ -82,14 +75,16 @@ public class AccessTransformersComponent extends DelegatingConfigurableFileColle
     public void write(CommentedConfig config) {
         final List<CommentedConfig> transformers = new ArrayList<>();
 
-        for (File file : getFiles()) {
-            if (file.exists()) {
-                final CommentedConfig fileConfig = CommentedConfig.inMemory();
-                fileConfig.set("file", "META-INF/Tableau/AccessTransformers/%s/%s".formatted(sourceSet.getName(), file.getName()));
-                transformers.add(fileConfig);
-            }
+        if (!this.isEmpty()) {
+            for (File file : getFiles()) {
+                if (file.exists()) {
+                    final CommentedConfig fileConfig = CommentedConfig.inMemory();
+                    fileConfig.set("file", "META-INF/Tableau/AccessTransformers/%s/%s".formatted(sourceSet.getName(), file.getName()));
+                    transformers.add(fileConfig);
+                }
+            }    
         }
-
+        
         config.set("accessTransformers", transformers);
     }
 }

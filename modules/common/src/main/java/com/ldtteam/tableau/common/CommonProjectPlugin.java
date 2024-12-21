@@ -45,7 +45,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project target) {
         //Register all base plugins.
-        target.getPlugins().apply("base");
+        target.getPlugins().apply("java-library");
         target.getPlugins().apply("jacoco");
         target.getPlugins().apply("idea");
         target.getPlugins().apply("eclipse");

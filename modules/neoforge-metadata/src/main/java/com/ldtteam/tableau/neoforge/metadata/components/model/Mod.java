@@ -12,17 +12,11 @@ import org.gradle.api.Action;
 import org.gradle.api.Named;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
-import org.gradle.api.file.Directory;
-import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.TaskProvider;
-import org.gradle.language.jvm.tasks.ProcessResources;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.ldtteam.tableau.git.extensions.GitExtension;
@@ -31,7 +25,7 @@ import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension.So
 /**
  * Represents the metadata component for a single mod.
  */
-public abstract class Mod {
+public abstract class Mod implements Named {
 
     private final String modId;
     private final NamedDomainObjectContainer<Dependency> dependencies;
@@ -65,57 +59,6 @@ public abstract class Mod {
                 .sorted(Comparator.comparing(GitExtension.Developer::count).reversed())
                 .map(developer -> developer.name())
                 .collect(Collectors.joining(", "))));
-
-        // Configure the automatic inclusion of the logo file on process resources.
-        final String logoFileName = "%s.png".formatted(modId);
-        final Provider<Directory> logoDirectory = project.getLayout().getBuildDirectory()
-                .dir("metadata")
-                .map(metadata -> metadata.dir("logos"))
-                .map(logos -> logos.dir(modId));
-        final Provider<RegularFile> logoFile = logoDirectory.map(dir -> dir.file(logoFileName));
-        final TaskProvider<Copy> copyLogo = project.getTasks()
-                .register(sourceSet.getSourceSet().getTaskName("copy", "%sLogo".formatted(modId)), Copy.class, copy -> {
-                    copy.onlyIf(task -> getLogo().isPresent() && getLogo().get().getAsFile().exists());
-                    copy.from(getLogo());
-                    copy.into(logoFile);
-                });
-        project.getTasks().named(sourceSet.getSourceSet().getProcessResourcesTaskName(), ProcessResources.class,
-                processResources -> {
-                    processResources.from(logoFile);
-                    processResources.into("META-INF/Tableau/Logos/%s".formatted(logoFileName));
-                    processResources.dependsOn(copyLogo);
-                });
-
-        /*
-         * //Validate the uniqueness of Access Transformer file names in project
-         * project.afterEvaluate(ignored -> {
-         * final long distinctFileNameCount = getAccessTransformers().getFiles()
-         * .stream()
-         * .map(File::getName)
-         * .distinct()
-         * .count();
-         * 
-         * final long fileCount = getAccessTransformers().getFiles().size();
-         * 
-         * if (fileCount != distinctFileNameCount) {
-         * throw getProblems().forNamespace("tableau")
-         * .throwing(spec -> {
-         * spec.id("metadata", "noneUniqueAtFileNames");
-         * spec.
-         * details("The project needs to have all unique access transformer file names. No duplicates are allowed!"
-         * );
-         * spec.solution("Rename one of the duplicate access transformer files.");
-         * });
-         * }
-         * });
-         * 
-         * //Configure the automatic inclusion of access transformer files
-         * final Provider<Directory> logoDirectory =
-         * project.getLayout().getBuildDirectory()
-         * .dir("metadata")
-         * .map(metadata -> metadata.dir("logos"))
-         * .map(logos -> logos.dir(modId));
-         */
     }
 
     /**
@@ -126,6 +69,11 @@ public abstract class Mod {
     @Input
     public String getModId() {
         return modId;
+    }
+
+    @Override
+    public String getName() {
+        return getModId();
     }
 
     /**

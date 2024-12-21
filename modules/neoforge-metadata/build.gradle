@@ -9,6 +9,7 @@
 plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     id 'java-gradle-plugin'
+    id 'groovy'
 }
 
 dependencies {
@@ -29,4 +30,36 @@ gradlePlugin {
             implementationClass = 'com.ldtteam.tableau.neoforge.metadata.NeoforgeMetadataPlugin'
         }
     }
+}
+
+testing {
+    suites {
+        test {
+            useJUnitJupiter()
+
+            dependencies {
+                implementation project()
+                implementation 'org.junit.platform:junit-platform-launcher'
+                implementation 'org.mockito:mockito-core:3.+'
+                implementation 'org.mockito:mockito-junit-jupiter:3.+'
+            }
+        }
+
+        integrationTest(JvmTestSuite) {
+            useJUnitJupiter()
+
+            dependencies {
+                implementation project()
+                implementation platform("org.spockframework:spock-bom:2.2-groovy-3.0")
+                implementation 'org.spockframework:spock-core'
+                implementation 'org.junit.platform:junit-platform-launcher'
+                implementation 'org.mockito:mockito-core:3.+'
+                implementation 'org.mockito:mockito-junit-jupiter:3.+'
+            }
+        }
+    }
+}
+
+tasks.withType(Test) {
+    jvmArgs('--add-opens=java.base/java.lang=ALL-UNNAMED')
 }

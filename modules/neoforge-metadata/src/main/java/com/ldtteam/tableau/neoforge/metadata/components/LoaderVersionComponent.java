@@ -17,6 +17,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.ldtteam.tableau.neoforge.metadata.api.IMetadataComponent;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension.SourceSetConfiguration;
@@ -59,11 +60,11 @@ public abstract class LoaderVersionComponent implements IMetadataComponent {
                 .map(jarFs -> jarFs.getPath("META-INF", "neoforged.mods.toml"))
                 .filter(modsTomlPath -> Files.exists(modsTomlPath))
                 .map(modsTomlPath -> FileConfig.of(modsTomlPath))
+                .peek(config -> config.load())
                 .map(modsToml -> modsToml.<String>get(NAME))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow();
             }));
-
     }
 
     /**
@@ -100,7 +101,6 @@ public abstract class LoaderVersionComponent implements IMetadataComponent {
 
     @Override
     public void write(CommentedConfig config) {
-        config.setComment(NAME, "The supported loader range of FML that can be used to load this mod into the game.");
         config.set(NAME, getRange().get());
     }
 }

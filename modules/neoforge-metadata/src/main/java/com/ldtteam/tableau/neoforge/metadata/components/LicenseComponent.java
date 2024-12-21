@@ -45,13 +45,6 @@ public abstract class LicenseComponent implements IMetadataComponent {
 
     @Override
     public void write(CommentedConfig config) {
-        config.setComment(NAME, """
-                # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
-                # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
-                # 
-                # Automatically populated by Tableau from the license.name field of the mod metadata.
-                """);
-
         config.set(NAME, getName().get());
     }
 }

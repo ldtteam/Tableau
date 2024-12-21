@@ -3,6 +3,7 @@
  */
 package com.ldtteam.tableau.utilities;
 
+import com.ldtteam.tableau.scripting.ScriptingPlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;

@@ -20,12 +20,17 @@ import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.ldtteam.tableau.common.CommonPlugin;
 import com.ldtteam.tableau.common.extensions.ModExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
+import com.ldtteam.tableau.resource.processing.ResourceProcessingPlugin;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
+import com.ldtteam.tableau.scripting.ScriptingPlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
+import com.ldtteam.tableau.sourceset.management.SourcesetManagementPlugin;
+import com.ldtteam.tableau.sourceset.management.SourcesetManagementProjectPlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers;
@@ -48,6 +53,9 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
+        target.getPlugins().apply(CommonPlugin.class);
+        target.getPlugins().apply(SourcesetManagementPlugin.class);
+        target.getPlugins().apply(ResourceProcessingPlugin.class);
         target.getPlugins().apply(UserDevPlugin.class);
 
         TableauScriptingExtension.register(target, NeoGradleExtension.EXTENSION_NAME, NeoGradleExtension.class, target);
