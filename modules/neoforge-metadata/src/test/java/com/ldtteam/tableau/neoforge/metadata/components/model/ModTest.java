@@ -55,11 +55,11 @@ class ModTest {
 
     @Test
     void testWriteDependencies() {
-        Mod.Dependency dependency = project.getObjects().newInstance(Mod.Dependency.class, "dependencyModId");
+        ModDependency dependency = project.getObjects().newInstance(ModDependency.class, "dependencyModId");
         dependency.getVersionRange().set("[1.0,2.0)");
-        dependency.getType().set(Mod.Dependency.Type.REQUIRED);
-        dependency.getOrdering().set(Mod.Dependency.Ordering.NONE);
-        dependency.getSide().set(Mod.Dependency.Side.BOTH);
+        dependency.getType().set(ModDependency.Type.REQUIRED);
+        dependency.getOrdering().set(ModDependency.Ordering.NONE);
+        dependency.getSide().set(ModDependency.Side.BOTH);
 
         mod.getDependencies().add(dependency);
 
