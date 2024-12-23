@@ -16,6 +16,11 @@ As well as the versions of NeoForge and Minecraft that your mod is compatible wi
 
 The goal of this guide is it to explain how Tableau helps with this process, and how you can use it to your advantage.
 
+:::info
+While you can use resource processing to fill in the required values in your `neoforge.mods.toml` file, we recommend that you 
+use the NeoForge metadata generation module that comes with tableau
+:::
+
 ## Configuring Tableaus interpolation targets
 By default, Tableau will not interpolate any resources, however its interpolation mechanism is active.
 To add resources as interpolation targets, you need to configure the `resourceProcessing` block in the Tableau DSL:

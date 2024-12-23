@@ -49,7 +49,6 @@ public class AccessTransformersComponent extends DelegatingConfigurableFileColle
         
         this.sourceSet = sourceSet;
 
-        /*
         //The convention of our data is that it takes the sourcesets module data and looks for the relevant at-file in the META-INF directory.
         this.convention(sourceSet.getSourceSet().getResources().getSourceDirectories().getElements()
                 .map(sourceDirectories -> {
@@ -64,7 +63,7 @@ public class AccessTransformersComponent extends DelegatingConfigurableFileColle
                 })
                 .map(firstResourceDirectory -> {
                     return firstResourceDirectory.dir("META-INF").file("accesstransformer.cfg");
-                }));*/
+                }));
         
         //Register the usage of the in us contained ATs.
         final AccessTransformers accessTransformers = project.getExtensions().getByType(Minecraft.class).getAccessTransformers();

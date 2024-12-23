@@ -39,7 +39,7 @@ public abstract class Mod implements Named {
     @Inject
     public Mod(final Project project, final SourceSetConfiguration sourceSet, final String modId) {
         this.modId = modId;
-        this.dependencies = project.getObjects().newInstance(ModDependencies.class, project);
+        this.dependencies = project.getObjects().newInstance(ModDependencies.class, project, sourceSet);
 
         final GitExtension gitExtension = GitExtension.get(project);
 

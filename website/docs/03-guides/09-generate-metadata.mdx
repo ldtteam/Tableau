@@ -1,0 +1,281 @@
+---
+sidebar_label: Generating Metadata
+title: Automatically generate NeoForge metadata
+slug: generating-metadata
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+In this guide we will take a look at generating the `neoforge.mods.toml` file completely in gradle,
+as well as managing dependencies of your mod directly with it.
+
+:::info
+All sections of this guide will happen in the `metadata` block of each sourceset in the Tableau DSL.
+:::
+
+## Metadata related to your jar
+The `neoforge.mods.toml` file is related to your distribution jar, not directly to your mod.
+So it contains some properties that describe information about the jar it-self.
+
+These are the following:
+- Loader version
+- License
+- Access transformers to load
+
+We will consider the loader version and license together as the common properties and then address access transformers seperately.
+
+:::warning
+While it is already possible with this module to create a `neoforge.mods.toml` for each sourceset independently, the system is not completely ready for multi jar publishing and its API might change in the future to address the needs of this Tableau feature better.
+
+Consider sticking with the `main` sourceset as the source of your configuration, unless you know exactly what you are doing.
+:::
+
+### Common properties
+To configure the loader version and/or the license for your jar you can set the following properties:
+
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        license = "GNU"
+                        loaderVersion = "1.2.3"
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        license.set("GNU")
+                        loaderVersion.set("1.2.3")
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+This example sets the license and loader version of the primary jar published by the main sourceset.
+
+### Adding access transformers
+During development of a mod it is sometimes required to gain access to `private`, or `protected` types, fields or methods. 
+This information is also necessary in production, and to enable the loader to configure these access flags on the referenced symbols in question, it needs to know where it can find the access transformers to load.
+
+This is achieved by loading the `accessTransformers` list from the `neoforged.mods.toml`.
+The metadata generation module as such offers a way to configure the relevant access transformers applied to your project as well as which are included into your metadata and your jar:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        accessTransformers = [file('path/to/some/at/file/in/your/project.cfg')]
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        accessTransformers.add(file('path/to/some/at/file/in/your/project.cfg'))
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+Using this code path will do 3 things:
+- Include the at file reference in your `neoforge.mods.toml`.
+- Include the at file in your jar (more on that in the warning below).
+- Tell NeoGradle to load the at in your development environment.
+
+:::warning
+Please make sure that your access transformer files each have unique file names, as they are included all in the same directory in the jar.
+
+If you duplicate the file name an error will be reported.
+:::
+
+## Adding mods
+Once you have configured the jar metadata it-self you need to inform FML that your jar includes a mod.
+To do this add a mod to the `mods` block of your metadata section:
+
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        mods {
+                            exampleMod {
+                                version = "1.2.3" //Optionally configure the version, it is by default pulled from the project
+                                description = "The amazing example mod" //Optionally configure the description, by default it will be the `The <mod id> mod`
+                                displayName = "Example Mod" //Optionally configure the display name, it is by default the project name.
+                                logo = file('path/to/logo.png') //Optionally configure the logo, defaults to the logo.png-file in your project root.
+                                credits = ["Awesome mod author"] // Optionally configure who needs to be creditted for the mod, by default pulled from git as all contributors.
+                                authors = ["Me"] //Optionally configure the authors, by default pulled from git, as those contributors with more then 5 contributions.
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        mods {
+                            exampleMod {
+                                version.set("1.2.3") //Optionally configure the version, it is by default pulled from the project
+                                description.set("The amazing example mod") //Optionally configure the description, by default it will be the `The <mod id> mod`
+                                displayName.set("Example Mod") //Optionally configure the display name, it is by default the project name.
+                                logo.set(file('path/to/logo.png')) //Optionally configure the logo, defaults to the logo.png-file in your project root.
+                                credits.add("Awesome mod author") // Optionally configure who needs to be creditted for the mod, by default pulled from git as all contributors.
+                                authors.add("Me") //Optionally configure the authors, by default pulled from git, as those contributors with more then 5 contributions.
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+## Configuring dependencies
+In most cases your mod will have a dependency or two, either on NeoForge or on Minecraft, or a Library mod.
+
+The metadata should reflect that information, when a dependency is then missing, or an incompatibility is found the user can be properly informed.
+To register these dependencies you can use the `dependencies` block for each mod:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        mods {
+                            exampleMod {
+                                dependencies {
+                                    domumornamentum {
+                                        type = REQUIRED //Required, represents what kind of dependency this is.
+                                        versionRange = "[1.2.3,)" //Required, represents the exact version range that is compatible.
+                                        reason = "Needed for building included styles to work" //Required when type is INCOMPATIBLE, suggested for all others.
+                                        ordering = AFTER //Optional, Indicates whether your mod should load after or before this dependency, if not supplied, then ordering is random or parallel.
+                                        side = BOTH //Optional, indicates on what kind of distribution this applies, can be BOTH, CLIENT, SERVER. Defaults to BOTH
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        mods {
+                            exampleMod {
+                                dependencies {
+                                    domumornamentum {
+                                        type.set(REQUIRED) //Required, represents what kind of dependency this is.
+                                        versionRange.set("[1.2.3,)") //Required, represents the exact version range that is compatible.
+                                        reason.set("Needed for building included styles to work") //Required when type is INCOMPATIBLE, suggested for all others.
+                                        ordering.set(AFTER) //Optional, Indicates whether your mod should load after or before this dependency, if not supplied, then ordering is random or parallel.
+                                        side.set(BOTH) //Optional, indicates on what kind of distribution this applies, can be BOTH, CLIENT, SERVER. Defaults to BOTH
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+### Managing dependencies directly.
+Next to specifying the dependencies directly through `ModDependency` entries in the `dependencies` block you can also reference two configurations in the `dependencies` block and add both the dependency to the classpath as well as a derived mod dependency from their file automatically:
+
+<Tabs groupId="gradle-code">
+    <TabItem value="groovy" label="Groovy">
+        ```groovy title="build.gradle"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        mods {
+                            exampleMod {
+                                dependencies {
+                                    required 'com.ldtteam:domumornamentum:[123,)'
+                                    optional 'com.libraries:somelibrary:[123]'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="kotlin" label="Kotlin">
+        ```kotlin title="build.gradle.kts"
+        tableau {
+            sourceSets {
+                main {
+                    metadata {
+                        mods {
+                            exampleMod {
+                                dependencies {
+                                    domumornamentum {
+                                        required 'com.ldtteam:domumornamentum:[123,)'
+                                        optional 'com.libraries:somelibrary:[123]'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+The required configuration in this block, will directly map to the `api` configuration of the relevant source set that the metadata is configured in, while the `optional` configuration will map to the `runtimeClasspath` configuration.
+
+:::note
+While these are currently the only two dependency configurations we expose in this block, we might expand these in the future.
+:::
