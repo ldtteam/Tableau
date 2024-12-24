@@ -32,6 +32,8 @@ class ModTest {
         sourceSetConfiguration = mock(SourceSetConfiguration.class);
         sourceSet = mock(SourceSet.class);
         when(sourceSetConfiguration.getSourceSet()).thenReturn(sourceSet);
+        when(sourceSet.getRuntimeClasspathConfigurationName()).thenReturn("runtimeClasspath");
+        when(sourceSet.getApiConfigurationName()).thenReturn("api");
         mod = project.getObjects().newInstance(Mod.class, project, sourceSetConfiguration, "testMod");
     }
 

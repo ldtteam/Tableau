@@ -40,6 +40,8 @@ public class DependencyResolver {
     /**
      * Find all the resolved dependencies.
      *
+     * @param project The project in which dependencies are being resolved.
+     * @param problems The problems handler.
      * @param configuration The configuration to look for dependencies in.
      * @param required      Whether this dependency is required or not.
      * @return The set provider.
