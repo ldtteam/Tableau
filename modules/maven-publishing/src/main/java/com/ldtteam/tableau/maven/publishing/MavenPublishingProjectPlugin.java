@@ -54,8 +54,11 @@ public class MavenPublishingProjectPlugin implements Plugin<Project> {
             //This needs to be in an after evaluate block to ensure that the project has been configured.
             publishing.getPublications().create("default", MavenPublication.class, publication -> {
                 publication.from(project.getComponents().getByName("java"));
-                publication.pom(mavenPublishing::configure);
                 publication.suppressAllPomMetadataWarnings();
+            });
+
+            publishing.getPublications().withType(MavenPublication.class).configureEach(publication -> {
+                publication.pom(mavenPublishing::configure);
             });
         });
     }
