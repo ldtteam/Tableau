@@ -1,6 +1,6 @@
 package com.ldtteam.tableau.parchment.extensions;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import net.neoforged.gradle.dsl.common.extensions.subsystems.Subsystems;
 import org.gradle.api.Project;
@@ -36,8 +36,8 @@ public abstract class ParchmentExtension {
     @Inject
     public ParchmentExtension(Project project) {
 
-        final ModExtension modExtension = ModExtension.get(project);
-        getMinecraftVersion().convention(modExtension.getMinecraftVersion());
+        final ProjectExtension projectExtension = ProjectExtension.get(project);
+        getMinecraftVersion().convention(projectExtension.getMinecraftVersion());
 
         getParchmentVersion().convention("BLEEDING-SNAPSHOT");
 
@@ -52,10 +52,10 @@ public abstract class ParchmentExtension {
      * <p>
      *     Parchment supports cross version compatibility, so this version is used to determine the
      *     version of the artifacts to use. If parchment has not released a new version yet for the
-     *     minecraft version you configured in {@link com.ldtteam.tableau.common.extensions.ModExtension}
+     *     minecraft version you configured in {@link ProjectExtension}
      *     you can configure a different version here.
      * <p>
-     *     This value is defaulted to the minecraft version configured in the {@link com.ldtteam.tableau.common.extensions.ModExtension}.
+     *     This value is defaulted to the minecraft version configured in the {@link ProjectExtension}.
      *
      * @return the minecraft version to get the parchment artifacts for
      */

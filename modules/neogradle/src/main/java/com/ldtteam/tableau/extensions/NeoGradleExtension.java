@@ -1,6 +1,6 @@
 package com.ldtteam.tableau.extensions;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
@@ -52,14 +52,14 @@ public abstract class NeoGradleExtension implements ExtensionAware {
         }
 
         final VersioningExtension versioning = VersioningExtension.get(project);
-        final ModExtension modExtension = ModExtension.get(project);
+        final ProjectExtension projectExtension = ProjectExtension.get(project);
 
         //Set the default values for the extension.
         getPrimaryJarClassifier().convention("universal");
 
         //By default, we extract the latest neoforge version from the minecraft version.
         getNeoForgeVersion().convention(
-            modExtension.getMinecraftVersion().flatMap(enabled -> versioning.getMinecraft().getMinecraftVersion().map(version -> {
+            projectExtension.getMinecraftVersion().flatMap(enabled -> versioning.getMinecraft().getMinecraftVersion().map(version -> {
                 //The minecraft version is formatted like: a.b.c
                 //The NeoForge version is formatted like: b.c.+
                 final String[] parts = version.split("\\.");

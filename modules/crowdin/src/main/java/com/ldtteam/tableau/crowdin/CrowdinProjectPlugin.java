@@ -72,7 +72,8 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
                 throw problems.getReporter().throwing(spec -> {
                     spec.id("crowdin-no-source-files", "Missing source files for Crowdin")
                             .details("No source files specified for Crowdin, please specify at least one source file to manage")
-                            .solution("Add at least one source file to the crowdin block of the Tableau DSL");
+                            .solution("Add at least one source file to the crowdin block of the Tableau DSL")
+                            .withException(new InvalidUserDataException("No source files specified for Crowdin"));
                 });
             }
 
@@ -82,7 +83,8 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
                     throw problems.getReporter().throwing(spec -> {
                         spec.id("crowdin-no-target-files", "Missing target files for Crowdin")
                                 .details("No target files specified for Crowdin, if you specify more then one source file, they need to be merged into at least one target file.")
-                                .solution("Add at least one target file to the crowdin block of the Tableau DSL");
+                                .solution("Add at least one target file to the crowdin block of the Tableau DSL")
+                                .withException(new InvalidUserDataException("No target files specified for Crowdin"));
                     });
                 }
 

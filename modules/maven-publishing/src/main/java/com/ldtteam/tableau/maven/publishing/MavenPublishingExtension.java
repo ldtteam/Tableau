@@ -1,6 +1,6 @@
 package com.ldtteam.tableau.maven.publishing;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.git.extensions.GitExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Action;
@@ -83,8 +83,11 @@ public class MavenPublishingExtension {
         pom(POM::distributeOnLDTTeamMaven);
 
         final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
-        final Provider<String> username = project.getProviders().environmentVariable("LDTTeamJfrogUsername");
-        final Provider<String> password = project.getProviders().environmentVariable("LDTTeamJfrogPassword");
+        final Provider<String> username = project.getProviders().environmentVariable("LDTTeamJfrogUsername")
+                .orElse(project.getProviders().environmentVariable("MAVEN_USERNAME"));
+        final Provider<String> password = project.getProviders().environmentVariable("LDTTeamJfrogPassword")
+                .orElse(project.getProviders().environmentVariable("MAVEN_PASSWORD"))
+                .orElse(project.getProviders().environmentVariable("MAVEN_TOKEN"));
 
         if (username.isPresent() && password.isPresent()) {
             publishing.repositories(mavenRepositories -> {
@@ -191,7 +194,7 @@ public class MavenPublishingExtension {
             configurator.execute(new POM(project, pom));
         }
 
-        final ModExtension mod = ModExtension.get(project);
+        final ProjectExtension mod = ProjectExtension.get(project);
 
         pom.getUrl().set(mod.getUrl());
 

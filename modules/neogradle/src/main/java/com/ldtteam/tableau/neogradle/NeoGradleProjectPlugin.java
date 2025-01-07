@@ -21,16 +21,14 @@ import org.jetbrains.annotations.NotNull;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.ldtteam.tableau.common.CommonPlugin;
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.extensions.NeoGradleExtension;
 import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.extensions.NeoGradleSourceSetConfigurationExtension;
 import com.ldtteam.tableau.resource.processing.ResourceProcessingPlugin;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
-import com.ldtteam.tableau.scripting.ScriptingPlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.SourcesetManagementPlugin;
-import com.ldtteam.tableau.sourceset.management.SourcesetManagementProjectPlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers;
@@ -172,7 +170,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
     private void configureRuns(@NotNull Project target) {
         final RunManager runManager = target.getExtensions().getByType(RunManager.class);
         final NeoGradleExtension extension = NeoGradleExtension.get(target);
-        final ModExtension modExtension = ModExtension.get(target);
+        final ProjectExtension projectExtension = ProjectExtension.get(target);
         final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
         final SourceSetContainer sourceSetContainer = target.getExtensions().getByType(SourceSetContainer.class);
 
@@ -205,7 +203,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             //Add the arguments for the data gen run.
             //By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
             run.getArguments().addAll(
-                    modExtension.getModId().map(modId -> List.of(
+                    projectExtension.getModId().map(modId -> List.of(
                             "--mod", modId,
                             "--all",
                             "--output", target.file("src/datagen/generated/%s".formatted(modId)).getAbsolutePath(),
@@ -237,7 +235,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         runManager.named("gameTestServer", run -> {
             //Ensure that our mods have their tests run.
             run.getSystemProperties().putAll(
-                    modExtension.getModId().map(modId -> Map.of("forge.enabledGameTestNamespaces", modId))
+                    projectExtension.getModId().map(modId -> Map.of("forge.enabledGameTestNamespaces", modId))
             );
         });
 
@@ -249,7 +247,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
             //Add the mod sources to the run.
             run.getModSources().addAllLater(
-                    modExtension.getModId().map(modId -> {
+                    projectExtension.getModId().map(modId -> {
                         final List<SourceSet> sourceSets = sourceSetExtension
                                 .stream()
                                 .filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())

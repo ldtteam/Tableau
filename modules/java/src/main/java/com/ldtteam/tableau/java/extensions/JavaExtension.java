@@ -1,8 +1,7 @@
 package com.ldtteam.tableau.java.extensions;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
-import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.provider.Property;
@@ -40,7 +39,7 @@ public abstract class JavaExtension {
         final JavaPluginExtension java = project.getExtensions().getByType(JavaPluginExtension.class);
         java.getToolchain().getLanguageVersion().set(getJavaVersion().map(JavaLanguageVersion::of));
 
-        getAutomaticModuleName().convention(ModExtension.get(project).getModId());
+        getAutomaticModuleName().convention(ProjectExtension.get(project).getModId());
 
         //By default, we run with the current JDKs java.
         //noinspection UnstableApiUsage

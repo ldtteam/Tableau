@@ -24,7 +24,7 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.jetbrains.annotations.NotNull;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.utilities.utils.DelegatingNamedDomainObjectContainer;
 
@@ -130,7 +130,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
             //Run this in an afterEval, because we need a group configured, which is not available at apply and construction time.
             final SourceSetConfiguration main = maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
 
-            main.getResources().srcDir(ModExtension.get(project).getModId().map("src/datagen/generated/%s"::formatted));
+            main.getResources().srcDir(ProjectExtension.get(project).getModId().map("src/datagen/generated/%s"::formatted));
         });
     }
 

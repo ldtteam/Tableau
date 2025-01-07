@@ -3,7 +3,7 @@
  */
 package com.ldtteam.tableau.common;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
@@ -51,7 +51,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
         target.getPlugins().apply("eclipse");
 
         //The DSL Extension.
-        TableauScriptingExtension.register(target, ModExtension.EXTENSION_NAME, ModExtension.class, target);
+        TableauScriptingExtension.register(target, ProjectExtension.EXTENSION_NAME, ProjectExtension.class, target);
 
         //Configure processing.
         configureVersioning(target);
@@ -72,22 +72,12 @@ public class CommonProjectPlugin implements Plugin<Project> {
 
         //Validate that the user configured a mod id, error out if not set.
         target.afterEvaluate(ignored -> {
-            if (!ModExtension.get(target).getModId().isPresent()) {
-                throw problems.getReporter().throwing(spec -> {
-                    //TODO: Configure documentation link.
-                    spec.id("missing-mod-id", "Mod id is not configured.")
-                            .details("Without a specified mod id a lot of systems can not be configured.")
-                            .solution("Configure the mod id, in tableau's mod block.");
-                });
+            if (!ProjectExtension.get(target).getModId().isPresent()) {
+
             }
 
-            if (!ModExtension.get(target).getGroup().isPresent()) {
-                throw problems.getReporter().throwing(spec -> {
-                    //TODO: Configure documentation link.
-                    spec.id("missing-mod-group", "Mod group is not configured.")
-                            .details("Without a specified mod group a lot of systems can not be configured.")
-                            .solution("Configure the mod group, in tableau's mod block.");
-                });
+            if (!ProjectExtension.get(target).getGroup().isPresent()) {
+
             }
         });
     }
@@ -156,7 +146,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
         target.setVersion(projectVersion);
 
         //Set the group of the project.
-        target.setGroup(new ProjectGroup(ModExtension.get(target).getGroup()));
+        target.setGroup(new ProjectGroup(ProjectExtension.get(target).getGroup()));
     }
 
     /**
@@ -166,7 +156,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
      */
     private void configureBase(final Project project) {
         final BasePluginExtension base = project.getExtensions().getByType(BasePluginExtension.class);
-        base.getArchivesName().set(ModExtension.get(project).getModId());
+        base.getArchivesName().set(ProjectExtension.get(project).getModId());
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.ldtteam.tableau.crowdin.extensions;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -37,7 +37,7 @@ public abstract class CrowdinExtension {
     @SuppressWarnings("UnstableApiUsage")
     @Inject
     public CrowdinExtension(Project project) {
-        final ModExtension mod = ModExtension.get(project);
+        final ProjectExtension mod = ProjectExtension.get(project);
 
         getSourceFiles().convention(mod.getModId().map(id -> project.file("src/main/resources/assets/" + id + "/lang/en_us.json")));
         getTargetFiles().convention(mod.getModId().map(id -> project.file("src/main/resources/assets/" + id + "/lang/en_us.json")));

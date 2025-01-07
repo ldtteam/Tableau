@@ -1,6 +1,6 @@
 package com.ldtteam.tableau.extensions;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.resource.processing.extensions.ResourceProcessingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.*;
@@ -37,8 +37,8 @@ public abstract class NeoGradleResourceProcessingExtension {
         getInterpolateVersions().convention(true);
 
         //Configure the minimal versions.
-        final ModExtension modExtension = ModExtension.get(project);
-        getMinimalMinecraftVersion().convention(modExtension.getMinecraftVersion());
+        final ProjectExtension projectExtension = ProjectExtension.get(project);
+        getMinimalMinecraftVersion().convention(projectExtension.getMinecraftVersion());
 
         //Configure the minimal forge version.
         getMinimalForgeVersion().convention(determineMinimalNeoforgeVersion(project));
@@ -53,7 +53,7 @@ public abstract class NeoGradleResourceProcessingExtension {
                     }
 
                     //Extract NeoGradle interpolation values.
-                    final ModExtension mod = ModExtension.get(project);
+                    final ProjectExtension mod = ProjectExtension.get(project);
                     final NeoGradleExtension neoGradle = NeoGradleExtension.get(project);
 
                     //Extract the minecraft version range.

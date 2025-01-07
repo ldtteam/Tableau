@@ -2,8 +2,10 @@ package com.ldtteam.tableau.common.extensions;
 
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Action;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
-import org.gradle.api.provider.ListProperty;
+import org.gradle.api.problems.Problems;
+import org.gradle.api.problems.Severity;
 import org.gradle.api.provider.Property;
 
 import javax.inject.Inject;
@@ -11,7 +13,8 @@ import javax.inject.Inject;
 /**
  * Mod extension, handles the project configuration for the mod.
  */
-public abstract class ModExtension {
+@SuppressWarnings("UnstableApiUsage")
+public abstract class ProjectExtension {
 
     /**
      * Gets the mod extension for a given project.
@@ -19,14 +22,14 @@ public abstract class ModExtension {
      * @param project The project.
      * @return The mod extension.
      */
-    public static ModExtension get(final Project project) {
-        return TableauScriptingExtension.get(project, ModExtension.class);
+    public static ProjectExtension get(final Project project) {
+        return TableauScriptingExtension.get(project, ProjectExtension.class);
     }
 
     /**
      * The name of the extension.
      */
-    public static final String EXTENSION_NAME = "mod";
+    public static final String EXTENSION_NAME = "project";
 
     private final Versioning versioning;
 
@@ -36,11 +39,34 @@ public abstract class ModExtension {
      * @param project The project for the model.
      */
     @Inject
-    public ModExtension(final Project project) {
+    public ProjectExtension(final Project project) {
         versioning = project.getObjects().newInstance(Versioning.class);
 
         getPublisher().convention("ldtteam");
+
+        getModId().convention(project.provider(() -> {
+            throw getProblems().getReporter().throwing(spec -> {
+                //TODO: Configure documentation link.
+                spec.id("missing-mod-id", "Mod id is not configured.")
+                        .details("Without a specified mod id a lot of systems can not be configured.")
+                        .solution("Configure the mod id, in tableau's project block.")
+                        .withException(new IllegalStateException("Mod id is not configured."));
+            });
+        }));
+
+        getGroup().convention(project.provider(() -> {
+            throw getProblems().getReporter().throwing(spec -> {
+                //TODO: Configure documentation link.
+                spec.id("missing-mod-group", "Mod group is not configured.")
+                        .details("Without a specified project group a lot of systems can not be configured.")
+                        .solution("Configure the projects group, in tableau's project block.")
+                        .withException(new IllegalStateException("Mod group is not configured."));
+            });
+        }));
     }
+
+    @Inject
+    protected abstract Problems getProblems();
 
     /**
      * The versioning model for this mod.
@@ -63,7 +89,7 @@ public abstract class ModExtension {
     /**
      * The current mod id for the mod.
      * <p>
-     *     Not configuring the mod id, will likely result in an error during the build.
+     * Not configuring the mod id, will likely result in an error during the build.
      *
      * @return The mod id.
      */
@@ -72,10 +98,10 @@ public abstract class ModExtension {
     /**
      * The mod group.
      * <p>
-     *     Generally the mod group is the name of the modding team or the name of the modding group, in reverse DNS order.
-     *     So, for example: com.ldtteam, or com.github.example-team
+     * Generally the mod group is the name of the modding team or the name of the modding group, in reverse DNS order.
+     * So, for example: com.ldtteam, or com.github.example-team
      * <p>
-     *     Not configuring the mod group, will likely result in an error during the build.
+     * Not configuring the mod group, will likely result in an error during the build.
      *
      * @return The mod group.
      */
@@ -119,9 +145,9 @@ public abstract class ModExtension {
         /**
          * The semver or maven compatible version string.
          * <p>
-         *     Mods should generally use maven versioning.
+         * Mods should generally use maven versioning.
          * <p>
-         *     The default value is 0.0.0
+         * The default value is 0.0.0
          *
          * @return The mod version.
          */
@@ -130,9 +156,9 @@ public abstract class ModExtension {
         /**
          * The version suffix.
          * <p>
-         *     This should generally be something like -SNAPSHOT, -RELEASE or empty.
+         * This should generally be something like -SNAPSHOT, -RELEASE or empty.
          * <p>
-         *     Might also indicate the branch that was used as source to build this version of the mod.
+         * Might also indicate the branch that was used as source to build this version of the mod.
          *
          * @return The mod version suffix.
          */

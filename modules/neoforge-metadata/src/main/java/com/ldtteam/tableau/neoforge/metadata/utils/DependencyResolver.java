@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
@@ -122,6 +123,7 @@ public class DependencyResolver {
                     spec.details("Failed to read the mod metadata from the file: " + data.file().getAbsolutePath());
                     spec.contextualLabel("Dependencies");
                     spec.fileLocation(data.file().getAbsolutePath());
+                    spec.withException(new GradleException("Failed to read the mod metadata from the file: " + data.file().getAbsolutePath(), e));
                 });
         }
     }

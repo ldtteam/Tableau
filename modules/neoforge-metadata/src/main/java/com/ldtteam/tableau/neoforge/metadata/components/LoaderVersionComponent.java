@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
@@ -85,6 +86,7 @@ public abstract class LoaderVersionComponent implements IMetadataComponent {
                     spec.contextualLabel("Metadata generation")
                         .details("Tableau was not able to properly open the NeoForge jar to search for the currently supported loader range!")
                         .solution("Configure the supported loader range your self, validate your dependencies, or try again later")
+                        .withException(new GradleException("Failed to open the NeoForge jar to search for the currently supported loader range!", e))
                         .severity(Severity.ERROR);
                 });
         }

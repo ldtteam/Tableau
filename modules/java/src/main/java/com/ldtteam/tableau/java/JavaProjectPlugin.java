@@ -3,7 +3,7 @@
  */
 package com.ldtteam.tableau.java;
 
-import com.ldtteam.tableau.common.extensions.ModExtension;
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.java.extensions.JavaExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
@@ -16,7 +16,6 @@ import org.gradle.api.tasks.javadoc.Javadoc;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 
@@ -61,7 +60,7 @@ public class JavaProjectPlugin implements Plugin<Project> {
             });
 
             jar.manifest(manifest -> {
-                final ModExtension mod = ModExtension.get(project);
+                final ProjectExtension mod = ProjectExtension.get(project);
                 final JavaExtension java = JavaExtension.get(project);
 
                 manifest.attributes(Map.of(
