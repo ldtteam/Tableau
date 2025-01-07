@@ -75,12 +75,13 @@ public abstract class LoaderVersionComponent implements IMetadataComponent {
     @Inject 
     protected abstract Problems getProblems();
 
+    @SuppressWarnings("UnstableApiUsage")
     private FileSystem openFileSystem(Path path) {
         try {
             return FileSystems.newFileSystem(path);
         } catch (IOException e) {
-            throw getProblems().forNamespace("Tableau")
-                .rethrowing(new RuntimeException("Failed to open the Jar FS", e), spec -> {
+            throw getProblems().getReporter()
+                .throwing(spec -> {
                     spec.contextualLabel("Metadata generation")
                         .details("Tableau was not able to properly open the NeoForge jar to search for the currently supported loader range!")
                         .solution("Configure the supported loader range your self, validate your dependencies, or try again later")

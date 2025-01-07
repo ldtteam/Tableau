@@ -69,7 +69,7 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
             final org.zaproxy.gradle.crowdin.CrowdinExtension crowdin = target.getExtensions().getByType(org.zaproxy.gradle.crowdin.CrowdinExtension.class);
 
             if (crowdinExtension.getSourceFiles().isEmpty()) {
-                throw problems.forNamespace("tableau").throwing(spec -> {
+                throw problems.getReporter().throwing(spec -> {
                     spec.id("crowdin-no-source-files", "Missing source files for Crowdin")
                             .details("No source files specified for Crowdin, please specify at least one source file to manage")
                             .solution("Add at least one source file to the crowdin block of the Tableau DSL");
@@ -79,7 +79,7 @@ public class CrowdinProjectPlugin implements Plugin<Project> {
             boolean mergesTranslations = false;
             if (crowdinExtension.getSourceFiles().getFiles().size() != 1) {
                 if (crowdinExtension.getTargetFiles().isEmpty()) {
-                    throw problems.forNamespace("tableau").throwing(spec -> {
+                    throw problems.getReporter().throwing(spec -> {
                         spec.id("crowdin-no-target-files", "Missing target files for Crowdin")
                                 .details("No target files specified for Crowdin, if you specify more then one source file, they need to be merged into at least one target file.")
                                 .solution("Add at least one target file to the crowdin block of the Tableau DSL");

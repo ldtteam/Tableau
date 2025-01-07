@@ -92,6 +92,7 @@ public class DependencyResolver {
         return false;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private static List<ModDependency> getModInfos(final Project project, final Problems problems, final ResolvedDependencyData data, final boolean required) {
         try (final FileSystem fileSystem = FileSystems.newFileSystem(data.file().toPath())) {
             final Path path = fileSystem.getPath("META-INF/neoforge.mods.toml");
@@ -115,7 +116,7 @@ public class DependencyResolver {
             }
             return modInfos;
         } catch (final Exception e) {
-            throw problems.forNamespace("tableau")
+            throw problems.getReporter()
                 .throwing(spec -> {
                     spec.id("metadata", "dependency-resolver");
                     spec.details("Failed to read the mod metadata from the file: " + data.file().getAbsolutePath());

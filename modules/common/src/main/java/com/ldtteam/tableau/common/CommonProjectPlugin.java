@@ -73,7 +73,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
         //Validate that the user configured a mod id, error out if not set.
         target.afterEvaluate(ignored -> {
             if (!ModExtension.get(target).getModId().isPresent()) {
-                throw problems.forNamespace("tableau").throwing(spec -> {
+                throw problems.getReporter().throwing(spec -> {
                     //TODO: Configure documentation link.
                     spec.id("missing-mod-id", "Mod id is not configured.")
                             .details("Without a specified mod id a lot of systems can not be configured.")
@@ -82,7 +82,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
             }
 
             if (!ModExtension.get(target).getGroup().isPresent()) {
-                throw problems.forNamespace("tableau").throwing(spec -> {
+                throw problems.getReporter().throwing(spec -> {
                     //TODO: Configure documentation link.
                     spec.id("missing-mod-group", "Mod group is not configured.")
                             .details("Without a specified mod group a lot of systems can not be configured.")
