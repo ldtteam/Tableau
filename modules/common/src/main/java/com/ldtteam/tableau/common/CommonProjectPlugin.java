@@ -56,7 +56,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
         //Configure processing.
         configureVersioning(target);
         configureRepositories(target);
-        configureBase(target);
 
         //Set global duplication strategy
         target.getTasks().withType(Copy.class).configureEach(task -> task.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
@@ -136,16 +135,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
 
         //Set the group of the project.
         target.setGroup(new ProjectGroup(ProjectExtension.get(target).getGroup()));
-    }
-
-    /**
-     * Configures the {@link BasePluginExtension} plugin for the project.
-     *
-     * @param project The project.
-     */
-    private void configureBase(final Project project) {
-        final BasePluginExtension base = project.getExtensions().getByType(BasePluginExtension.class);
-        base.getArchivesName().set(ProjectExtension.get(project).getModId());
     }
 
     /**
