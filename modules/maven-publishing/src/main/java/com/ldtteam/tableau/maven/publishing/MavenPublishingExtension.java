@@ -91,7 +91,7 @@ public class MavenPublishingExtension {
      */
     public void publishToLDTTeamMaven(final String repositoryId) {
         //LDTTeam always overrides configured POM settings
-        pom(POM::distributeOnLDTTeamMaven);
+        pom(pom -> pom.distributeOnLDTTeamMaven(repositoryId));
 
         final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
         final Provider<String> username = project.getProviders().environmentVariable("LDTTeamJfrogUsername")
@@ -337,9 +337,16 @@ public class MavenPublishingExtension {
         /**
          * Configures distribution to happen via the LDTTeam Maven repository.
          */
-        public void distributeOnLDTTeamMaven() {
+        public void distributeOnLDTTeamMods() {
+            distributeOnLDTTeamMaven("mods-maven");
+        }
+
+        /**
+         * Configures distribution to happen via the LDTTeam Maven repository.
+         */
+        public void distributeOnLDTTeamMaven(final String repositoryId) {
             distributionManagement(distributionManagement -> {
-                distributionManagement.getDownloadUrl().set("https://ldtteam.jfrog.io/artifactory/modding/");
+                distributionManagement.getDownloadUrl().set("https://ldtteam.jfrog.io/artifactory/%s".formatted(repositoryId));
             });
         }
 
