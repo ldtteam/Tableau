@@ -57,10 +57,10 @@ public abstract class ProjectExtension {
         getGroup().convention(project.provider(() -> {
             throw getProblems().getReporter().throwing(spec -> {
                 //TODO: Configure documentation link.
-                spec.id("missing-mod-group", "Mod group is not configured.")
+                spec.id("missing-project-group", "Project group is not configured.")
                         .details("Without a specified project group a lot of systems can not be configured.")
                         .solution("Configure the projects group, in tableau's project block.")
-                        .withException(new IllegalStateException("Mod group is not configured."));
+                        .withException(new IllegalStateException("Project group is not configured."));
             });
         }));
     }
