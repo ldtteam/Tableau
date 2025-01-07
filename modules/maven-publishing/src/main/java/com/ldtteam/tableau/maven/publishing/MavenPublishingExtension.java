@@ -343,6 +343,8 @@ public class MavenPublishingExtension {
 
         /**
          * Configures distribution to happen via the LDTTeam Maven repository.
+         *
+         * @param repositoryId The Artifactory repository id to publish to.
          */
         public void distributeOnLDTTeamMaven(final String repositoryId) {
             distributionManagement(distributionManagement -> {
