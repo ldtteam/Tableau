@@ -69,17 +69,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
 
         //Set jar duplication strategies
         target.getTasks().withType(Jar.class).configureEach(jar -> jar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
-
-        //Validate that the user configured a mod id, error out if not set.
-        target.afterEvaluate(ignored -> {
-            if (!ProjectExtension.get(target).getModId().isPresent()) {
-
-            }
-
-            if (!ProjectExtension.get(target).getGroup().isPresent()) {
-
-            }
-        });
     }
 
     /**
