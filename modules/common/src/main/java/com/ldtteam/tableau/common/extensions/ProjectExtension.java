@@ -65,6 +65,11 @@ public abstract class ProjectExtension {
         }));
     }
 
+    /**
+     * The gradle problem API for handling configuration issues.
+     *
+     * @return The problem API.
+     */
     @Inject
     protected abstract Problems getProblems();
 
