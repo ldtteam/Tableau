@@ -58,6 +58,11 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 
         TableauScriptingExtension.register(target, NeoGradleExtension.EXTENSION_NAME, NeoGradleExtension.class, target);
 
+        target.getRepositories().maven(maven -> {
+            maven.setUrl("https://ldtteam.jfrog.io/ldtteam/modding/");
+            maven.setName("LDT Team Modding");
+        });
+
         configureLibraryConfigurations(target);
         configureSourceSets(target);
         configureRuns(target);

@@ -74,11 +74,22 @@ public class MavenPublishingExtension {
     }
 
     /**
-     * Configures the publishing system to publish the project to the LDTTeam Maven repository.
+     * Configures the publishing system to publish the project to the LDTTeam Mod Maven repository.
      * <p>
      *     Also configures the POM to publish to the LDTTeam Maven repository.
      */
-    public void publishToLDTTeam() {
+    public void publishAsLDTTeamMod() {
+        publishToLDTTeamMaven("mods-maven");
+    }
+
+    /**
+     * Configures the publishing system to publish the project to the LDTTeam repository.
+     * <p>
+     *     Also configures the POM to publish to the LDTTeam Maven repository.
+     *
+     * @param repositoryId The Artifactory repository id to publish to.
+     */
+    public void publishToLDTTeamMaven(final String repositoryId) {
         //LDTTeam always overrides configured POM settings
         pom(POM::distributeOnLDTTeamMaven);
 
@@ -92,7 +103,7 @@ public class MavenPublishingExtension {
         if (username.isPresent() && password.isPresent()) {
             publishing.repositories(mavenRepositories -> {
                 mavenRepositories.maven(mavenRepository -> {
-                    mavenRepository.setUrl("https://ldtteam.jfrog.io/ldtteam/mods-maven");
+                    mavenRepository.setUrl("https://ldtteam.jfrog.io/ldtteam/%s".formatted(repositoryId));
                     mavenRepository.credentials(credentials -> {
                         credentials.setUsername(username.get());
                         credentials.setPassword(password.get());

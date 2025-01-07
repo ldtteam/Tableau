@@ -76,10 +76,6 @@ public class CommonProjectPlugin implements Plugin<Project> {
      * @param target The target project.
      */
     private void configureRepositories(@NotNull Project target) {
-        target.getRepositories().maven(maven -> {
-            maven.setUrl("https://ldtteam.jfrog.io/ldtteam/modding/");
-            maven.setName("LDT Team Modding");
-        });
         target.getRepositories().mavenLocal();
         target.getRepositories().mavenCentral();
         target.getRepositories().flatDir(dir -> {
