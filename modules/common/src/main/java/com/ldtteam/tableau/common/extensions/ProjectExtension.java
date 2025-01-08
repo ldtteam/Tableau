@@ -7,6 +7,7 @@ import org.gradle.api.Project;
 import org.gradle.api.problems.Problems;
 import org.gradle.api.problems.Severity;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 
 import javax.inject.Inject;
 
@@ -40,7 +41,7 @@ public abstract class ProjectExtension {
      */
     @Inject
     public ProjectExtension(final Project project) {
-        versioning = project.getObjects().newInstance(Versioning.class);
+        versioning = project.getObjects().newInstance(Versioning.class, project);
 
         getPublisher().convention("ldtteam");
 
@@ -138,11 +139,14 @@ public abstract class ProjectExtension {
      */
     public abstract static class Versioning {
 
+        private final Project project;
+
         /**
          * Creates a new versioning model.
          */
         @Inject
-        public Versioning() {
+        public Versioning(Project project) {
+            this.project = project;
             getVersion().convention("0.0.0");
             getSuffix().convention("alpha");
         }
@@ -168,5 +172,25 @@ public abstract class ProjectExtension {
          * @return The mod version suffix.
          */
         public abstract Property<String> getSuffix();
+
+        /**
+         * Creates a provider for a value of a given environment variable.
+         *
+         * @param key The key of the environment variable.
+         * @return The provider for the value of the environment variable.
+         */
+        public Provider<String> environmentVariable(final String key) {
+            return project.getProviders().environmentVariable(key);
+        }
+
+        /**
+         * Creates a provider for a value of a given gradle property.
+         *
+         * @param key The key of the system property.
+         * @return The provider for the value of the gradle property.
+         */
+        public Provider<String> property(final String key) {
+            return project.getProviders().gradleProperty(key);
+        }
     }
 }
