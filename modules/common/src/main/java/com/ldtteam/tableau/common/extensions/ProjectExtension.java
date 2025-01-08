@@ -182,7 +182,10 @@ public abstract class ProjectExtension {
          * @return The provider for the value of the environment variable.
          */
         public Provider<String> environmentVariable(final String key) {
-            return project.getProviders().environmentVariable(key);
+            return project.getProviders().environmentVariable(key).map(version -> {
+                project.getLogger().warn("Using environment variable for versioning: {} = {}", key, version);
+                return version;
+            });
         }
 
         /**
