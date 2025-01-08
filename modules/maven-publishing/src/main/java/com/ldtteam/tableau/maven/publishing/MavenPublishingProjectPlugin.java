@@ -51,10 +51,12 @@ public class MavenPublishingProjectPlugin implements Plugin<Project> {
         final MavenPublishingExtension mavenPublishing = MavenPublishingExtension.get(project);
 
         project.afterEvaluate(ignored -> {
-            //This needs to be in an after evaluate block to ensure that the project has been configured.
-            publishing.getPublications().create("default", MavenPublication.class, publication -> {
-                publication.from(project.getComponents().getByName("java"));
-            });
+            if (mavenPublishing.getShouldCreateDefaultPublication().get()) {
+                //This needs to be in an after evaluate block to ensure that the project has been configured.
+                publishing.getPublications().create("default", MavenPublication.class, publication -> {
+                    publication.from(project.getComponents().getByName("java"));
+                });
+            }
 
             publishing.getPublications().withType(MavenPublication.class).configureEach(publication -> {
                 publication.pom(mavenPublishing::configure);

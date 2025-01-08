@@ -11,6 +11,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.*;
+import org.gradle.api.tasks.Input;
 import org.gradle.internal.instrumentation.api.annotations.ToBeReplacedByLazyProperty;
 
 import javax.inject.Inject;
@@ -19,7 +20,7 @@ import java.util.*;
 /**
  * Extension that configures the Maven publishing plugin.
  */
-public class MavenPublishingExtension {
+public abstract class MavenPublishingExtension {
 
     /**
      * Gets the Maven publishing extension for the given project.
@@ -62,6 +63,23 @@ public class MavenPublishingExtension {
     public MavenPublishingExtension(final Project project) {
         this.project = project;
         this.configurators = new LinkedList<>();
+
+        this.getShouldCreateDefaultPublication().convention(true);
+    }
+
+    /**
+     * Indicates whether tableau should create a default publication.
+     *
+     * @return whether tableau should create a default publication
+     */
+    @Input
+    public abstract Property<Boolean> getShouldCreateDefaultPublication();
+
+    /**
+     * Disables the default publication.
+     */
+    public void disableDefaultPublication() {
+        getShouldCreateDefaultPublication().set(false);
     }
 
     /**
