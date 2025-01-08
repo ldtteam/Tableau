@@ -28,7 +28,7 @@ public abstract class VersioningExtension {
     public static final String EXTENSION_NAME = "versioning";
 
     private final MinecraftBasedVersioning minecraft;
-    private final ProjectExtension.Versioning mod;
+    private final ProjectExtension.Versioning project;
 
     /**
      * Creates a new versioning extension model.
@@ -37,8 +37,8 @@ public abstract class VersioningExtension {
      */
     @Inject
     public VersioningExtension(final Project project) {
-        minecraft = project.getObjects().newInstance(MinecraftBasedVersioning.class, project);
-        mod = ProjectExtension.get(project).getVersioning();
+        this.minecraft = project.getObjects().newInstance(MinecraftBasedVersioning.class, project);
+        this.project = ProjectExtension.get(project).getVersioning();
     }
 
     /**
@@ -65,8 +65,8 @@ public abstract class VersioningExtension {
      *
      * @return The mod versioning configuration setup.
      */
-    public ProjectExtension.Versioning getMod() {
-        return mod;
+    public ProjectExtension.Versioning getProject() {
+        return project;
     }
 
     /**
@@ -74,8 +74,8 @@ public abstract class VersioningExtension {
      *
      * @param action The action to execute.
      */
-    public void mod(final Action<ProjectExtension.Versioning> action) {
-        action.execute(mod);
+    public void project(final Action<ProjectExtension.Versioning> action) {
+        action.execute(project);
     }
 
     /**

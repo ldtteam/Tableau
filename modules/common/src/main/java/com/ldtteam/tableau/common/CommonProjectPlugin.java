@@ -10,7 +10,6 @@ import com.ldtteam.tableau.utilities.extensions.UtilityFunctions;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.file.DuplicatesStrategy;
-import org.gradle.api.plugins.BasePluginExtension;
 import org.gradle.api.problems.Problems;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Copy;
@@ -97,7 +96,7 @@ public class CommonProjectPlugin implements Plugin<Project> {
         final VersioningExtension versioning = TableauScriptingExtension.register(target, VersioningExtension.EXTENSION_NAME, VersioningExtension.class, target);
 
         //Default mod version string build from the configured version and suffix.
-        final Provider<String> versionString = versioning.getMod().getVersion().zip(versioning.getMod().getSuffix(), (version, suffix) -> {
+        final Provider<String> versionString = versioning.getProject().getVersion().zip(versioning.getProject().getSuffix(), (version, suffix) -> {
             if (suffix.trim().isEmpty()) {
                 return version;
             }
