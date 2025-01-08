@@ -108,7 +108,7 @@ public class MavenPublishingExtension {
                         credentials.setUsername(username.get());
                         credentials.setPassword(password.get());
                     });
-                    mavenRepository.setName("LDTTeam Maven");
+                    mavenRepository.setName("LDTTeamMaven");
                 });
             });
         }
@@ -170,7 +170,7 @@ public class MavenPublishingExtension {
                         credentials.setUsername(username.get());
                         credentials.setPassword(password.get());
                     });
-                    mavenRepository.setName("GitHub Packages");
+                    mavenRepository.setName("GitHubPackages");
                 });
             });
         }
