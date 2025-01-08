@@ -230,8 +230,6 @@ public abstract class MavenPublishingExtension {
         pom.organization(organization -> {
             organization.getName().set(mod.getPublisher());
         });
-
-        pom.setPackaging("jar");
     }
 
     /**
