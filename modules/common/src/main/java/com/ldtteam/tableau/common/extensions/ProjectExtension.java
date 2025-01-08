@@ -143,6 +143,8 @@ public abstract class ProjectExtension {
 
         /**
          * Creates a new versioning model.
+         *
+         * @param project The project for the model.
          */
         @Inject
         public Versioning(Project project) {
