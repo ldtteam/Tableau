@@ -19,11 +19,12 @@ import org.gradle.external.javadoc.StandardJavadocDocletOptions;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
+import java.util.Objects;
 
 /**
  * The common project plugin.
  * <p>
- *     This plugin is applied to all projects and configures the project with the common settings.
+ * This plugin is applied to all projects and configures the project with the common settings.
  */
 @SuppressWarnings("UnstableApiUsage")
 public class CommonProjectPlugin implements Plugin<Project> {
@@ -86,9 +87,9 @@ public class CommonProjectPlugin implements Plugin<Project> {
     /**
      * Configures the versioning for the project.
      * <p>
-     *     This will set the version of the project to the version of the mod.
-     *     If the minecraft based versioning is enabled, the version will be set to the minecraft based version.
-     *     If the minecraft based versioning is disabled, the version will be set to the version of the mod.
+     * This will set the version of the project to the version of the mod.
+     * If the minecraft based versioning is enabled, the version will be set to the minecraft based version.
+     * If the minecraft based versioning is disabled, the version will be set to the version of the mod.
      *
      * @param target The target project.
      */
@@ -135,20 +136,76 @@ public class CommonProjectPlugin implements Plugin<Project> {
     /**
      * A record to store the project version, returning only the project version when {@link Object#toString()} is called.
      */
-    private record ProjectVersion(Provider<String> versionProvider) {
+    @SuppressWarnings("ClassCanBeRecord") //Gradle does not like it.
+    public static final class ProjectVersion {
+        private final Provider<String> versionProvider;
+
+        /**
+         *
+         */
+        public ProjectVersion(Provider<String> versionProvider) {
+            this.versionProvider = versionProvider;
+        }
+
         @Override
         public String toString() {
             return versionProvider().get();
         }
+
+        public Provider<String> versionProvider() {
+            return versionProvider;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (ProjectVersion) obj;
+            return Objects.equals(this.versionProvider, that.versionProvider);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(versionProvider);
+        }
+
     }
 
     /**
      * A record to store the project group, returning only the project group when {@link Object#toString()} is called.
      */
-    private record ProjectGroup(Provider<String> groupProvider) {
+    @SuppressWarnings("ClassCanBeRecord") //Gradle does not like it.
+    public static final class ProjectGroup {
+        private final Provider<String> groupProvider;
+
+        /**
+         *
+         */
+        public ProjectGroup(Provider<String> groupProvider) {
+            this.groupProvider = groupProvider;
+        }
+
         @Override
         public String toString() {
             return groupProvider().get();
         }
+
+        public Provider<String> groupProvider() {
+            return groupProvider;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (ProjectGroup) obj;
+            return Objects.equals(this.groupProvider, that.groupProvider);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(groupProvider);
+        }
+
     }
 }
