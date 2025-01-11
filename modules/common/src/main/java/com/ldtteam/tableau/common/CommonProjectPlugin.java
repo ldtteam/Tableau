@@ -141,7 +141,9 @@ public class CommonProjectPlugin implements Plugin<Project> {
         private final Provider<String> versionProvider;
 
         /**
+         * Creates a new project version provider wrapper.
          *
+         * @param versionProvider The provider for the version.
          */
         public ProjectVersion(Provider<String> versionProvider) {
             this.versionProvider = versionProvider;
@@ -152,6 +154,11 @@ public class CommonProjectPlugin implements Plugin<Project> {
             return versionProvider().get();
         }
 
+        /**
+         * Gets the provider for the version.
+         *
+         * @return The version provider.
+         */
         public Provider<String> versionProvider() {
             return versionProvider;
         }
@@ -179,7 +186,9 @@ public class CommonProjectPlugin implements Plugin<Project> {
         private final Provider<String> groupProvider;
 
         /**
+         * Creates a new project group provider wrapper.
          *
+         * @param groupProvider The provider for the group.
          */
         public ProjectGroup(Provider<String> groupProvider) {
             this.groupProvider = groupProvider;
@@ -190,6 +199,11 @@ public class CommonProjectPlugin implements Plugin<Project> {
             return groupProvider().get();
         }
 
+        /**
+         * Gets the provider for the group.
+         *
+         * @return The group provider.
+         */
         public Provider<String> groupProvider() {
             return groupProvider;
         }
