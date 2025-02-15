@@ -98,7 +98,7 @@ public class DependencyResolver {
         try (final FileSystem fileSystem = FileSystems.newFileSystem(data.file().toPath())) {
             final Path path = fileSystem.getPath("META-INF/neoforge.mods.toml");
             if (!Files.exists(path)) {
-                return List.of();
+                return new ArrayList<>();
             }
 
             final FileConfig fileConfig = FileConfig.builder(path).build();

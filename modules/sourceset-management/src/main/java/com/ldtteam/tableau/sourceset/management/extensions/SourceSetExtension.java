@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.sourceset.management.extensions;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -124,7 +125,9 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
 
         final SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
         getUniversalJarSourceSets().add(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME));
-        getPublishedSourceSets().convention(List.of(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)));
+        List<SourceSet> elements = new ArrayList<>();
+        elements.add(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME));
+        getPublishedSourceSets().convention(elements);
 
         project.afterEvaluate(p -> {
             //Run this in an afterEval, because we need a group configured, which is not available at apply and construction time.

@@ -11,6 +11,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.bundling.Jar;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public abstract class NeoGradleExtension implements ExtensionAware {
         });
 
         //Default to no additional data gen mods.
-        getAdditionalDataGenMods().convention(List.of());
+        getAdditionalDataGenMods().convention(new ArrayList<>());
     }
 
     /**

@@ -3,9 +3,11 @@
  */
 package com.ldtteam.tableau.neogradle;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -186,13 +188,15 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         runManager.named("client", run -> {
             run.getArguments().addAll(
                     extension.getUseRandomPlayerNames().map(useRandomPlayerNames -> {
+                        final List<String> randomPlayerNames = new ArrayList<>();
+
                         if (useRandomPlayerNames) {
                             final String randomAppendix = String.valueOf((Math.abs(new Random().nextInt() % 600) + 1));
-                            return List.of("--username", "Dev%s".formatted(randomAppendix));
-                        } else {
-                            //When not using random player names, we don't need to add any arguments.
-                            return List.of();
+                            randomPlayerNames.add("--username");
+                            randomPlayerNames.add("Dev%s".formatted(randomAppendix));
                         }
+
+                        return randomPlayerNames;
                     })
             );
         });
@@ -208,12 +212,17 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             //Add the arguments for the data gen run.
             //By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
             run.getArguments().addAll(
-                    projectExtension.getModId().map(modId -> List.of(
-                            "--mod", modId,
-                            "--all",
-                            "--output", target.file("src/datagen/generated/%s".formatted(modId)).getAbsolutePath(),
-                            "--existing", target.file("src/main/resources/").getAbsolutePath()
-                    ))
+                    projectExtension.getModId().map(modId -> {
+                        List<String> dataRunArguments = new ArrayList<>();
+                        dataRunArguments.add("--mod");
+                        dataRunArguments.add(modId);
+                        dataRunArguments.add("--all");
+                        dataRunArguments.add("--output");
+                        dataRunArguments.add(target.file("src/datagen/generated/%s".formatted(modId)).getAbsolutePath());
+                        dataRunArguments.add("--existing");
+                        dataRunArguments.add(target.file("src/main/resources/").getAbsolutePath());
+                        return dataRunArguments;
+                    })
             );
 
             //Add the arguments for the additional data gen mods.
@@ -221,14 +230,14 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                     extension.getAdditionalDataGenMods().map(mods -> {
                         if (mods.isEmpty()) {
                             //When no additional data gen mods are set, we don't need to add any arguments.
-                            return List.of();
+                            return new ArrayList<>();
                         }
 
                         //When additional data gen mods are set, we need to add the arguments for each mod.
                         //Per mod, we need to add the "--existing-mod" argument followed by the mod id.
                         return mods.stream()
                                 .flatMap(modId -> Stream.of("--existing-mod", modId))
-                                .toList();
+                                .collect(Collectors.toList());
                     })
             );
         });
@@ -257,7 +266,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                                 .stream()
                                 .filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())
                                 .map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
-                                .toList();
+                                .collect(Collectors.toList());
 
                         final Multimap<String, SourceSet> modSources = HashMultimap.create();
                         modSources.putAll(modId, sourceSets);

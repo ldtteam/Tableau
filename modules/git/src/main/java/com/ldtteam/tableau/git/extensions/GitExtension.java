@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The Git extension for the Tableau project.
@@ -256,7 +257,7 @@ public abstract class GitExtension {
                 final int count = Integer.parseInt(line.substring(0, nameStart).trim());
 
                 return new Developer(count, name, email);
-            }).toList();
+            }).collect(Collectors.toList());
         }
     }
 
