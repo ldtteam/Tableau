@@ -18,6 +18,7 @@ shadow = { module = "com.gradleup.shadow:shadow-gradle-plugin", version.ref = "s
 jetbrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
 curseForgeGradle = { module = "net.darkhax.curseforgegradle:CurseForgeGradle", version.ref = "curseForgeGradle" }
 nightconfig = { module = "com.electronwill.night-config:toml", version.ref = "nightconfig" }
+loom = { module = "net.fabricmc:fabric-loom", version.ref = "loom" }
 
 [bundles]
 neogradle = ["neogradle-userdev"]
@@ -25,5 +26,5 @@ crowdin = ["crowdin", "gradle-download"]
 sonarqube = ["sonarqube"]
 shadow = ["shadow"]
 jetbrainsAnnotations = ["jetbrainsAnnotations"]
-curseForgeGradle = ["curseForgeGradle", "neogradle-userdev"]
+curseForgeGradle = ["curseForgeGradle", "neogradle-userdev", "loom"]
 nightconfig = ["nightconfig"]

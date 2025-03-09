@@ -11,6 +11,7 @@ import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.darkhax.curseforgegradle.Constants;
 import net.darkhax.curseforgegradle.TaskPublishCurseForge;
 import net.darkhax.curseforgegradle.UploadArtifact;
+import net.fabricmc.loom.LoomGradlePlugin;
 import net.neoforged.gradle.userdev.UserDevProjectPlugin;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Plugin;
@@ -60,6 +61,12 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
             }
 
             return project.getTasks().named("jar", Jar.class);
+        }
+
+        if (project.getPlugins().hasPlugin(LoomGradlePlugin.class)) {
+            if (project.getTasks().findByName("remapJar") != null) {
+                return  project.getTasks().named("remapJar", Jar.class);
+            }
         }
 
         return project.getTasks().named("jar", Jar.class);
