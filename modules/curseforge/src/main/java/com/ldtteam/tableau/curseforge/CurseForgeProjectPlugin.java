@@ -84,7 +84,7 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
             task.apiToken = project.getProviders().environmentVariable("CURSE_API_KEY");
             task.debugMode = curse.getDebug().get();
 
-            final UploadArtifact artifact = task.upload(curse.getId(), mainJar);
+            final UploadArtifact artifact = task.upload(curse.getId().get(), mainJar);
             task.dependsOn(mainJar);
 
             curse.getAdditionalMinecraftVersions().get()
