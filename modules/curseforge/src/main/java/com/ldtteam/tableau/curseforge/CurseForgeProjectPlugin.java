@@ -6,6 +6,7 @@ package com.ldtteam.tableau.curseforge;
 import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.curseforge.extensions.CurseForgeExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
+import com.ldtteam.tableau.sourceset.management.SourcesetManagementPlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.darkhax.curseforgegradle.Constants;
 import net.darkhax.curseforgegradle.TaskPublishCurseForge;
@@ -36,6 +37,8 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
+        target.getPluginManager().apply(SourcesetManagementPlugin.class);
+
         TableauScriptingExtension.register(target, CurseForgeExtension.EXTENSION_NAME, CurseForgeExtension.class, target);
 
         target.afterEvaluate(ignore -> {
