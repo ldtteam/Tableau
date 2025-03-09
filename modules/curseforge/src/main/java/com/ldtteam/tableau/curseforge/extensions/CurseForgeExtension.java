@@ -1,6 +1,5 @@
 package com.ldtteam.tableau.curseforge.extensions;
 
-import com.ldtteam.tableau.extensions.NeoGradleResourceProcessingExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import net.darkhax.curseforgegradle.Constants;
 import org.gradle.api.Action;
@@ -51,9 +50,6 @@ public abstract class CurseForgeExtension {
                 return ReleaseType.ALPHA;
             }
         }).orElse(ReleaseType.RELEASE));
-
-        final NeoGradleResourceProcessingExtension neoGradle = NeoGradleResourceProcessingExtension.get(project);
-        getAdditionalMinecraftVersions().add(neoGradle.getMinimalMinecraftVersion());
 
         getUsesFancyDisplayName().convention(true);
 
