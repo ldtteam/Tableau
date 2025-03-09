@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -19,6 +20,8 @@ import org.gradle.api.artifacts.component.ModuleComponentSelector;
 import org.gradle.api.artifacts.result.DependencyResult;
 import org.gradle.api.artifacts.result.ResolvedArtifactResult;
 import org.gradle.api.artifacts.result.ResolvedComponentResult;
+import org.gradle.api.problems.ProblemGroup;
+import org.gradle.api.problems.ProblemId;
 import org.gradle.api.problems.Problems;
 import org.gradle.api.provider.Provider;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +33,10 @@ import com.ldtteam.tableau.neoforge.metadata.components.model.ModDependency;
 /**
  * Utility class for helping resolving dependencies data.
  */
+@SuppressWarnings("UnstableApiUsage")
 public class DependencyResolver {
+
+    private static final ProblemGroup DEPENDENCY_RESOLVER_GROUP = TableauScriptingExtension.problemGroup("dependency.resolver", "Dependency Resolving");
 
     /**
      * Utility class, not meant to be instantiated.
@@ -41,8 +47,8 @@ public class DependencyResolver {
     /**
      * Find all the resolved dependencies.
      *
-     * @param project The project in which dependencies are being resolved.
-     * @param problems The problems handler.
+     * @param project       The project in which dependencies are being resolved.
+     * @param problems      The problems handler.
      * @param configuration The configuration to look for dependencies in.
      * @param required      Whether this dependency is required or not.
      * @return The set provider.
@@ -69,7 +75,7 @@ public class DependencyResolver {
 
     @Nullable
     private static ResolvedDependencyData resolveDependency(final ResolvedArtifactResult resolvedArtifact,
-            final ResolvedComponentResult component) {
+                                                            final ResolvedComponentResult component) {
         final String versionRange = component.getDependencies().stream()
                 .map(DependencyResult::getRequested)
                 .filter(f -> f instanceof ModuleComponentSelector)
@@ -86,7 +92,7 @@ public class DependencyResolver {
     }
 
     private static boolean componentMatches(final ModuleComponentSelector selector,
-            final ResolvedArtifactResult artifact) {
+                                            final ResolvedArtifactResult artifact) {
         if (artifact.getId().getComponentIdentifier() instanceof ModuleComponentIdentifier artifactIdentifier) {
             return selector.getModuleIdentifier().equals(artifactIdentifier.getModuleIdentifier());
         }
@@ -103,9 +109,9 @@ public class DependencyResolver {
 
             final FileConfig fileConfig = FileConfig.builder(path).build();
             fileConfig.load();
-            
+
             final List<ModDependency> modInfos = new ArrayList<>();
-            final List<CommentedConfig> mods = fileConfig.get("mods");  
+            final List<CommentedConfig> mods = fileConfig.get("mods");
             for (final CommentedConfig config : mods) {
                 final String modId = config.get("modId");
                 if (modId != null) {
@@ -118,13 +124,15 @@ public class DependencyResolver {
             return modInfos;
         } catch (final Exception e) {
             throw problems.getReporter()
-                .throwing(spec -> {
-                    spec.id("metadata", "dependency-resolver");
-                    spec.details("Failed to read the mod metadata from the file: " + data.file().getAbsolutePath());
-                    spec.contextualLabel("Dependencies");
-                    spec.fileLocation(data.file().getAbsolutePath());
-                    spec.withException(new GradleException("Failed to read the mod metadata from the file: " + data.file().getAbsolutePath(), e));
-                });
+                    .throwing(
+                            new GradleException("Failed to read the mod metadata from the file: " + data.file().getAbsolutePath(), e),
+                            ProblemId.create("metadata", "dependency-resolver", DEPENDENCY_RESOLVER_GROUP),
+                            spec -> {
+                                spec.details("Failed to read the mod metadata from the file: " + data.file().getAbsolutePath());
+                                spec.contextualLabel("Dependencies");
+                                spec.fileLocation(data.file().getAbsolutePath());
+                                spec.documentedAt("https://tableau.ldtteam.com/docs/guides/generating-metadata");
+                            });
         }
     }
 

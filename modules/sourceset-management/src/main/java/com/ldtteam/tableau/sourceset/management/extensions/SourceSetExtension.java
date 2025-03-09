@@ -97,10 +97,16 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
             implementation.extendsFrom(tableauImplementation);
             api.extendsFrom(tableauApi);
 
-            java.registerFeature(sourceSet.getName(), feature -> {
-                feature.usingSourceSet(sourceSet);
-                feature.withSourcesJar();
-                feature.withJavadocJar();
+            project.afterEvaluate(p -> {
+                java.registerFeature(sourceSet.getName(), feature -> {
+                    feature.usingSourceSet(sourceSet);
+
+                    if (configuration.getIsSourcesPublished().get())
+                        feature.withSourcesJar();
+
+                    if (configuration.getIsJavadocPublished().get())
+                        feature.withJavadocJar();
+                });
             });
 
             getUniversalJarSourceSets().addAll(
@@ -193,6 +199,9 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
 
             getIsPartOfPrimaryJar().convention(SourceSet.isMain(sourceSet));
             getIsPublished().convention(SourceSet.isMain(sourceSet));
+
+            getIsSourcesPublished().convention(true);
+            getIsJavadocPublished().convention(true);
         }
 
         /**
@@ -227,6 +236,20 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          * @return The property.
          */
         public abstract Property<Boolean> getIsPublished();
+
+        /**
+         * Indicates if a sources jar should be published.
+         *
+         * @return True when published, false otherwise.
+         */
+        public abstract Property<Boolean> getIsSourcesPublished();
+
+        /**
+         * Indicates if a javadoc jar should be published.
+         *
+         * @return True when published, false otherwise.
+         */
+        public abstract Property<Boolean> getIsJavadocPublished();
 
         /**
          * The dependencies for the source set.

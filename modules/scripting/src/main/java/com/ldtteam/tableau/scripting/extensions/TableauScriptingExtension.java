@@ -3,6 +3,7 @@ package com.ldtteam.tableau.scripting.extensions;
 import com.ldtteam.tableau.scripting.ScriptingPlugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.problems.ProblemGroup;
 
 import javax.inject.Inject;
 
@@ -12,13 +13,27 @@ import javax.inject.Inject;
  * <p>
  *     Statically this class provides an API to register an retrieve DSL extensions for a given project.
  */
+@SuppressWarnings("UnstableApiUsage")
 public abstract class TableauScriptingExtension implements ExtensionAware {
+
+    private static final ProblemGroup ROOT_GROUP = ProblemGroup.create("tableau", "Tableau");
 
     /**
      * Creates a new root DSL scripting extension.
      */
     @Inject
     public TableauScriptingExtension() {
+    }
+
+    /**
+     * Creates a new problem group for the given id and name.
+     *
+     * @param id The id of the new group, will be prefixed by tablea.
+     * @param name The display name of the group.
+     * @return The group.
+     */
+    public static ProblemGroup problemGroup(String id, String name) {
+        return ProblemGroup.create("tableau." + id, name, ROOT_GROUP);
     }
 
     /**

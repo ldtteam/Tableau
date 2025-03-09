@@ -4,6 +4,8 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Action;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
+import org.gradle.api.problems.ProblemGroup;
+import org.gradle.api.problems.ProblemId;
 import org.gradle.api.problems.Problems;
 import org.gradle.api.problems.Severity;
 import org.gradle.api.provider.Property;
@@ -16,6 +18,8 @@ import javax.inject.Inject;
  */
 @SuppressWarnings("UnstableApiUsage")
 public abstract class ProjectExtension {
+
+    private static final ProblemGroup COMMON_GROUP = TableauScriptingExtension.problemGroup("common", "Common");
 
     /**
      * Gets the mod extension for a given project.
@@ -46,23 +50,24 @@ public abstract class ProjectExtension {
         getPublisher().convention("ldtteam");
 
         getModId().convention(project.provider(() -> {
-            throw getProblems().getReporter().throwing(spec -> {
-                //TODO: Configure documentation link.
-                spec.id("missing-mod-id", "Mod id is not configured.")
-                        .details("Without a specified mod id a lot of systems can not be configured.")
-                        .solution("Configure the mod id, in tableau's project block.")
-                        .withException(new IllegalStateException("Mod id is not configured."));
-            });
+            throw getProblems().getReporter().throwing(new IllegalStateException("Mod id is not configured."),
+                    ProblemId.create("missing-mod-id", "Mod id is not configured.", COMMON_GROUP),
+                    spec -> {
+                        spec.details("Without a specified mod id a lot of systems can not be configured.")
+                                .solution("Configure the mod id, in tableau's project block.")
+                                .documentedAt("https://tableau.ldtteam.com/docs/getting-started#configuring-the-basics");
+                    });
         }));
 
         getGroup().convention(project.provider(() -> {
-            throw getProblems().getReporter().throwing(spec -> {
-                //TODO: Configure documentation link.
-                spec.id("missing-project-group", "Project group is not configured.")
-                        .details("Without a specified project group a lot of systems can not be configured.")
-                        .solution("Configure the projects group, in tableau's project block.")
-                        .withException(new IllegalStateException("Project group is not configured."));
-            });
+            throw getProblems().getReporter().throwing(
+                    new IllegalStateException("Project group is not configured."),
+                    ProblemId.create("missing-project-group", "Project group is not configured.", COMMON_GROUP),
+                    spec -> {
+                        spec.details("Without a specified project group a lot of systems can not be configured.")
+                                .solution("Configure the projects group, in tableau's project block.")
+                                .documentedAt("https://tableau.ldtteam.com/docs/getting-started#configuring-the-basics");
+                    });
         }));
     }
 
