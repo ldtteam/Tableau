@@ -5,17 +5,15 @@ package com.ldtteam.tableau.curseforge;
 
 import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.curseforge.extensions.CurseForgeExtension;
-import com.ldtteam.tableau.jarjar.JarJarPlugin;
-import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
-import com.ldtteam.tableau.shadowing.ShadowingPlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.darkhax.curseforgegradle.Constants;
 import net.darkhax.curseforgegradle.TaskPublishCurseForge;
 import net.darkhax.curseforgegradle.UploadArtifact;
+import net.neoforged.gradle.userdev.UserDevProjectPlugin;
 import org.gradle.api.InvalidUserDataException;
-import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.jvm.tasks.Jar;
@@ -38,8 +36,6 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        target.getPlugins().apply(NeoGradlePlugin.class);
-
         TableauScriptingExtension.register(target, CurseForgeExtension.EXTENSION_NAME, CurseForgeExtension.class, target);
 
         target.afterEvaluate(ignore -> {
@@ -48,19 +44,26 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
     }
 
     private TaskProvider<? extends Jar> getMainJar(Project project) {
-        if (project.getPlugins().hasPlugin(JarJarPlugin.class)) {
-            return project.getTasks().named("jarJar", Jar.class);
-        }
+        if (project.getPlugins().hasPlugin(UserDevProjectPlugin.class)) {
+            if (project.getTasks().findByName("jarJar") != null) {
+                if (project.getTasks().getByName("jarJar").getEnabled()) {
+                    return project.getTasks().named("jarJar", Jar.class);
+                }
+            }
+            if (project.getTasks().findByName("shadowJar") != null) {
+                if (project.getTasks().getByName("shadowJar").getEnabled()) {
+                    return project.getTasks().named("shadowJar", Jar.class);
+                }
+            }
 
-        if (project.getPlugins().hasPlugin(ShadowingPlugin.class)) {
-            return project.getTasks().named("shadowJar", Jar.class);
+            return project.getTasks().named("jar", Jar.class);
         }
 
         return project.getTasks().named("jar", Jar.class);
     }
 
-    private boolean mainJarIsSlim(Project project) {
-        return project.getPlugins().hasPlugin(ShadowingPlugin.class) || project.getPlugins().hasPlugin(JarJarPlugin.class);
+    private boolean mainJarIsFat(TaskProvider<? extends Jar> jar) {
+        return !jar.getName().equals("jar");
     }
 
     private void configureUploadTask(final Project project) {
@@ -109,7 +112,7 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
                 artifact.withAdditionalFile(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
                 task.dependsOn(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
 
-                if (!SourceSet.isMain(sourceSet) || mainJarIsSlim(project)) {
+                if (!SourceSet.isMain(sourceSet) || mainJarIsFat(mainJar)) {
                     artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJarTaskName()));
                     task.dependsOn(project.getTasks().named(sourceSet.getJarTaskName()));
                 }

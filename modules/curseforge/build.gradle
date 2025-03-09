@@ -15,11 +15,8 @@ dependencies {
     api project(':scripting')
     api project(':utilities')
 
-    api project(':shadowing')
-    api project(':jarjar')
-
     api project(':common')
-    api project(':neogradle')
+    api project(':sourceset-management')
 
     api libs.bundles.curseForgeGradle
 }
