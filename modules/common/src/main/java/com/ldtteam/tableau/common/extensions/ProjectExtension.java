@@ -156,8 +156,16 @@ public abstract class ProjectExtension {
         @Inject
         public Versioning(Project project) {
             this.project = project;
-            getVersion().convention("0.0.0");
-            getSuffix().convention("alpha");
+            getVersion().convention(environmentVariable("VERSION")
+                    .orElse(project.getProviders().gradleProperty("modVersion"))
+                    .orElse(project.getProviders().gradleProperty("mod.version"))
+                    .orElse(project.getProviders().gradleProperty("local.version"))
+                    .orElse(project.getProviders().gradleProperty("localVersion"))
+                    .orElse("0.0.0"));
+            getSuffix().convention(project.getProviders().gradleProperty("modVersionSuffix")
+                    .orElse(project.getProviders().gradleProperty("local.suffix"))
+                    .orElse(project.getProviders().gradleProperty("localSuffix"))
+                    .orElse(""));
         }
 
         /**
