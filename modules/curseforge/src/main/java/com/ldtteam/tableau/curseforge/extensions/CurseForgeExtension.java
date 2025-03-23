@@ -42,6 +42,12 @@ public abstract class CurseForgeExtension {
     public CurseForgeExtension(final Project project) {
         this.project = project;
 
+        getId().convention(
+                project.getProviders().gradleProperty("curse.id")
+                        .orElse(project.getProviders().gradleProperty("curseId"))
+                        .map(Integer::parseInt)
+        );
+
         getReleaseType().convention(project.getProviders().environmentVariable("CURSE_RELEASE_TYPE").map(value -> {
             try {
                 return ReleaseType.valueOf(value.toUpperCase(Locale.ROOT));
