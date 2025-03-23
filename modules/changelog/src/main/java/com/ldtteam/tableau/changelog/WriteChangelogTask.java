@@ -31,6 +31,11 @@ public abstract class WriteChangelogTask extends DefaultTask {
     public WriteChangelogTask() {
         setGroup("documentation");
         setDescription("Writes a changelog component to the changelog file.");
+
+        getChangelogFile().convention(
+                getProject().getLayout().getBuildDirectory().file("changelog.md")
+        );
+        onlyIf(t -> getComponent().isPresent());
     }
 
     /**

@@ -27,22 +27,16 @@ public class ChangelogProjectPlugin implements Plugin<Project> {
 
     @Override
     public void apply(@NotNull Project target) {
-        TableauScriptingExtension.register(target, ChangelogExtension.EXTENSION_NAME, ChangelogExtension.class);
+        final ChangelogExtension extension = TableauScriptingExtension.register(target, ChangelogExtension.EXTENSION_NAME, ChangelogExtension.class);
 
         //Write the header
         target.getTasks().register("outputChangelogHeader", WriteChangelogTask.class, task -> {
-            task.getComponent().set(ChangelogExtension.get(target).getHeader().map(header -> header + System.lineSeparator() + System.lineSeparator()));
-            task.getChangelogFile().convention(target.getLayout().getBuildDirectory().file("changelog.md"));
-
-            task.onlyIf(t -> ChangelogExtension.get(target).getHeader().isPresent());
+            task.getComponent().set(extension.getHeader().map(header -> header + System.lineSeparator() + System.lineSeparator()));
         });
 
         //Write the footer
         target.getTasks().register("outputChangelogFooter", WriteChangelogTask.class, task -> {
-            task.getComponent().set(ChangelogExtension.get(target).getFooter());
-            task.getChangelogFile().convention(target.getLayout().getBuildDirectory().file("changelog.md"));
-
-            task.onlyIf(t -> ChangelogExtension.get(target).getFooter().isPresent());
+            task.getComponent().set(extension.getFooter());
         });
     }
 }
