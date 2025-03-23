@@ -165,7 +165,8 @@ public abstract class ProjectExtension {
             getSuffix().convention(project.getProviders().gradleProperty("modVersionSuffix")
                     .orElse(project.getProviders().gradleProperty("local.suffix"))
                     .orElse(project.getProviders().gradleProperty("localSuffix"))
-                    .orElse(""));
+                    .orElse("")
+                    .map(s -> s.startsWith("-") ? s.substring(1) : s));
         }
 
         /**
