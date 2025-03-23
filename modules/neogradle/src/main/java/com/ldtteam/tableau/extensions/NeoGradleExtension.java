@@ -2,6 +2,7 @@ package com.ldtteam.tableau.extensions;
 
 import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;
+import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -60,12 +61,13 @@ public abstract class NeoGradleExtension implements ExtensionAware {
 
         //By default, we extract the latest neoforge version from the minecraft version.
         getNeoForgeVersion().convention(
-            projectExtension.getMinecraftVersion().flatMap(enabled -> versioning.getMinecraft().getMinecraftVersion().map(version -> {
-                //The minecraft version is formatted like: a.b.c
-                //The NeoForge version is formatted like: b.c.+
-                final String[] parts = version.split("\\.");
-                return "%s.%s.+".formatted(parts[1], parts[2]);
-            })).orElse("+")
+                project.getProviders().gradleProperty("neoforge.version")
+                        .orElse(projectExtension.getMinecraftVersion().flatMap(enabled -> versioning.getMinecraft().getMinecraftVersion().map(version -> {
+                            //The minecraft version is formatted like: a.b.c
+                            //The NeoForge version is formatted like: b.c.+
+                            final String[] parts = version.split("\\.");
+                            return "%s.%s.+".formatted(parts[1], parts[2]);
+                        })).orElse("+"))
         );
 
         //Always default to a normal username.

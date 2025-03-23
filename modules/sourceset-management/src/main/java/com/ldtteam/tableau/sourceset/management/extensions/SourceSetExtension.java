@@ -21,8 +21,10 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
+import org.gradle.api.tasks.SourceSetOutput;
 import org.jetbrains.annotations.NotNull;
 
 import com.ldtteam.tableau.common.extensions.ProjectExtension;
@@ -178,6 +180,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
         private final SourceSet sourceSet;
         private final SourceDirectorySet java;
         private final SourceDirectorySet resources;
+        private final SourceSetOutput output;
 
         private final SourceSetDependencies dependencies;
 
@@ -194,6 +197,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
             this.sourceSet = sourceSet;
             this.java = sourceSet.getJava();
             this.resources = sourceSet.getResources();
+            this.output = sourceSet.getOutput();
 
             this.dependencies = objectFactory.newInstance(SourceSetDependencies.class);
 
@@ -305,6 +309,16 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
             action.execute(resources);
         }
 
+        /**
+         * The output of this sourceset configuration.
+         * Is equal to the underlying sourcesets output.
+         *
+         * @return The output.
+         */
+        public SourceSetOutput getOutput() {
+            return output;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -323,6 +337,8 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
      */
     @SuppressWarnings("UnstableApiUsage")
     public abstract static class SourceSetDependencies implements Dependencies, ExtensionAware {
+
+
 
         /**
          * Creates a new source set dependencies model.
@@ -344,5 +360,45 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          * @return the api dependencies.
          */
         public abstract DependencyCollector getApi();
+
+        /**
+         * Registers the given source set as a dependency of this sourcesets implementation.
+         *
+         * @param configuration The configuration to add.
+         */
+        public void implementation(SourceSetConfiguration configuration) {
+            getImplementation().add(configuration.getOutput());
+        }
+
+        /**
+         * Registers the given source set provided by the provider as a dependency of this sourcesets implementation.
+         *
+         * @param configuration The configuration provider to add.
+         */
+        public void implementation(Provider<SourceSetConfiguration> configuration) {
+            getImplementation().add(configuration.map(SourceSetConfiguration::getOutput)
+                    .map(getDependencyFactory()::create)
+            );
+        }
+
+        /**
+         * Registers the given source set as a dependency of this sourcesets api.
+         *
+         * @param configuration The configuration to add.
+         */
+        public void api(SourceSetConfiguration configuration) {
+            getApi().add(configuration.getOutput());
+        }
+
+        /**
+         * Registers the given source set provided by the provider as a dependency of this sourcesets api.
+         *
+         * @param configuration The configuration provider to add.
+         */
+        public void api(Provider<SourceSetConfiguration> configuration) {
+            getApi().add(configuration.map(SourceSetConfiguration::getOutput)
+                    .map(getDependencyFactory()::create)
+            );
+        }
     }
 }

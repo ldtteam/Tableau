@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import net.neoforged.gradle.dsl.common.extensions.sourceset.RunnableSourceSet;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Rule;
@@ -89,6 +90,11 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
             final SourceSet sourceSet = target.getExtensions().getByType(SourceSetContainer.class).getByName(sourceSetConfig.getName());
             final Configuration implementation = target.getConfigurations().maybeCreate(sourceSet.getImplementationConfigurationName());
             final NeoGradleExtension neoGradleExtension = NeoGradleExtension.get(target);
+
+            final RunnableSourceSet runnableSourceSet = sourceSet.getExtensions().findByType(RunnableSourceSet.class);
+            runnableSourceSet.getModIdentifier().set(
+                    ProjectExtension.get(target).getModId()
+            );
 
             //Register the neogradle dependency for the source set.
             implementation.getDependencies().addLater(

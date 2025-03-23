@@ -38,7 +38,10 @@ public abstract class NeoGradleResourceProcessingExtension {
 
         //Configure the minimal versions.
         final ProjectExtension projectExtension = ProjectExtension.get(project);
-        getMinimalMinecraftVersion().convention(projectExtension.getMinecraftVersion());
+        getMinimalMinecraftVersion().convention(
+                project.getProviders().gradleProperty("minecraft.version.minimal")
+                                .orElse(projectExtension.getMinecraftVersion())
+                );
 
         //Configure the minimal forge version.
         getMinimalForgeVersion().convention(determineMinimalNeoforgeVersion(project));

@@ -69,6 +69,8 @@ public abstract class ProjectExtension {
                                 .documentedAt("https://tableau.ldtteam.com/docs/getting-started#configuring-the-basics");
                     });
         }));
+
+        getMinecraftVersion().convention(project.getProviders().gradleProperty("minecraft.version"));
     }
 
     /**
