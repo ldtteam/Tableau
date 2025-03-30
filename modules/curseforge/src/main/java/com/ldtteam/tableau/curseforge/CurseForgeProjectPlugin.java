@@ -99,7 +99,6 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
 
             artifact.releaseType = curse.getReleaseType();
 
-            artifact.addModLoader("NeoForge");
             artifact.addGameVersion(mod.getMinecraftVersion());
 
             if (curse.getUsesFancyDisplayName().get()) {
