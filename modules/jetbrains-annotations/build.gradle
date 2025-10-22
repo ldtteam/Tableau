@@ -21,10 +21,20 @@ sourceSets {
     }
 }
 
+configurations {
+    api {}
+    jetbrainsVersionResolver {
+        canBeResolved = true
+    }
+
+    jetbrainsVersionResolver.extendsFrom api
+}
+
 dependencies {
     api project(':scripting')
     api project(':sourceset-management')
     api libs.bundles.jetbrainsAnnotations
+    jetbrainsVersionResolver libs.bundles.jetbrainsAnnotations
 }
 
 gradlePlugin {
@@ -46,9 +56,10 @@ tasks.register('resolveJetbrainsAnnotationsVersion') {
             annotationsVersionFile.parentFile.mkdirs()
         }
 
-        configurations.api.copy()
+        configurations.jetbrainsVersionResolver.copy()
                 .resolvedConfiguration
-                .firstLevelModuleDependencies
+                .lenientConfiguration
+                .allModuleDependencies
                 .stream()
                 .filter { it.moduleGroup == 'org.jetbrains' && it.moduleName == 'annotations' }
                 .findFirst()
