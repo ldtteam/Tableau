@@ -56,7 +56,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
      *
      * @param project The project.
      */
-    @SuppressWarnings("UnstableApiUsage")
+    @SuppressWarnings({"UnstableApiUsage", "ConstantValue"})
     @Inject
     public SourceSetExtension(final Project project) {
         super(project.container(SourceSetConfiguration.class, new NamedDomainObjectFactory<>() {
@@ -100,6 +100,16 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
             api.extendsFrom(tableauApi);
 
             project.afterEvaluate(p -> {
+                if (SourceSet.isMain(sourceSet)) {
+                    if (configuration.getIsSourcesPublished().get())
+                        java.withSourcesJar();
+
+                    if (configuration.getIsJavadocPublished().get())
+                        java.withJavadocJar();
+
+                    return;
+                }
+
                 java.registerFeature(sourceSet.getName(), feature -> {
                     feature.usingSourceSet(sourceSet);
 
@@ -150,7 +160,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
      *
      * @param action The configuration action.
      */
-    public void api(final Action<SourceSetConfiguration> action) {
+    public void api(final Action<@NotNull SourceSetConfiguration> action) {
          create(JavaPlugin.API_CONFIGURATION_NAME, configuration -> {
             action.execute(configuration);
             configuration.getIsPartOfPrimaryJar().set(true);
@@ -162,14 +172,14 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
      *
      * @return The source sets.
      */
-    public abstract ListProperty<SourceSet> getUniversalJarSourceSets();
+    public abstract ListProperty<@NotNull SourceSet> getUniversalJarSourceSets();
 
     /**
      * Gets the source sets that are published, individually.
      *
      * @return The source sets.
      */
-    public abstract ListProperty<SourceSet> getPublishedSourceSets();
+    public abstract ListProperty<@NotNull SourceSet> getPublishedSourceSets();
 
     /**
      * Contains the configuration for a source set.
@@ -232,28 +242,28 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          *
          * @return The property.
          */
-        public abstract Property<Boolean> getIsPartOfPrimaryJar();
+        public abstract Property<@NotNull Boolean> getIsPartOfPrimaryJar();
 
         /**
          * Indicates whether the source set is published.
          *
          * @return The property.
          */
-        public abstract Property<Boolean> getIsPublished();
+        public abstract Property<@NotNull Boolean> getIsPublished();
 
         /**
          * Indicates if a sources jar should be published.
          *
          * @return True when published, false otherwise.
          */
-        public abstract Property<Boolean> getIsSourcesPublished();
+        public abstract Property<@NotNull Boolean> getIsSourcesPublished();
 
         /**
          * Indicates if a javadoc jar should be published.
          *
          * @return True when published, false otherwise.
          */
-        public abstract Property<Boolean> getIsJavadocPublished();
+        public abstract Property<@NotNull Boolean> getIsJavadocPublished();
 
         /**
          * The dependencies for the source set.
@@ -269,7 +279,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          *
          * @param action The configuration action.
          */
-        public void dependencies(Action<SourceSetDependencies> action) {
+        public void dependencies(Action<@NotNull SourceSetDependencies> action) {
             action.execute(getDependencies());
         }
 
@@ -287,7 +297,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          *
          * @param action The configuration action.
          */
-        public void java(final Action<SourceDirectorySet> action) {
+        public void java(final Action<@NotNull SourceDirectorySet> action) {
             action.execute(java);
         }
 
@@ -305,7 +315,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          *
          * @param action The configuration action.
          */
-        public void resources(final Action<SourceDirectorySet> action) {
+        public void resources(final Action<@NotNull SourceDirectorySet> action) {
             action.execute(resources);
         }
 
@@ -335,7 +345,6 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
     /**
      * Contains the dependencies for a source set.
      */
-    @SuppressWarnings("UnstableApiUsage")
     public abstract static class SourceSetDependencies implements Dependencies, ExtensionAware {
 
 
@@ -375,7 +384,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          *
          * @param configuration The configuration provider to add.
          */
-        public void implementation(Provider<SourceSetConfiguration> configuration) {
+        public void implementation(Provider<@NotNull SourceSetConfiguration> configuration) {
             getImplementation().add(configuration.map(SourceSetConfiguration::getOutput)
                     .map(getDependencyFactory()::create)
             );
@@ -395,7 +404,7 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
          *
          * @param configuration The configuration provider to add.
          */
-        public void api(Provider<SourceSetConfiguration> configuration) {
+        public void api(Provider<@NotNull SourceSetConfiguration> configuration) {
             getApi().add(configuration.map(SourceSetConfiguration::getOutput)
                     .map(getDependencyFactory()::create)
             );
