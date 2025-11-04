@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import net.neoforged.gradle.common.runs.run.RunImpl;
 import net.neoforged.gradle.dsl.common.extensions.sourceset.RunnableSourceSet;
 import net.neoforged.gradle.dsl.common.runs.run.Run;
 import org.gradle.api.Plugin;
@@ -264,7 +265,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
     private static Run createDataRun(final @NotNull Project target, final RunManager runManager, final ProjectExtension projectExtension, final NeoGradleExtension extension,
         final String runName)
     {
-        final Run run = runManager.maybeCreate(runName);
+        final Run run = target.getObjects().newInstance(RunImpl.class, target, runName);
 
         //Add the arguments for the data gen run.
         //By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
