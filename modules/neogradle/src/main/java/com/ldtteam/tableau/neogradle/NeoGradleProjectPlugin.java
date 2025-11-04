@@ -12,7 +12,9 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import net.neoforged.gradle.common.runs.run.RunImpl;
 import net.neoforged.gradle.dsl.common.extensions.sourceset.RunnableSourceSet;
+import net.neoforged.gradle.dsl.common.runs.run.Run;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Rule;
@@ -210,43 +212,12 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
         //Ensure a server run is created.
         runManager.maybeCreate("server");
 
-        //Ensure a data gen run is created.
-        runManager.maybeCreate("data");
-
-        //Configure the data run to have the correct arguments.
-        runManager.named("data", run -> {
-            //Add the arguments for the data gen run.
-            //By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
-            run.getArguments().addAll(
-                    projectExtension.getModId().map(modId -> {
-                        List<String> dataRunArguments = new ArrayList<>();
-                        dataRunArguments.add("--mod");
-                        dataRunArguments.add(modId);
-                        dataRunArguments.add("--all");
-                        dataRunArguments.add("--output");
-                        dataRunArguments.add(target.file("src/datagen/generated/%s".formatted(modId)).getAbsolutePath());
-                        dataRunArguments.add("--existing");
-                        dataRunArguments.add(target.file("src/main/resources/").getAbsolutePath());
-                        return dataRunArguments;
-                    })
-            );
-
-            //Add the arguments for the additional data gen mods.
-            run.getArguments().addAll(
-                    extension.getAdditionalDataGenMods().map(mods -> {
-                        if (mods.isEmpty()) {
-                            //When no additional data gen mods are set, we don't need to add any arguments.
-                            return new ArrayList<>();
-                        }
-
-                        //When additional data gen mods are set, we need to add the arguments for each mod.
-                        //Per mod, we need to add the "--existing-mod" argument followed by the mod id.
-                        return mods.stream()
-                                .flatMap(modId -> Stream.of("--existing-mod", modId))
-                                .collect(Collectors.toList());
-                    })
-            );
-        });
+        //Ensure that all configured data runs are created.
+        runManager.addAllLater(
+            extension.getDataGenerationRuns().map(names -> names.stream()
+                .map(name -> createDataRun(target, runManager, projectExtension, extension, name))
+                .toList())
+        );
 
         //Ensure a game test server run is created.
         runManager.maybeCreate("gameTestServer");
@@ -289,6 +260,46 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
                     .map(sourceSet -> getLibraryConfiguration(target, sourceSet))
                     .forEach(config -> run.getDependencies().getRuntime().add(config));
         });
+    }
+
+    private static Run createDataRun(final @NotNull Project target, final RunManager runManager, final ProjectExtension projectExtension, final NeoGradleExtension extension,
+        final String runName)
+    {
+        final Run run = target.getObjects().newInstance(RunImpl.class, target, runName);
+
+        //Add the arguments for the data gen run.
+        //By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
+        run.getArguments().addAll(
+                projectExtension.getModId().map(modId -> {
+                    List<String> dataRunArguments = new ArrayList<>();
+                    dataRunArguments.add("--mod");
+                    dataRunArguments.add(modId);
+                    dataRunArguments.add("--all");
+                    dataRunArguments.add("--output");
+                    dataRunArguments.add(target.file("src/datagen/generated/%s".formatted(modId)).getAbsolutePath());
+                    dataRunArguments.add("--existing");
+                    dataRunArguments.add(target.file("src/main/resources/").getAbsolutePath());
+                    return dataRunArguments;
+                })
+        );
+
+        //Add the arguments for the additional data gen mods.
+        run.getArguments().addAll(
+                extension.getAdditionalDataGenMods().map(mods -> {
+                    if (mods.isEmpty()) {
+                        //When no additional data gen mods are set, we don't need to add any arguments.
+                        return new ArrayList<>();
+                    }
+
+                    //When additional data gen mods are set, we need to add the arguments for each mod.
+                    //Per mod, we need to add the "--existing-mod" argument followed by the mod id.
+                    return mods.stream()
+                            .flatMap(modId -> Stream.of("--existing-mod", modId))
+                            .collect(Collectors.toList());
+                })
+        );
+
+        return run;
     }
 
     /**

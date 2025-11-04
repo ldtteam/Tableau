@@ -2,7 +2,6 @@ package com.ldtteam.tableau.extensions;
 
 import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.common.extensions.VersioningExtension;
-import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -10,9 +9,11 @@ import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.bundling.Jar;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +85,13 @@ public abstract class NeoGradleExtension implements ExtensionAware {
 
         //Default to no additional data gen mods.
         getAdditionalDataGenMods().convention(new ArrayList<>());
+
+        //Default to the data generation runs defined in the property, if not set default to the current modern Minecraft run configuration.
+        getDataGenerationRuns().convention(
+            project.getProviders().gradleProperty("neoforge.data.runs").map(
+                s -> Arrays.stream(s.split(",")).toList()
+            ).orElse(List.of("clientData", "serverData"))
+        );
     }
 
     /**
@@ -123,28 +131,28 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      *
      * @return The version of NeoForge to use.
      */
-    public abstract Property<String> getNeoForgeVersion();
+    public abstract Property<@NotNull String> getNeoForgeVersion();
 
     /**
      * The classifier to use for the primary jar.
      *
      * @return The classifier for the primary jar.
      */
-    public abstract Property<String> getPrimaryJarClassifier();
+    public abstract Property<@NotNull String> getPrimaryJarClassifier();
 
     /**
      * Whether, to use random player names, when starting the client.
      *
      * @return Indicates whether the project should use random player names.
      */
-    public abstract Property<Boolean> getUseRandomPlayerNames();
+    public abstract Property<@NotNull Boolean> getUseRandomPlayerNames();
 
     /**
      * The additional data gen mods to use.
      *
      * @return The additional data gen mods to use.
      */
-    public abstract ListProperty<String> getAdditionalDataGenMods();
+    public abstract ListProperty<@NotNull String> getAdditionalDataGenMods();
 
     /**
      * Adds a data gen mod to the project.
@@ -160,5 +168,15 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      *
      * @return Indicates whether the project is an FML library.
      */
-    public abstract Property<Boolean> getIsLibrary();
+    public abstract Property<@NotNull Boolean> getIsLibrary();
+
+    /**
+     * Defines the data generation runs to configure.
+     * Generally match up with the run types exposed by neoforge.
+     * <p>
+     *     This is by default read from a gradle property `neoforge.runs.data`, if that is not supplied it is currently by default to clientData and serverData.
+     * </p>
+     * @return The data generation run.
+     */
+    public abstract ListProperty<@NotNull String> getDataGenerationRuns();
 }
