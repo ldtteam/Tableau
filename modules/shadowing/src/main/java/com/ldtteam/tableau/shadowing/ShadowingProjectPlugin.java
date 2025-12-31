@@ -133,8 +133,16 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
         });
     }
 
+    /**
+     * Internal interface for dependency injection of a new {@link DependencyCollector}.
+     */
     public interface DependencyCollectorInjector
     {
+        /**
+         * The created dependency collector.
+         *
+         * @return The collector.
+         */
         DependencyCollector getDependencyCollector();
     }
 }
