@@ -84,10 +84,12 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
         sourceSets.matching(sourceSet -> SourceSet.isMain(sourceSet.getSourceSet()))
                 .configureEach(sourceSet -> {
                     final SourceSetExtension.SourceSetConfiguration main = sourceSets.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
-                    final DependencyCollector dependencies = project.getObjects().dependencyCollector();
-                    main.getDependencies().getExtensions().add(CONTAINED_CONFIGURATION_NAME, dependencies);
+                    final DependencyCollectorInjector
+                        inject = project.getObjects().newInstance(DependencyCollectorInjector.class);
+                    final DependencyCollector collector = inject.getDependencyCollector();
+                    main.getDependencies().getExtensions().add(CONTAINED_CONFIGURATION_NAME, collector);
 
-                    configuration.fromDependencyCollector(dependencies);
+                    configuration.fromDependencyCollector(collector);
                 });
     }
 
@@ -129,5 +131,10 @@ public class ShadowingProjectPlugin implements Plugin<Project> {
 
             shadowing.getRenamedNamespaces().get().forEach(shadowJar::relocate);
         });
+    }
+
+    public interface DependencyCollectorInjector
+    {
+        DependencyCollector getDependencyCollector();
     }
 }

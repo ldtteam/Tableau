@@ -8,7 +8,6 @@ import com.ldtteam.tableau.jarjar.extensions.JarJarExtension;
 import com.ldtteam.tableau.neogradle.NeoGradlePlugin;
 import com.ldtteam.tableau.sourceset.management.extensions.SourceSetExtension;
 import net.neoforged.gradle.common.tasks.JarJar;
-import net.neoforged.gradle.common.util.DependencyCollectorInjector;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -78,8 +77,8 @@ public class JarJarProjectPlugin implements Plugin<Project> {
         sourceSets.matching(sourceSet -> SourceSet.isMain(sourceSet.getSourceSet()))
                 .configureEach(sourceSet -> {
                     final SourceSetExtension.SourceSetConfiguration main = sourceSets.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
-                    final net.neoforged.gradle.common.util.DependencyCollectorInjector
-                        inject = project.getObjects().newInstance(net.neoforged.gradle.common.util.DependencyCollectorInjector.class);
+                    final DependencyCollectorInjector
+                        inject = project.getObjects().newInstance(DependencyCollectorInjector.class);
                     final DependencyCollector collector = inject.getDependencyCollector();
                     main.getDependencies().getExtensions().add(CONTAINED_CONFIGURATION_NAME, collector);
 
