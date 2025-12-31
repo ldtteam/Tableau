@@ -3,6 +3,16 @@ entries:
   tableau:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-12-31T22:12:35.493305744Z"
+    description: The helm chart for deploying the tableau website.
+    digest: 1d594c2ed62e6e355dd8c44a21eab6c95e9a1c8402ad5f2f6cca13460a36b3a0
+    name: tableau
+    type: application
+    urls:
+    - https://github.com/ldtteam/Tableau/releases/download/tableau-0.0.82/tableau-0.0.82.tgz
+    version: 0.0.82
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-12-31T21:54:40.457382578Z"
     description: The helm chart for deploying the tableau website.
     digest: 2f456ab239fa8f9099874ec73e0b1a75e8034f34f80c58f947a9ed50ef75085d
@@ -601,4 +611,4 @@ entries:
     urls:
     - https://github.com/ldtteam/Tableau/releases/download/tableau-0.0.21/tableau-0.0.21.tgz
     version: 0.0.21
-generated: "2025-12-31T21:54:40.457668831Z"
+generated: "2025-12-31T22:12:35.493605751Z"
