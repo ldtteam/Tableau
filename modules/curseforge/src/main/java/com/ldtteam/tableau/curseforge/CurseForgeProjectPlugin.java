@@ -99,7 +99,7 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
 
             artifact.releaseType = curse.getReleaseType();
 
-            artifact.addGameVersion(mod.getMinecraftVersion());
+            artifact.addGameVersion(curse.getPublishedMinecraftVersions());
 
             if (curse.getUsesFancyDisplayName().get()) {
                 final String displayName = curse.getArtifactName().isPresent() ?

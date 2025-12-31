@@ -7,7 +7,7 @@ shadow = "8.+"
 jetbrainsAnnotations = "+"
 curseForgeGradle = "1.+"
 nightconfig = "3.6.+"
-loom = "1.+"
+loom = "1.14.+"
 
 [libraries]
 neogradle-userdev = { module = "net.neoforged.gradle:userdev", version.ref = "neogradle" }

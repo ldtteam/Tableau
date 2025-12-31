@@ -1,5 +1,6 @@
 package com.ldtteam.tableau.curseforge.extensions;
 
+import com.ldtteam.tableau.common.extensions.ProjectExtension;
 import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import net.darkhax.curseforgegradle.Constants;
 import org.gradle.api.Action;
@@ -9,6 +10,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.SetProperty;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -42,6 +44,8 @@ public abstract class CurseForgeExtension {
     public CurseForgeExtension(final Project project) {
         this.project = project;
 
+        final ProjectExtension mod = ProjectExtension.get(project);
+
         getId().convention(
                 project.getProviders().gradleProperty("curse.id")
                         .orElse(project.getProviders().gradleProperty("curseId"))
@@ -56,6 +60,17 @@ public abstract class CurseForgeExtension {
                 return ReleaseType.ALPHA;
             }
         }).orElse(ReleaseType.RELEASE));
+
+        getAdditionalMinecraftVersions().convention(
+            project.getProviders().gradleProperty("minecraft.additionalVersions")
+                .map(versions -> versions.split(";"))
+                .map(Arrays::asList)
+        );
+
+        getPublishedMinecraftVersions().convention(
+            project.getProviders().gradleProperty("curse.minecraft.version")
+                .orElse(mod.getMinecraftVersion())
+        );
 
         getUsesFancyDisplayName().convention(true);
 
@@ -114,6 +129,18 @@ public abstract class CurseForgeExtension {
      * @return The release type of the project on CurseForge.
      */
     public abstract Property<ReleaseType> getReleaseType();
+
+    /**
+     * The main minecraft version which the mod is published to.
+     * <p>
+     *     By default, this uses the mod minecraft version.
+     * </p>
+     * <p>
+     *     Can be configured via the curse.minecraft.version property
+     * </p>
+     * @return The published minecraft version.
+     */
+    public abstract Property<String> getPublishedMinecraftVersions();
 
     /**
      * The minecraft versions which this build additionally supports.
