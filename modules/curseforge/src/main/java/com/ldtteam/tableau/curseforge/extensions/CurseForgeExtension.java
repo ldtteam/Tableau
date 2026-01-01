@@ -65,6 +65,7 @@ public abstract class CurseForgeExtension {
             project.getProviders().gradleProperty("minecraft.additionalVersions")
                 .map(versions -> versions.split(";"))
                 .map(Arrays::asList)
+                .map(list -> list.stream().filter(v -> !v.isBlank()).toList())
         );
 
         getPublishedMinecraftVersions().convention(
