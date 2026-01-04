@@ -1,5 +1,5 @@
 [versions]
-neogradle = "7.1.+"
+neogradle = "7.1.20"
 gradle-download = "5.+"
 crowdin = "0.+"
 sonarqube = "5.+"
