@@ -39,8 +39,6 @@ public abstract class ParchmentExtension {
         final ProjectExtension projectExtension = ProjectExtension.get(project);
         getMinecraftVersion().convention(projectExtension.getMinecraftVersion());
 
-        getParchmentVersion().convention("BLEEDING-SNAPSHOT");
-
         //Configure neogradle.
         final Subsystems neogradleSubsystems = project.getExtensions().getByType(Subsystems.class);
         neogradleSubsystems.getParchment().getMinecraftVersion().convention(getMinecraftVersion());
