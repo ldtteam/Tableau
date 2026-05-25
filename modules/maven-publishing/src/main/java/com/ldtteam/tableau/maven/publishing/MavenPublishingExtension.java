@@ -6,6 +6,7 @@ import com.ldtteam.tableau.scripting.extensions.TableauScriptingExtension;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.XmlProvider;
+import org.gradle.api.credentials.HttpHeaderCredentials;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -132,6 +133,32 @@ public abstract class MavenPublishingExtension {
         }
     }
 
+    public void publishUsingActionsTokenTo(String repositoryName, String repositoryUrl) {
+        if (publishingMode.includedInMaven()) {
+            publishingMode = PublishingMode.CUSTOM;
+            pom(pom -> pom.distributeOnCustomRepo(repositoryUrl));
+        }
+
+        final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
+        final Provider<String> token = project.getProviders().environmentVariable("GITHUB_TOKEN")
+            .map("Bearer %s"::formatted);
+
+        if (token.isPresent()) {
+            publishing.repositories(mavenRepositories -> {
+                mavenRepositories.maven(mavenRepository -> {
+                    mavenRepository.setUrl(repositoryUrl);
+
+                    mavenRepository.credentials(HttpHeaderCredentials.class, credentials -> {
+                        credentials.setName("Authentication");
+                        credentials.setValue(token.get());
+                    });
+
+                    mavenRepository.setName(repositoryName);
+                });
+            });
+        }
+    }
+
     /**
      * Configures the publishing system to publish the project to a custom Maven repository.
      * <p>
@@ -149,15 +176,27 @@ public abstract class MavenPublishingExtension {
         final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
         final Provider<String> username = project.getProviders().environmentVariable("%s_USERNAME".formatted(repositoryName.toUpperCase(Locale.ROOT)));
         final Provider<String> password = project.getProviders().environmentVariable("%S_TOKEN".formatted(repositoryName.toUpperCase(Locale.ROOT)));
+        final Provider<Boolean> isHeader = project.getProviders().environmentVariable("%S_AS_HEADER".formatted(repositoryName.toUpperCase(Locale.ROOT)))
+            .map(Boolean::parseBoolean);
 
         if (username.isPresent() && password.isPresent()) {
             publishing.repositories(mavenRepositories -> {
                 mavenRepositories.maven(mavenRepository -> {
                     mavenRepository.setUrl(repositoryUrl);
-                    mavenRepository.credentials(credentials -> {
-                        credentials.setUsername(username.get());
-                        credentials.setPassword(password.get());
-                    });
+
+                    var usesHttpHeaderAuthentication = isHeader.orElse(false).get();
+                    if (usesHttpHeaderAuthentication) {
+                        mavenRepository.credentials(HttpHeaderCredentials.class, credentials -> {
+                            credentials.setName(username.get());
+                            credentials.setValue(password.get());
+                        });
+                    } else {
+                        mavenRepository.credentials(credentials -> {
+                            credentials.setUsername(username.get());
+                            credentials.setPassword(password.get());
+                        });
+                    }
+
                     mavenRepository.setName(repositoryName);
                 });
             });
