@@ -133,6 +133,13 @@ public abstract class MavenPublishingExtension {
         }
     }
 
+    /**
+     * This configures this project to publish to the given maven repository authenticating using the
+     * GitHub Actions Job Token.
+     *
+     * @param repositoryName The repository name
+     * @param repositoryUrl The url under which the repository resides
+     */
     public void publishUsingActionsTokenTo(String repositoryName, String repositoryUrl) {
         if (publishingMode.includedInMaven()) {
             publishingMode = PublishingMode.CUSTOM;
