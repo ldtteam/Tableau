@@ -147,17 +147,18 @@ public abstract class MavenPublishingExtension {
         }
 
         final PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
-        final Provider<String> token = project.getProviders().environmentVariable("GITHUB_TOKEN")
-            .map("Bearer %s"::formatted);
+        final Provider<String> token = project.getProviders().environmentVariable("GITHUB_TOKEN");
 
         if (token.isPresent()) {
             publishing.repositories(mavenRepositories -> {
                 mavenRepositories.maven(mavenRepository -> {
                     mavenRepository.setUrl(repositoryUrl);
 
-                    mavenRepository.credentials(HttpHeaderCredentials.class, credentials -> {
-                        credentials.setName("Authentication");
-                        credentials.setValue(token.get());
+                    // Use OAuth2 with github token for universal HTTP client compatibility
+                    // GitHub Maven registry supports oauth2 as username with token as password
+                    mavenRepository.credentials(credentials -> {
+                        credentials.setUsername("oauth2");
+                        credentials.setPassword(token.get());
                     });
 
                     mavenRepository.setName(repositoryName);
