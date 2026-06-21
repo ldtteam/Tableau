@@ -11,6 +11,7 @@ import org.gradle.api.provider.SetProperty;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 
 /**
@@ -66,6 +67,7 @@ public abstract class CurseForgeExtension {
                 .map(versions -> versions.split(";"))
                 .map(Arrays::asList)
                 .map(list -> list.stream().filter(v -> !v.isBlank()).toList())
+                .orElse(Collections.emptyList())
         );
 
         getPublishedMinecraftVersions().convention(
