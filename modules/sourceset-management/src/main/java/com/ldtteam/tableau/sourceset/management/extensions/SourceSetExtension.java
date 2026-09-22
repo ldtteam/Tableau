@@ -150,8 +150,6 @@ public abstract class SourceSetExtension extends DelegatingNamedDomainObjectCont
         project.afterEvaluate(p -> {
             //Run this in an afterEval, because we need a group configured, which is not available at apply and construction time.
             final SourceSetConfiguration main = maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
-
-            main.getResources().srcDir(ProjectExtension.get(project).getModId().map("src/datagen/generated/%s"::formatted));
         });
     }
 

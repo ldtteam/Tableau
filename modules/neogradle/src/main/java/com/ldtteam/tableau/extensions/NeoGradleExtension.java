@@ -92,6 +92,13 @@ public abstract class NeoGradleExtension implements ExtensionAware {
                 s -> Arrays.stream(s.split(",")).toList()
             ).orElse(List.of("clientData", "serverData"))
         );
+
+        //Default to common run, but support splitting.
+        getSplitGenerationOutputs().convention(
+                project.getProviders().gradleProperty("neoforge.data.runs.split").map(
+						Boolean::getBoolean
+                ).orElse(false)
+        );
     }
 
     /**
@@ -179,4 +186,11 @@ public abstract class NeoGradleExtension implements ExtensionAware {
      * @return The data generation run.
      */
     public abstract ListProperty<@NotNull String> getDataGenerationRuns();
+
+    /**
+     * Defines whether each data run writes to the same output, or is split.
+     *
+     * @return True when splitting, false when not.
+     */
+    public abstract Property<@NotNull Boolean> getSplitGenerationOutputs();
 }
