@@ -96,7 +96,7 @@ public abstract class NeoGradleExtension implements ExtensionAware {
         //Default to common run, but support splitting.
         getSplitGenerationOutputs().convention(
                 project.getProviders().gradleProperty("neoforge.data.runs.split").map(
-						Boolean::getBoolean
+						Boolean::parseBoolean
                 ).orElse(false)
         );
     }
