@@ -243,7 +243,11 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 					.forEach(config -> run.getDependencies().getRuntime().add(config));
 
 
-			target.afterEvaluate((evaluatedProject) -> {
+
+		});
+
+		target.afterEvaluate((evaluatedProject) -> {
+			runManager.configureEach(run -> {
 				//Add the mod sources to the run.
 				run.getModSources().addAllLater(
 						projectExtension.getModId().map(modId -> {
