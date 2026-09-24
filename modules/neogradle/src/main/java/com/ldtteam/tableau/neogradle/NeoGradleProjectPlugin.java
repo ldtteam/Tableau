@@ -249,36 +249,21 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 		target.afterEvaluate((evaluatedProject) -> {
 			runManager.configureEach(run -> {
 				//Add the mod sources to the run.
-				run.getModSources().addAllLater(
-						projectExtension.getModId().map(modId -> {
-							final List<SourceSet> sourceSets = sourceSetExtension
-									.stream()
-									.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())
-									.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
-									.collect(Collectors.toList());
+				final List<SourceSet> sourceSets = sourceSetExtension
+						.stream()
+						.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())
+						.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
+						.toList();
 
-							final Multimap<String, SourceSet> modSources = HashMultimap.create();
-							modSources.putAll(modId, sourceSets);
+				run.getModSources().add(projectExtension.getModId().get(), sourceSets);
 
-							return modSources;
-						})
-				);
+				final List<SourceSet> unitTestSourceSets = sourceSetExtension
+						.stream()
+						.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsUnitTestSource().get())
+						.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
+						.toList();
 
-				//Add the unit test sources to the run.
-				run.getUnitTestSources().addAllLater(
-						projectExtension.getModId().map(modId -> {
-							final List<SourceSet> sourceSets = sourceSetExtension
-									.stream()
-									.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsUnitTestSource().get())
-									.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
-									.collect(Collectors.toList());
-
-							final Multimap<String, SourceSet> modSources = HashMultimap.create();
-							modSources.putAll(modId, sourceSets);
-
-							return modSources;
-						})
-				);
+				run.getUnitTestSources().add(projectExtension.getModId().get(), unitTestSourceSets);
 			});
 		});
 	}
