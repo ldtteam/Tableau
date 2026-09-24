@@ -47,6 +47,13 @@ public abstract class NeoGradleSourceSetConfigurationExtension {
     public abstract Property<Boolean> getIsModSource();
 
     /**
+     * Indicates whether the source set is a unit test source.
+     *
+     * @return Indicates whether the source set is a unit test source.
+     */
+    public abstract Property<Boolean> getIsUnitTestSource();
+
+    /**
      * Indicates whether the source sets dependencies should be included in the libraries.
      *
      * @return Indicates whether the source sets dependencies should be included in the libraries.

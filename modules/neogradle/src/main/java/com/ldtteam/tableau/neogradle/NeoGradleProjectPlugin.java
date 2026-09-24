@@ -250,6 +250,22 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 					})
 			);
 
+			//Add the unit test sources to the run.
+			run.getUnitTestSources().addAllLater(
+					projectExtension.getModId().map(modId -> {
+						final List<SourceSet> sourceSets = sourceSetExtension
+								.stream()
+								.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsUnitTestSource().get())
+								.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
+								.collect(Collectors.toList());
+
+						final Multimap<String, SourceSet> modSources = HashMultimap.create();
+						modSources.putAll(modId, sourceSets);
+
+						return modSources;
+					})
+			);
+
 			//After evaluation, add the library configurations to the run.
 			sourceSetExtension
 					.stream()
