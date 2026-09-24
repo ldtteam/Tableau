@@ -37,6 +37,7 @@ public abstract class NeoGradleSourceSetConfigurationExtension {
     public NeoGradleSourceSetConfigurationExtension(Project project, SourceSetExtension.SourceSetConfiguration sourceSetConfiguration) {
         getIncludeInLibraries().convention(false);
         getIsModSource().convention(SourceSet.isMain(sourceSetConfiguration.getSourceSet()));
+        getIsUnitTestSource().convention(sourceSetConfiguration.getSourceSet().getName().equals(SourceSet.TEST_SOURCE_SET_NAME));
     }
 
     /**

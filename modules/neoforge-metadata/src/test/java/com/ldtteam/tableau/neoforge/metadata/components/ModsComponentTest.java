@@ -35,6 +35,7 @@ class ModsComponentTest {
         
         var neoGradleSourceSetConfiguration = mock(NeoGradleSourceSetConfigurationExtension.class);
         when(neoGradleSourceSetConfiguration.getIsModSource()).thenReturn(project.getObjects().property(Boolean.class));
+        when(neoGradleSourceSetConfiguration.getIsUnitTestSource()).thenReturn(project.getObjects().property(Boolean.class));
         when(neoGradleSourceSetConfiguration.getIncludeInLibraries()).thenReturn(project.getObjects().property(Boolean.class));
 
         var extensionContainer = mock(ExtensionContainer.class);

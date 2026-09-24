@@ -42,6 +42,7 @@ public abstract class ModsComponent extends DelegatingNamedDomainObjectContainer
             //As soon as a mod is added to the sourceset, we include the jar as a source in all runs.
             final NeoGradleSourceSetConfigurationExtension neogradleSourceSet = NeoGradleSourceSetConfigurationExtension.get(sourceSet);
             neogradleSourceSet.getIsModSource().convention(true);
+            neogradleSourceSet.getIsUnitTestSource().convention(false);
 
             //When a mod gets added, we enable the metadata generation on the sourceset
             final MetadataExtension metadata = MetadataExtension.get(sourceSet);
