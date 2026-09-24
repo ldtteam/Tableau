@@ -234,38 +234,6 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 			run.systemProperty("forge.logging.markers", "");
 			run.systemProperty("forge.logging.console.level", "info");
 
-			//Add the mod sources to the run.
-			run.getModSources().addAllLater(
-					projectExtension.getModId().map(modId -> {
-						final List<SourceSet> sourceSets = sourceSetExtension
-								.stream()
-								.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())
-								.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
-								.collect(Collectors.toList());
-
-						final Multimap<String, SourceSet> modSources = HashMultimap.create();
-						modSources.putAll(modId, sourceSets);
-
-						return modSources;
-					})
-			);
-
-			//Add the unit test sources to the run.
-			run.getUnitTestSources().addAllLater(
-					projectExtension.getModId().map(modId -> {
-						final List<SourceSet> sourceSets = sourceSetExtension
-								.stream()
-								.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsUnitTestSource().get())
-								.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
-								.collect(Collectors.toList());
-
-						final Multimap<String, SourceSet> modSources = HashMultimap.create();
-						modSources.putAll(modId, sourceSets);
-
-						return modSources;
-					})
-			);
-
 			//After evaluation, add the library configurations to the run.
 			sourceSetExtension
 					.stream()
@@ -273,6 +241,41 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 					.map(config -> sourceSetContainer.getByName(config.getName()))
 					.map(sourceSet -> getLibraryConfiguration(target, sourceSet))
 					.forEach(config -> run.getDependencies().getRuntime().add(config));
+
+
+			target.afterEvaluate((evaluatedProject) -> {
+				//Add the mod sources to the run.
+				run.getModSources().addAllLater(
+						projectExtension.getModId().map(modId -> {
+							final List<SourceSet> sourceSets = sourceSetExtension
+									.stream()
+									.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsModSource().get())
+									.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
+									.collect(Collectors.toList());
+
+							final Multimap<String, SourceSet> modSources = HashMultimap.create();
+							modSources.putAll(modId, sourceSets);
+
+							return modSources;
+						})
+				);
+
+				//Add the unit test sources to the run.
+				run.getUnitTestSources().addAllLater(
+						projectExtension.getModId().map(modId -> {
+							final List<SourceSet> sourceSets = sourceSetExtension
+									.stream()
+									.filter(sourceSet -> NeoGradleSourceSetConfigurationExtension.get(sourceSet).getIsUnitTestSource().get())
+									.map(sourceSet -> sourceSetContainer.getByName(sourceSet.getName()))
+									.collect(Collectors.toList());
+
+							final Multimap<String, SourceSet> modSources = HashMultimap.create();
+							modSources.putAll(modId, sourceSets);
+
+							return modSources;
+						})
+				);
+			});
 		});
 	}
 
