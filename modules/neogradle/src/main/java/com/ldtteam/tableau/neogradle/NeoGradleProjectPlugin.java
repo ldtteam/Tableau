@@ -282,8 +282,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 		//Add the arguments for the data gen run.
 		//By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
 		run.getArguments().addAll(
-				extension.getSplitGenerationOutputs().flatMap(split -> projectExtension.getModId().map(modId -> {
-					final File output = buildDataGenerationOutput(target, runName, split, modId);
+				projectExtension.getModId().map(modId -> {
+					final File output = buildDataGenerationOutput(target, runName, extension.getSplitGenerationOutputs().get(), modId);
 
 					List<String> dataRunArguments = new ArrayList<>();
 					dataRunArguments.add("--mod");
@@ -294,7 +294,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 					dataRunArguments.add("--existing");
 					dataRunArguments.add(target.file("src/main/resources/").getAbsolutePath());
 					return dataRunArguments;
-				}))
+				})
 		);
 
 		//Add the arguments for the additional data gen mods.
