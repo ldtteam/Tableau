@@ -290,7 +290,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 						output = target.file("src/datagen/generated/%s/%s".formatted(modId, outputDirectoryName));
 					}
 
-					target.getLogger().lifecycle("Data generation output: %s".formatted(output.getAbsolutePath()));
+					target.getLogger().error("Data generation output: %s. Split: %s".formatted(output.getAbsolutePath(), split));
                     mainSourceSet.getResources().srcDir(output.getAbsolutePath());
 
 					List<String> dataRunArguments = new ArrayList<>();
