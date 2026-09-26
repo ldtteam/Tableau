@@ -242,8 +242,6 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 					.map(sourceSet -> getLibraryConfiguration(target, sourceSet))
 					.forEach(config -> run.getDependencies().getRuntime().add(config));
 
-
-
 		});
 
 		target.afterEvaluate((evaluatedProject) -> {
@@ -292,7 +290,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 						output = target.file("src/datagen/generated/%s/%s".formatted(modId, outputDirectoryName));
 					}
 
-                    mainSourceSet.getResources().srcDir(output);
+					target.getLogger().lifecycle("Data generation output: %s".formatted(output.getAbsolutePath()));
+                    mainSourceSet.getResources().srcDir(output.getAbsolutePath());
 
 					List<String> dataRunArguments = new ArrayList<>();
 					dataRunArguments.add("--mod");
