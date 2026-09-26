@@ -30,11 +30,13 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -72,6 +74,8 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 		configureResourceProcessing(target);
 		configureAccessTransformers(target);
 		configureInterfaceInjections(target);
+
+		configureMainSourceSetDataGen(target);
 	}
 
 	/**
@@ -279,19 +283,7 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 		//By default, these are the arguments for the main mod, its output directory, and the default existing resources' directory.
 		run.getArguments().addAll(
 				extension.getSplitGenerationOutputs().flatMap(split -> projectExtension.getModId().map(modId -> {
-					File output = target.file("src/datagen/generated/%s".formatted(modId));
-
-					if (split) {
-						var outputDirectoryName = runName.toLowerCase();
-                        if (outputDirectoryName.endsWith("data")) {
-                            outputDirectoryName = outputDirectoryName.substring(0, outputDirectoryName.length() - 4);
-                        }
-
-						output = target.file("src/datagen/generated/%s/%s".formatted(modId, outputDirectoryName));
-					}
-
-					target.getLogger().error("Data generation output: %s. Split: %s".formatted(output.getAbsolutePath(), split));
-                    mainSourceSet.getResources().srcDir(output.getAbsolutePath());
+					final File output = buildDataGenerationOutput(target, runName, split, modId);
 
 					List<String> dataRunArguments = new ArrayList<>();
 					dataRunArguments.add("--mod");
@@ -322,6 +314,21 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 		);
 
 		return run;
+	}
+
+	private static @NonNull File buildDataGenerationOutput(final @NonNull Project target, final String runName, final Boolean split, final String modId) {
+		File output = target.file("src/datagen/generated/%s".formatted(modId));
+
+		if (split) {
+			var outputDirectoryName = runName.toLowerCase();
+			if (outputDirectoryName.endsWith("data")) {
+				outputDirectoryName = outputDirectoryName.substring(0, outputDirectoryName.length() - 4).toLowerCase(Locale.ROOT);
+			}
+
+			output = target.file("src/datagen/generated/%s/%s".formatted(modId, outputDirectoryName));
+		}
+
+		return output;
 	}
 
 	/**
@@ -383,5 +390,28 @@ public class NeoGradleProjectPlugin implements Plugin<Project> {
 		interfaceInjections.files(extension.getInterfaceInjections());
 
 		//TODO: Consider how and when to expose the interface injections as artifacts.
+	}
+
+	private void configureMainSourceSetDataGen(final Project target) {
+		final RunManager runManager = target.getExtensions().getByType(RunManager.class);
+		final NeoGradleExtension extension = NeoGradleExtension.get(target);
+		final ProjectExtension projectExtension = ProjectExtension.get(target);
+		final SourceSetExtension sourceSetExtension = SourceSetExtension.get(target);
+		final SourceSetContainer sourceSetContainer = target.getExtensions().getByType(SourceSetContainer.class);
+
+		target.afterEvaluate(evaluatedProject -> {
+			final String modId = projectExtension.getModId().get();
+			final boolean split = extension.getSplitGenerationOutputs().get();
+
+			sourceSetExtension.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME);
+			final SourceSet mainSourceSet = sourceSetContainer.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+
+			extension.getDataGenerationRuns().get().forEach(runName -> {
+				final File output = buildDataGenerationOutput(target, runName, split, modId);
+
+				target.getLogger().lifecycle("Data generation output: %s. Split: %s".formatted(output.getAbsolutePath(), split));
+				mainSourceSet.getResources().srcDir(output.getAbsolutePath());
+			});
+		});
 	}
 }
