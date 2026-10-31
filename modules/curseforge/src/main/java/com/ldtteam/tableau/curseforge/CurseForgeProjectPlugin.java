@@ -104,6 +104,9 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
                 artifact.addGameVersion("client");
                 artifact.addGameVersion("server");
 
+                task.getLogger().lifecycle("Configured game versions:");
+                artifact.gameVersions.forEach(v -> task.getLogger().lifecycle(" - %s".formatted(v)));
+
                 if (curse.getUsesFancyDisplayName().get()) {
                     final String displayName = curse.getArtifactName().isPresent() ?
                             curse.getArtifactName().get() :
