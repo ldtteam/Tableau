@@ -91,50 +91,53 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
             task.apiToken = project.getProviders().environmentVariable("CURSE_API_KEY");
             task.debugMode = curse.getDebug().get();
 
-            final UploadArtifact artifact = task.upload(curse.getId().get(), mainJar);
+            task.upload(curse.getId().get(), mainJar, artifact -> {
+                curse.getAdditionalMinecraftVersions().get()
+                        .forEach(artifact::addGameVersion);
+
+                artifact.releaseType = curse.getReleaseType();
+
+                artifact.addGameVersion(curse.getPublishedMinecraftVersions().map((v) -> {
+                    task.getLogger().lifecycle("Determined published minecraft version to be: " + v);
+                    return v;
+                }));
+                artifact.addGameVersion("client");
+                artifact.addGameVersion("server");
+
+                if (curse.getUsesFancyDisplayName().get()) {
+                    final String displayName = curse.getArtifactName().isPresent() ?
+                            curse.getArtifactName().get() :
+                            project.getRootProject().getName();
+
+                    artifact.displayName = "%s - %s - %s".formatted(displayName,
+                            project.getVersion(),
+                            curse.getReleaseType().get().toString().toLowerCase(Locale.ROOT));
+                }
+
+                artifact.changelog = project.getRootProject().file("changelog.md");
+                artifact.changelogType = "markdown";
+
+                sourceSets.getPublishedSourceSets().get().forEach(sourceSet -> {
+                    artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJavadocJarTaskName()));
+                    task.dependsOn(project.getTasks().named(sourceSet.getJavadocJarTaskName()));
+
+                    artifact.withAdditionalFile(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
+                    task.dependsOn(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
+
+                    if (!SourceSet.isMain(sourceSet) || mainJarIsFat(mainJar)) {
+                        artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJarTaskName()));
+                        task.dependsOn(project.getTasks().named(sourceSet.getJarTaskName()));
+                    }
+                });
+
+                curse.getRelationships().get().forEach((slug, relationship) -> {
+                    if (!Constants.VALID_RELATION_TYPES.contains(relationship)) {
+                        throw new InvalidUserDataException("Invalid relationship type: %s for project: %s".formatted(relationship, slug));
+                    }
+                    artifact.addRelation(slug, relationship);
+                });
+            });
             task.dependsOn(mainJar);
-
-            curse.getAdditionalMinecraftVersions().get()
-                    .forEach(artifact::addGameVersion);
-
-            artifact.releaseType = curse.getReleaseType();
-
-            artifact.addGameVersion(curse.getPublishedMinecraftVersions());
-            artifact.addGameVersion("client");
-            artifact.addGameVersion("server");
-
-            if (curse.getUsesFancyDisplayName().get()) {
-                final String displayName = curse.getArtifactName().isPresent() ?
-                        curse.getArtifactName().get() :
-                        project.getRootProject().getName();
-
-                artifact.displayName = "%s - %s - %s".formatted(displayName,
-                        project.getVersion(),
-                        curse.getReleaseType().get().toString().toLowerCase(Locale.ROOT));
-            }
-
-            artifact.changelog = project.getRootProject().file("changelog.md");
-            artifact.changelogType = "markdown";
-
-            sourceSets.getPublishedSourceSets().get().forEach(sourceSet -> {
-                artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJavadocJarTaskName()));
-                task.dependsOn(project.getTasks().named(sourceSet.getJavadocJarTaskName()));
-
-                artifact.withAdditionalFile(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
-                task.dependsOn(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
-
-                if (!SourceSet.isMain(sourceSet) || mainJarIsFat(mainJar)) {
-                    artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJarTaskName()));
-                    task.dependsOn(project.getTasks().named(sourceSet.getJarTaskName()));
-                }
-            });
-
-            curse.getRelationships().get().forEach((slug, relationship) -> {
-                if (!Constants.VALID_RELATION_TYPES.contains(relationship)) {
-                    throw new InvalidUserDataException("Invalid relationship type: %s for project: %s".formatted(relationship, slug));
-                }
-                artifact.addRelation(slug, relationship);
-            });
         });
 
         project.getTasks().named("publish").configure(task -> task.dependsOn(curseforge));

@@ -53,7 +53,7 @@ allprojects { Project it ->
 
     it.version = it.findProperty("version")
     if (it.version == null || it.version.toString() == "unspecified") {
-        it.version = "0.0.0-LOCAL"
+        it.version = "0.0.0-CURSE-DEBUG"
     }
     it.group = 'com.ldtteam.tableau'
 
