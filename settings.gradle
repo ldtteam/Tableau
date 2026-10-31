@@ -9,12 +9,12 @@
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
+        gradlePluginPortal()
         maven {
             url("https://ldtteam.jfrog.io/artifactory/tableau/")
             name("Tableau")
         }
         mavenLocal()
-        gradlePluginPortal()
     }
 }
 

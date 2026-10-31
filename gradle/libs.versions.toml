@@ -5,7 +5,7 @@ crowdin = "0.+"
 sonarqube = "5.+"
 shadow = "8.+"
 jetbrainsAnnotations = "+"
-curseForgeGradle = "1.1.15"
+curseForgeGradle = "1.3.33"
 nightconfig = "3.6.+"
 loom = "1.14.+"
 
