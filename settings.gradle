@@ -14,6 +14,7 @@ dependencyResolutionManagement {
             name("Tableau")
         }
         mavenLocal()
+        gradlePluginPortal()
     }
 }
 
