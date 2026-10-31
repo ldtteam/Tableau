@@ -96,16 +96,7 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
                         .forEach(artifact::addGameVersion);
 
                 artifact.releaseType = curse.getReleaseType();
-
-                artifact.addGameVersion(curse.getPublishedMinecraftVersions().map((v) -> {
-                    task.getLogger().lifecycle("Determined published minecraft version to be: " + v);
-                    return v;
-                }));
-                artifact.addGameVersion("client");
-                artifact.addGameVersion("server");
-
-                task.getLogger().lifecycle("Configured game versions:");
-                artifact.gameVersions.forEach(v -> task.getLogger().lifecycle(" - %s".formatted(v)));
+                configureGameVersions(artifact, curse);
 
                 if (curse.getUsesFancyDisplayName().get()) {
                     final String displayName = curse.getArtifactName().isPresent() ?
@@ -121,14 +112,17 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
                 artifact.changelogType = "markdown";
 
                 sourceSets.getPublishedSourceSets().get().forEach(sourceSet -> {
-                    artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJavadocJarTaskName()));
+                    final UploadArtifact javadocJar = artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJavadocJarTaskName()));
+                    configureGameVersions(javadocJar, curse);
                     task.dependsOn(project.getTasks().named(sourceSet.getJavadocJarTaskName()));
 
-                    artifact.withAdditionalFile(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
+                    final UploadArtifact sourcesJar = artifact.withAdditionalFile(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
+                    configureGameVersions(sourcesJar, curse);
                     task.dependsOn(project.getTasks().named(sourceSet.getSourcesJarTaskName()));
 
                     if (!SourceSet.isMain(sourceSet) || mainJarIsFat(mainJar)) {
-                        artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJarTaskName()));
+                        final UploadArtifact slimJar = artifact.withAdditionalFile(project.getTasks().named(sourceSet.getJarTaskName()));
+                        configureGameVersions(slimJar, curse);
                         task.dependsOn(project.getTasks().named(sourceSet.getJarTaskName()));
                     }
                 });
@@ -144,5 +138,11 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
         });
 
         project.getTasks().named("publish").configure(task -> task.dependsOn(curseforge));
+    }
+
+    private static void configureGameVersions(final UploadArtifact artifact, final CurseForgeExtension curse) {
+        artifact.addGameVersion(curse.getPublishedMinecraftVersions());
+        artifact.addGameVersion("client");
+        artifact.addGameVersion("server");
     }
 }
