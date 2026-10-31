@@ -141,8 +141,8 @@ public class CurseForgeProjectPlugin implements Plugin<Project> {
     }
 
     private static void configureGameVersions(final UploadArtifact artifact, final CurseForgeExtension curse) {
-        artifact.addGameVersion(curse.getPublishedMinecraftVersions());
-        artifact.addGameVersion("client");
-        artifact.addGameVersion("server");
+        artifact.gameVersions.add(curse.getPublishedMinecraftVersions().get());
+        artifact.gameVersions.add("client");
+        artifact.gameVersions.add("server");
     }
 }
